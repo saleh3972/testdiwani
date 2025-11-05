@@ -2,7 +2,7 @@
 <html dir="rtl" lang="ar">
 <!--
     ========================================
-    🎯 الديوان -نظام  محاسبي v20.0
+    🎯 الديوان - النظام المحاسبي v20.0
     ========================================
     
     📋 التحسينات في هذا الإصدار:
@@ -3165,7 +3165,6 @@ textarea.input-success:focus {
                 <th class="sortable" data-column="total">الإجمالي</th>
                 <th class="sortable" data-column="paidAmount">المدفوع</th>
                 <th class="sortable" data-column="remainingAmount">المتبقي</th>
-                <th class="sortable" data-column="paymentMethod">طريقة الدفع</th>
                 <th>المرفق</th> <th>الإجراءات</th>
             </tr>
         </thead>
@@ -3233,14 +3232,6 @@ textarea.input-success:focus {
                 <label for="applySaleTax" style="cursor: pointer;">تطبيق الضريبة (15%)</label>
             </span>
             <span id="saleTax">0.00</span>
-        </div>
-    <div>
-        <span>الخصم:</span>
-        <input type="number" id="saleDiscount" placeholder="0.00" value="0" min="0" oninput="updateSaleTotals()" style="width: 120px; text-align: left; direction: ltr;">
-    </div>
-    <div>
-            <span>المبلغ المدفوع:</span>
-            <input type="number" id="salePaidAmount" placeholder="0.00" oninput="updateSaleTotals()">
         </div>
          <div>
             <span>المبلغ المدفوع:</span>
@@ -4120,17 +4111,15 @@ textarea.input-success:focus {
             </div>
         </div>
         
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9em;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9em;">
             <div style="border: 1px solid #2c5aa0; padding: 8px; border-radius: 8px;">
                 <strong>عنوان العميل:</strong> <span id="printCustomerAddress">-----</span>
             </div>
             <div style="border: 1px solid #2c5aa0; padding: 8px; border-radius: 8px;">
                 <strong>ملاحظات:</strong> <span id="printSaleNotes">-----</span>
             </div>
-            <div style="border: 1px solid #2c5aa0; padding: 8px; border-radius: 8px; background: #e3f2fd;">
-                <strong>طريقة الدفع:</strong> <span id="printSalePaymentMethod" style="font-weight: bold;">-----</span>
-            </div>
         </div>
+        
         <!-- جدول الأصناف -->
     <table class="invoice-items-table" style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10px;">
             <thead>
@@ -4148,7 +4137,9 @@ textarea.input-success:focus {
                 <!-- سيتم ملؤها ديناميكياً -->
             </tbody>
         </table>
-      <div style="margin-top: 15px; width: 280px; float: left;">
+        
+        <!-- المجاميع أسفل يسار الصفحة -->
+            <div style="margin-top: 15px; width: 280px; float: left;">
             <div style="border: 1px solid #2c5aa0; padding: 8px; margin-bottom: 5px; display: grid; grid-template-columns: 1fr auto; gap: 10px; background: #f8f9fa; font-size: 0.9em;">
                 <strong>المجموع الفرعي:</strong>
                 <span id="printSaleSubtotal">0.00</span>
@@ -4156,11 +4147,6 @@ textarea.input-success:focus {
             <div id="printSaleTaxRow" style="border: 1px solid #2c5aa0; padding: 8px; margin-bottom: 5px; display: grid; grid-template-columns: 1fr auto; gap: 10px; font-size: 0.9em;">
                 <strong>الضريبة (15%):</strong>
                 <span id="printSaleTax">0.00</span>
-            </div>
-
-            <div id="printSaleDiscountRow" style="border: 1px solid #2c5aa0; padding: 8px; margin-bottom: 5px; display: grid; grid-template-columns: 1fr auto; gap: 10px; font-size: 0.9em; background: #fff3cd;">
-                <strong>الخصم:</strong>
-                <span id="printSaleDiscount" style="font-weight: bold;">0.00</span>
             </div>
             <div style="border: 2px solid #2c5aa0; padding: 10px; background: #e3f2fd; display: grid; grid-template-columns: 1fr auto; gap: 10px; font-weight: bold; font-size: 1em; color: #2c5aa0;">
                 <strong>الإجمالي النهائي:</strong>
@@ -7820,166 +7806,120 @@ function loadCustomersToSelect() {
             updateSaleTotals();
         }
         
-function updateSaleTotals() {
-    const subtotal = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
-    const applyTax = document.getElementById('applySaleTax').checked;
-    const tax = applyTax ? subtotal * 0.15 : 0;
-    
-    // حساب الخصم
-    const discount = parseFloat(document.getElementById('saleDiscount').value) || 0;
-    
-    // حساب الإجمالي النهائي (المبلغ المستحق على العميل)
-    const total = (subtotal + tax) - discount;
-    
-    const paidAmount = parseFloat(document.getElementById('salePaidAmount').value) || 0;
-    
-    // المبلغ المتبقي = الإجمالي النهائي - المدفوع
-    const remainingAmount = total - paidAmount;
+        function updateSaleTotals() {
+            const subtotal = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
+            const applyTax = document.getElementById('applySaleTax').checked;
+            const tax = applyTax ? subtotal * 0.15 : 0;
+            const total = subtotal + tax;
+            const paidAmount = parseFloat(document.getElementById('salePaidAmount').value) || 0;
+            const remainingAmount = total - paidAmount;
 
-    document.getElementById('saleSubtotal').textContent = subtotal.toFixed(2);
-    document.getElementById('saleTax').textContent = tax.toFixed(2);
-    document.getElementById('saleTotal').textContent = total.toFixed(2);
-    
-    const remainingEl = document.getElementById('saleRemainingAmount');
-    
-    // --- ⬇️  بداية التعديل ⬇️ ---
-    
-    // 1. عرض المبلغ المتبقي الحقيقي (قد يكون سالباً)
-    remainingEl.textContent = remainingAmount.toFixed(2); 
-    
-    // 2. تطبيق منطق الألوان الثلاثي (مدين، دائن، صفر)
-    // نستخدم هامش صغير (0.01) لتجنب مشاكل الفاصلة العائمة
-    if (remainingAmount > 0.01) {
-        remainingEl.className = 'remaining-unpaid'; // عليه فلوس (أحمر)
-    } else if (remainingAmount < -0.01) {
-        remainingEl.className = 'remaining-credit'; // له فلوس (أخضر)
-    } else {
-        remainingEl.className = 'remaining-paid'; // الرصيد صفر (أسود)
-    }
-    
-    // --- ⬆️  نهاية التعديل ⬆️ ---
-}
-   function newSale() {
-    currentSaleItems = [];
-    editingSaleId = null;
-    document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('saleCustomer').value = '';
-    document.getElementById('saleCustomerName').value = '';
-    document.getElementById('saleCustomerCode').value = '';
-    document.getElementById('saleCustomerPhone').value = '';
-    document.getElementById('saleCustomerAddress').value = '';
-    document.getElementById('saleNotes').value = '';
-    document.getElementById('salePaidAmount').value = '';
-    document.getElementById('saleDiscount').value = '0'; // مسح الخصم
-    
-    // --- ⬇️  أضف هذا السطر ⬇️ ---
-    document.getElementById('salePaymentMethod').value = 'cash'; // إعادة تعيين طريقة الدفع
-    
-    generateSaleCode();
-    document.getElementById('saveSaleBtn').textContent = '💾 حفظ الفاتورة';
-    renderSaleItems();
-    updateSaleTotals();
-    renderSalesList();
-}
-       async function saveSale() {
-    const date = document.getElementById('saleDate').value;
-    const customerId = parseInt(document.getElementById('saleCustomer').value);
-    const notes = document.getElementById('saleNotes').value;
-    const customerAddress = document.getElementById('saleCustomerAddress').value;
-    const paidAmount = parseFloat(document.getElementById('salePaidAmount').value) || 0;
-    const taxApplied = document.getElementById('applySaleTax').checked;
-    
-    // --- ⬇️  1. قراءة الخصم (هذا السطر جديد) ⬇️ ---
-    const discount = parseFloat(document.getElementById('saleDiscount').value) || 0;
-
-    if (!date || !customerId || currentSaleItems.length === 0) {
-        showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع البيانات المطلوبة وإضافة أصناف للفاتورة', 'warning');
-        return;
-    }
-    
-    const subtotal = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
-    const tax = taxApplied ? subtotal * 0.15 : 0;
-    
-    // --- ⬇️  2. تعديل الحسابات لتشمل الخصم ⬇️ ---
-    const total = (subtotal + tax) - discount; // <-- تطبيق الخصم
-    const remainingAmount = total - paidAmount; // <-- حساب المتبقي الصحيح
-
-    if (editingSaleId) {
-        const saleIndex = sales.findIndex(s => s.id === editingSaleId);
-        if (saleIndex > -1) {
-            const originalSale = sales[saleIndex];
+            document.getElementById('saleSubtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('saleTax').textContent = tax.toFixed(2);
+            document.getElementById('saleTotal').textContent = total.toFixed(2);
             
-            originalSale.items.forEach(si => {
-                const item = items.find(i => i.id === si.id);
-                if (item) item.stock += si.quantity;
-            });
-
-            const updatedSale = {
-                ...originalSale,
-                date,
-                customerId,
-                notes,
-                customerAddress,
-                paidAmount,
-                items: [...currentSaleItems],
-                subtotal,
-                tax,
-                discount, // <-- حفظ الخصم
-                total, // <-- حفظ الإجمالي الصحيح
-                remainingAmount, // <-- حفظ المتبقي الصحيح
-                taxApplied
-            };
-            
-            sales[saleIndex] = updatedSale;
-            
-            showNotification('✅ تم التحديث', `تم تحديث الفاتورة رقم SAL${originalSale.number.toString().padStart(3, '0')} بنجاح!`, 'success');
+            const remainingEl = document.getElementById('saleRemainingAmount');
+            remainingEl.textContent = remainingAmount.toFixed(2);
+            remainingEl.className = remainingAmount <= 0 ? 'remaining-paid' : 'remaining-unpaid';
         }
-    } else {
-        const newSaleData = { 
-            id: Date.now(), 
-            number: currentSaleNumber, 
-            date, 
-            customerId, 
-            notes, 
-            customerAddress, 
-            paidAmount, 
-            items: [...currentSaleItems], 
-            subtotal, 
-            tax, 
-            discount, // <-- حفظ الخصم
-            total, // <-- حفظ الإجمالي الصحيح
-            remainingAmount, // <-- حفظ المتبقي الصحيح
-            taxApplied 
-        };
-        sales.push(newSaleData);
-        currentSaleNumber++;
-        showNotification('✅ تم الحفظ', `تم حفظ الفاتورة رقم SAL${newSaleData.number.toString().padStart(3, '0')} بنجاح!`, 'success');
-    }
-    
-    const success1 = await saveToFirebase('sales', sales);
-    
-    currentSaleItems.forEach(si => {
-        const item = items.find(i => i.id === si.id);
-        if (item) item.stock -= si.quantity;
-    });
-    const success2 = await saveToFirebase('items', items);
-    
-    if (success1 && success2) {
-        newSale(); // <-- دالة newSale التي عدلناها سابقاً ستقوم بتنظيف الحقول
-        updateDashboard();
-        renderItems();
-    } else {
-        showNotification('❌ خطأ', 'حدث خطأ في حفظ البيانات', 'error');
-    }
-}
-function renderSalesList() {
+        
+        function newSale() {
+            currentSaleItems = [];
+            editingSaleId = null;
+            document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('saleCustomer').value = '';
+            document.getElementById('saleCustomerName').value = '';
+            document.getElementById('saleCustomerCode').value = '';
+            document.getElementById('saleCustomerPhone').value = '';
+            document.getElementById('saleCustomerAddress').value = '';
+            document.getElementById('saleNotes').value = '';
+            document.getElementById('salePaidAmount').value = '';
+            generateSaleCode();
+            document.getElementById('saveSaleBtn').textContent = '💾 حفظ الفاتورة';
+            renderSaleItems();
+            updateSaleTotals();
+            renderSalesList();
+        }
+
+        async function saveSale() {
+            const date = document.getElementById('saleDate').value;
+            const customerId = parseInt(document.getElementById('saleCustomer').value);
+            const notes = document.getElementById('saleNotes').value;
+            const customerAddress = document.getElementById('saleCustomerAddress').value;
+            const paidAmount = parseFloat(document.getElementById('salePaidAmount').value) || 0;
+            const taxApplied = document.getElementById('applySaleTax').checked;
+
+            if (!date || !customerId || currentSaleItems.length === 0) {
+                showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع البيانات المطلوبة وإضافة أصناف للفاتورة', 'warning');
+                return;
+            }
+            
+            const subtotal = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
+            const tax = taxApplied ? subtotal * 0.15 : 0;
+            const total = subtotal + tax;
+            const remainingAmount = total - paidAmount;
+
+            if (editingSaleId) {
+                const saleIndex = sales.findIndex(s => s.id === editingSaleId);
+                if (saleIndex > -1) {
+                    const originalSale = sales[saleIndex];
+                    
+                    originalSale.items.forEach(si => {
+                        const item = items.find(i => i.id === si.id);
+                        if (item) item.stock += si.quantity;
+                    });
+
+                    const updatedSale = {
+                        ...originalSale,
+                        date,
+                        customerId,
+                        notes,
+                        customerAddress,
+                        paidAmount,
+                        items: [...currentSaleItems],
+                        subtotal,
+                        tax,
+                        total,
+                        remainingAmount,
+                        taxApplied
+                    };
+                    
+                    sales[saleIndex] = updatedSale;
+                    
+                    showNotification('✅ تم التحديث', `تم تحديث الفاتورة رقم SAL${originalSale.number.toString().padStart(3, '0')} بنجاح!`, 'success');
+                }
+            } else {
+                const newSaleData = { id: Date.now(), number: currentSaleNumber, date, customerId, notes, customerAddress, paidAmount, items: [...currentSaleItems], subtotal, tax, total, remainingAmount, taxApplied };
+                sales.push(newSaleData);
+                currentSaleNumber++;
+                showNotification('✅ تم الحفظ', `تم حفظ الفاتورة رقم SAL${newSaleData.number.toString().padStart(3, '0')} بنجاح!`, 'success');
+            }
+            
+            const success1 = await saveToFirebase('sales', sales);
+            
+            currentSaleItems.forEach(si => {
+                const item = items.find(i => i.id === si.id);
+                if (item) item.stock -= si.quantity;
+            });
+            const success2 = await saveToFirebase('items', items);
+            
+            if (success1 && success2) {
+                newSale();
+                updateDashboard();
+                renderItems();
+            } else {
+                showNotification('❌ خطأ', 'حدث خطأ في حفظ البيانات', 'error');
+            }
+        }
+    function renderSalesList() {
     const tbody = document.getElementById('salesList');
     tbody.innerHTML = '';
     
-    // ... (كل كود الفلترة والترتيب يبقى كما هو) ...
+    // تطبيق الفلترة
     let filteredSales = [...sales];
     const searchText = document.getElementById('searchSales')?.value || '';
     
+    // البحث النصي
     if (searchText) {
         filteredSales = filteredSales.filter(sale => {
             const customer = customers.find(c => c.id === sale.customerId);
@@ -7989,6 +7929,7 @@ function renderSalesList() {
         });
     }
     
+    // فلترة حسب التاريخ
     const dateFrom = document.getElementById('salesDateFrom')?.value;
     const dateTo = document.getElementById('salesDateTo')?.value;
     if (dateFrom) {
@@ -7998,6 +7939,7 @@ function renderSalesList() {
         filteredSales = filteredSales.filter(sale => new Date(sale.date) <= new Date(dateTo));
     }
     
+    // فلترة حسب المبلغ
     const amountFrom = document.getElementById('salesAmountFrom')?.value;
     const amountTo = document.getElementById('salesAmountTo')?.value;
     if (amountFrom) {
@@ -8007,14 +7949,14 @@ function renderSalesList() {
         filteredSales = filteredSales.filter(sale => sale.total <= parseFloat(amountTo));
     }
     
+    // تطبيق الترتيب
     const sortState = FilterSortHelper.currentSort['sales'];
     if (sortState) {
         filteredSales = FilterSortHelper.sortData(filteredSales, sortState.column, sortState.direction);
     }
     
     if (filteredSales.length === 0) {
-        // --- ⬇️  تم تعديل الرقم هنا من 8 إلى 9 ⬇️ ---
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">لا توجد نتائج</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد نتائج</td></tr>';
         return;
     }
     
@@ -8022,11 +7964,15 @@ function renderSalesList() {
         const customer = customers.find(c => c.id === sale.customerId);
         const totalQty = sale.items.reduce((sum, item) => sum + item.quantity, 0);
         
-        // --- ⬇️  استخدام قيمة المتبقي المحفوظة ⬇️ ---
-        const remaining = (sale.remainingAmount !== undefined) ? sale.remainingAmount : 0;
-        
+        // --- 💡 بداية التعديل: منطق الألوان الجديد ---
+        const remaining = sale.remainingAmount ?? (sale.total - (sale.paidAmount || 0));
+        // تحديد الكلاس بناءً على قيمة المتبقي
+        // remaining-unpaid: أحمر (عليه فلوس)
+        // remaining-credit: أخضر (له فلوس)
+        // remaining-paid: أسود (الرصيد صفر)
         const remainingClass = remaining > 0.01 ? 'remaining-unpaid' : (remaining < -0.01 ? 'remaining-credit' : 'remaining-paid');
         const remainingText = remaining.toFixed(2);
+        // --- 💡 نهاية التعديل ---
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -8037,9 +7983,6 @@ function renderSalesList() {
             <td data-label="الإجمالي">${sale.total.toFixed(2)}</td>
             <td data-label="المدفوع">${(sale.paidAmount || 0).toFixed(2)}</td>
             <td data-label="المتبقي" class="${remainingClass}">${remainingText}</td>
-            
-            <td data-label="طريقة الدفع">${getSalePaymentMethodName(sale.paymentMethod)}</td>
-
             <td data-label="الإجراءات">
                 <div class="action-buttons">
                     <button class="btn-secondary" onclick="printSaleInvoice(${sale.id})">🖨️ طباعة</button>
@@ -8053,6 +7996,7 @@ function renderSalesList() {
         tbody.appendChild(tr);
     });
 }
+
         // دوال الفلترة للمبيعات
         function applySalesFilters() {
             renderSalesList();
@@ -8075,53 +8019,114 @@ function renderSalesList() {
     // هذه الدالة لم تعد مستخدمة - تم دمجها في renderSalesList
     renderSalesList();
 }
-function printSaleInvoice(saleId) {
-    const sale = sales.find(s => s.id === saleId);
-    if (!sale) return;
-    
-    const customer = customers.find(c => c.id === sale.customerId);
-    
-    // ... (كل كود تحميل الشعار وبيانات العميل والأصناف يبقى كما هو) ...
-    // ...
+
+        function printSaleInvoice(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
             
-    // المجاميع
-    document.getElementById('printSaleSubtotal').textContent = (sale.subtotal || 0).toFixed(2);
-    
-    const taxRow = document.getElementById('printSaleTaxRow');
-    if (sale.taxApplied ?? true) { // الافتراضي هو true إذا لم تكن القيمة موجودة
-        document.getElementById('printSaleTax').textContent = (sale.tax || 0).toFixed(2);
-        if (taxRow) taxRow.style.display = 'grid';
-    } else {
-        if (taxRow) taxRow.style.display = 'none';
-    }
-    
-    // --- ⬇️  أضف هذا الكود ⬇️ ---
-    const discountRow = document.getElementById('printSaleDiscountRow');
-    const discountAmount = sale.discount || 0;
-    if (discountRow) {
-        if (discountAmount > 0) {
-            document.getElementById('printSaleDiscount').textContent = `-${discountAmount.toFixed(2)}`;
-            discountRow.style.display = 'grid';
-        } else {
-            discountRow.style.display = 'none';
+            const customer = customers.find(c => c.id === sale.customerId);
+            
+            // تحميل شعار النشاط واسمه
+            const currentActivity = JSON.parse(sessionStorage.getItem('currentActivity'));
+            if (currentActivity) {
+                document.getElementById('printSaleActivityName').textContent = currentActivity.name;
+                
+                // تحميل الشعار من localStorage
+                const storageKey = `activity_${currentActivity.id}_data`;
+                const activityData = JSON.parse(localStorage.getItem(storageKey));
+                const logoImg = document.getElementById('printSaleActivityLogo');
+                
+                if (activityData && activityData.logo) {
+                    logoImg.src = activityData.logo;
+                    logoImg.style.display = 'block';
+                } else {
+                    logoImg.style.display = 'none';
+                }
+            }
+            
+            // التاريخ والوقت
+            document.getElementById('printSaleDate').textContent = sale.date;
+            const now = new Date();
+            document.getElementById('printSaleTime').textContent = now.toLocaleTimeString('ar-SA', {hour: '2-digit', minute: '2-digit'});
+            document.getElementById('printSaleNumber').textContent = 'SAL' + sale.number.toString().padStart(3, '0');
+            
+            // بيانات العميل
+            document.getElementById('printCustomerName').textContent = customer ? customer.name : '-----';
+            document.getElementById('printCustomerCode').textContent = customer ? customer.code : '-----';
+            document.getElementById('printCustomerPhone').textContent = customer ? customer.phone : '-----';
+            document.getElementById('printCustomerAddress').textContent = sale.customerAddress || '-----';
+            
+            // ملاحظات
+            const notesElement = document.getElementById('printSaleNotes');
+            if (notesElement) {
+                notesElement.textContent = sale.notes || '-----';
+            }
+            
+            // جدول الأصناف - دمج جميع الأصناف في صف واحد
+            const itemsBody = document.getElementById('printSaleItems');
+            itemsBody.innerHTML = '';
+            
+            // إنشاء صف واحد يحتوي على جميع الأصناف
+            const tr = document.createElement('tr');
+            
+            // عمود التسلسل
+            let numbersHtml = '';
+            let codesHtml = '';
+            let namesHtml = '';
+            let quantitiesHtml = '';
+            let unitsHtml = '';
+            let pricesHtml = '';
+            let totalsHtml = '';
+            
+            sale.items.forEach((item, index) => {
+                const itemData = items.find(i => i.id === item.id);
+                const itemCode = itemData ? itemData.code : '---';
+                
+                const separator = index < sale.items.length - 1 ? '<hr style="margin: 4px 0; border: none; border-top: 1px solid #ccc;">' : '';
+                
+                numbersHtml += `${index + 1}${separator}`;
+                codesHtml += `${itemCode}${separator}`;
+                namesHtml += `${item.name}${separator}`;
+                quantitiesHtml += `${item.quantity}${separator}`;
+                unitsHtml += `${item.unit || 'قطعة'}${separator}`;
+                pricesHtml += `${item.price.toFixed(2)}${separator}`;
+                totalsHtml += `${item.total.toFixed(2)}${separator}`;
+            });
+            
+            tr.innerHTML = `
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: center; vertical-align: top; border-radius: 6px;">${numbersHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: center; vertical-align: top; border-radius: 6px;">${codesHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: right; vertical-align: top; border-radius: 6px;">${namesHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: center; vertical-align: top; border-radius: 6px;">${quantitiesHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: center; vertical-align: top; border-radius: 6px;">${unitsHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: center; vertical-align: top; border-radius: 6px;">${pricesHtml}</td>
+                <td style="border: 1px solid #2c5aa0; padding: 8px; text-align: left; vertical-align: top; direction: ltr; font-weight: bold; border-radius: 6px;">${totalsHtml}</td>
+            `;
+            itemsBody.appendChild(tr);
+            
+            // المجاميع
+            document.getElementById('printSaleSubtotal').textContent = (sale.subtotal || 0).toFixed(2);
+            
+            const taxRow = document.getElementById('printSaleTaxRow');
+            if (sale.includeTax) {
+                document.getElementById('printSaleTax').textContent = (sale.tax || 0).toFixed(2);
+                if (taxRow) taxRow.style.display = 'grid';
+            } else {
+                if (taxRow) taxRow.style.display = 'none';
+            }
+            
+            document.getElementById('printSaleTotal').textContent = (sale.total || 0).toFixed(2);
+            document.getElementById('printSalePaid').textContent = (sale.paidAmount || 0).toFixed(2);
+            const remaining = (sale.remainingAmount !== undefined) ? sale.remainingAmount : ((sale.total || 0) - (sale.paidAmount || 0));
+            document.getElementById('printSaleRemaining').textContent = remaining.toFixed(2);
+            
+            const printSection = document.getElementById('saleInvoicePrint');
+            printSection.style.display = 'block';
+            setTimeout(() => {
+                window.print();
+                printSection.style.display = 'none';
+            }, 100);
         }
-    }
-    // --- ⬆️  انتهت الإضافة ⬆️ ---
-    
-    document.getElementById('printSaleTotal').textContent = (sale.total || 0).toFixed(2);
-    document.getElementById('printSalePaid').textContent = (sale.paidAmount || 0).toFixed(2);
-    
-    // استخدم قيمة المتبقي المحفوظة مباشرة لأنها الآن صحيحة
-    const remaining = (sale.remainingAmount !== undefined) ? sale.remainingAmount : 0;
-    document.getElementById('printSaleRemaining').textContent = remaining.toFixed(2);
-    
-    const printSection = document.getElementById('saleInvoicePrint');
-    printSection.style.display = 'block';
-    setTimeout(() => {
-        window.print();
-        printSection.style.display = 'none';
-    }, 100);
-}
         
         async function deleteSale(id) {
             const confirmed = await showConfirmDialog({
@@ -8157,35 +8162,32 @@ function printSaleInvoice(saleId) {
                 }
             }
         }
-     function editSale(id) {
-    const sale = sales.find(s => s.id === id);
-    if (!sale) return;
-    
-    editingSaleId = id;
-    currentSaleItems = JSON.parse(JSON.stringify(sale.items));
-    
-    document.getElementById('saleDate').value = sale.date;
-    document.getElementById('saleCustomer').value = sale.customerId;
-    
-    // تحديث بيانات العميل
-    updateCustomerFields();
-    
-    document.getElementById('saleCustomerAddress').value = sale.customerAddress || '';
-    document.getElementById('saleNotes').value = sale.notes;
-    document.getElementById('salePaidAmount').value = sale.paidAmount || 0;
-    document.getElementById('saleDiscount').value = sale.discount || 0;
-    
-    // --- ⬇️  أضف هذا السطر ⬇️ ---
-    document.getElementById('salePaymentMethod').value = sale.paymentMethod || 'cash';
+        
+        function editSale(id) {
+            const sale = sales.find(s => s.id === id);
+            if (!sale) return;
+            
+            editingSaleId = id;
+            currentSaleItems = JSON.parse(JSON.stringify(sale.items));
+            
+            document.getElementById('saleDate').value = sale.date;
+            document.getElementById('saleCustomer').value = sale.customerId;
+            
+            // تحديث بيانات العميل
+            updateCustomerFields();
+            
+            document.getElementById('saleCustomerAddress').value = sale.customerAddress || '';
+            document.getElementById('saleNotes').value = sale.notes;
+            document.getElementById('salePaidAmount').value = sale.paidAmount || 0;
+            document.getElementById('saleCode').value = `تعديل SAL${sale.number.toString().padStart(3, '0')}`;
+            document.getElementById('saveSaleBtn').textContent = '💾 تحديث الفاتورة';
+            
+            document.getElementById('applySaleTax').checked = sale.taxApplied ?? true;
+            
+            renderSaleItems();
+            updateSaleTotals();
+        }
 
-    document.getElementById('saleCode').value = `تعديل SAL${sale.number.toString().padStart(3, '0')}`;
-    document.getElementById('saveSaleBtn').textContent = '💾 تحديث الفاتورة';
-    
-    document.getElementById('applySaleTax').checked = sale.taxApplied ?? true;
-    
-    renderSaleItems();
-    updateSaleTotals();
-}
         // ===== Returns Functions =====
         function showReturnTab(type) {
             document.getElementById('salesReturnContent').classList.remove('active');
@@ -8267,101 +8269,90 @@ function printSaleInvoice(saleId) {
             document.getElementById('salesReturnTotal').textContent = total.toFixed(2);
         }
 
-async function saveSale() {
-    const date = document.getElementById('saleDate').value;
-    const customerId = parseInt(document.getElementById('saleCustomer').value);
-    const notes = document.getElementById('saleNotes').value;
-    const customerAddress = document.getElementById('saleCustomerAddress').value;
-    const paidAmount = parseFloat(document.getElementById('salePaidAmount').value) || 0;
-    const taxApplied = document.getElementById('applySaleTax').checked;
-    
-    // --- 1. قراءة طريقة الدفع (جديد) ---
-    const paymentMethod = document.getElementById('salePaymentMethod').value;
-    // --- 2. قراءة الخصم ---
-    const discount = parseFloat(document.getElementById('saleDiscount').value) || 0;
-
-    if (!date || !customerId || currentSaleItems.length === 0) {
-        showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع البيانات المطلوبة وإضافة أصناف للفاتورة', 'warning');
-        return;
-    }
-    
-    const subtotal = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
-    const tax = taxApplied ? subtotal * 0.15 : 0;
-    
-    // --- 3. تعديل الحسابات لتشمل الخصم ---
-    const total = (subtotal + tax) - discount; // <-- تطبيق الخصم
-    const remainingAmount = total - paidAmount; // <-- حساب المتبقي الصحيح
-
-    if (editingSaleId) {
-        const saleIndex = sales.findIndex(s => s.id === editingSaleId);
-        if (saleIndex > -1) {
-            const originalSale = sales[saleIndex];
+        async function saveSaleReturn() {
+            if (!activeSaleReturn) {
+                showNotification('⚠️ لم يتم البحث', 'الرجاء البحث عن فاتورة أولاً', 'warning');
+                return;
+            }
             
-            originalSale.items.forEach(si => {
-                const item = items.find(i => i.id === si.id);
-                if (item) item.stock += si.quantity;
+            const returnedItems = [];
+            let totalReturnValue = 0;
+            document.querySelectorAll('#salesReturnItemsList tr').forEach(tr => {
+                const qty = parseInt(tr.querySelector('input').value) || 0;
+                if (qty > 0) {
+                    const originalItem = activeSaleReturn.items.find(i => i.id == tr.dataset.itemId);
+                    returnedItems.push({
+                        id: originalItem.id,
+                        name: originalItem.name,
+                        price: originalItem.price,
+                        quantity: qty
+                    });
+                    totalReturnValue += originalItem.price * qty;
+                }
             });
 
-            const updatedSale = {
-                ...originalSale,
-                date,
-                customerId,
-                notes,
-                customerAddress,
-                paidAmount,
-                paymentMethod: paymentMethod, // <-- حفظ طريقة الدفع
-                items: [...currentSaleItems],
-                subtotal,
-                tax,
-                discount, // <-- حفظ الخصم
-                total, // <-- حفظ الإجمالي الصحيح
-                remainingAmount, // <-- حفظ المتبقي الصحيح
-                taxApplied
+            if (returnedItems.length === 0) {
+                showNotification('⚠️ لا يوجد أصناف', 'لم يتم تحديد أي كميات للإرجاع', 'warning');
+                return;
+            }
+
+            returnedItems.forEach(returnedItem => {
+                const itemInStock = items.find(i => i.id === returnedItem.id);
+                if (itemInStock) {
+                    itemInStock.stock += returnedItem.quantity;
+                }
+            });
+
+            const newReturn = {
+                id: Date.now(),
+                number: currentSaleReturnNumber,
+                date: new Date().toISOString().split('T')[0],
+                originalInvoiceId: activeSaleReturn.id,
+                originalInvoiceNumber: activeSaleReturn.number,
+                customerId: activeSaleReturn.customerId,
+                items: returnedItems,
+                total: totalReturnValue
             };
+
+
+// --- 💡 إضافة جديدة: تحديث الفاتورة الأصلية ---
+            // 1. ابحث عن الفاتورة الأصلية في مصفوفة المبيعات
+            const originalSaleIndex = sales.findIndex(s => s.id === activeSaleReturn.id);
             
-            sales[saleIndex] = updatedSale;
+            if (originalSaleIndex > -1) {
+                // 2. قم بتحديث قيم الفاتورة الأصلية
+                const originalSale = sales[originalSaleIndex];
+                
+                // خصم قيمة المرتجع من الإجمالي والمتبقي
+                originalSale.total = roundCurrency((originalSale.total || 0) - totalReturnValue);
+                originalSale.remainingAmount = roundCurrency((originalSale.remainingAmount || 0) - totalReturnValue);
+                
+                // (اختياري) يمكنك إضافة ملاحظة للفاتورة الأصلية
+                originalSale.notes = (originalSale.notes || '') + ` [مرتجع بقيمة: ${totalReturnValue.toFixed(2)}]`;
+                
+                debugLog('تم تحديث الفاتورة الأصلية:', sales[originalSaleIndex]);
+            }
+            // --- 💡 نهاية الإضافة ---
+
+            // السطر 7930 يبدأ من هنا
+         salesReturns.push(newReturn);
+            currentSaleReturnNumber++;
             
-            showNotification('✅ تم التحديث', `تم تحديث الفاتورة رقم SAL${originalSale.number.toString().padStart(3, '0')} بنجاح!`, 'success');
+            const success1 = await saveToFirebase('salesReturns', salesReturns);
+            const success2 = await saveToFirebase('items', items);
+            const success3 = await saveToFirebase('sales', sales); // <-- إضافة جديدة: لحفظ التعديل على المبيعات
+            
+            if (success1 && success2 && success3) { // <-- تعديل الشرط: التأكد من حفظ كل شيء
+                showNotification('✅ تم الحفظ', `تم حفظ مرتجع المبيعات رقم SR${newReturn.number.toString().padStart(3, '0')} بنجاح`, 'success');
+                newSaleReturn();
+                renderSalesReturns();
+                updateDashboard();
+                renderItems();
+                renderSalesList(); // <-- إضافة جديدة: لتحديث قائمة المبيعات وإظهار الرصيد الجديد
+            } else {
+                showNotification('❌ خطأ', 'حدث خطأ في حفظ البيانات', 'error');
+            }
         }
-    } else {
-        const newSaleData = { 
-            id: Date.now(), 
-            number: currentSaleNumber, 
-            date, 
-            customerId, 
-            notes, 
-            customerAddress, 
-            paidAmount, 
-            paymentMethod: paymentMethod, // <-- حفظ طريقة الدفع
-            items: [...currentSaleItems], 
-            subtotal, 
-            tax, 
-            discount, // <-- حفظ الخصم
-            total, // <-- حفظ الإجمالي الصحيح
-            remainingAmount, // <-- حفظ المتبقي الصحيح
-            taxApplied 
-        };
-        sales.push(newSaleData);
-        currentSaleNumber++;
-        showNotification('✅ تم الحفظ', `تم حفظ الفاتورة رقم SAL${newSaleData.number.toString().padStart(3, '0')} بنجاح!`, 'success');
-    }
-    
-    const success1 = await saveToFirebase('sales', sales);
-    
-    currentSaleItems.forEach(si => {
-        const item = items.find(i => i.id === si.id);
-        if (item) item.stock -= si.quantity;
-    });
-    const success2 = await saveToFirebase('items', items);
-    
-    if (success1 && success2) {
-        newSale(); // <-- دالة newSale ستقوم بتنظيف الحقول
-        updateDashboard();
-        renderItems();
-    } else {
-        showNotification('❌ خطأ', 'حدث خطأ في حفظ البيانات', 'error');
-    }
-}
 
        function renderSalesReturns() {
     const tbody = document.getElementById('salesReturnsList');
@@ -8680,25 +8671,6 @@ function renderPurchaseReturns() {
             btn.textContent = '💾 تحديث المصروف';
             btn.onclick = () => updateExpense(id);
         }
-
-function getPaymentMethodName(method) { return { 'cash': 'نقدي', 'bank': 'تحويل بنكي', 'check': 'شيك', 'card': 'بطاقة ائتمان' }[method] || method; }
-
-// ⬇️  الصق الدالة الجديدة هنا ⬇️
-
-
-// دالة لترجمة رمز طريقة الدفع إلى نص عربي
-function getSalePaymentMethodName(method) {
-    const names = {
-        'cash': 'نقداً',
-        'bank': 'شبكة/بنك',
-        'credit': 'آجل'
-    };
-    return names[method] || method || 'نقداً'; // الافتراضي "نقداً"
-}
-// ⬆️  نهاية الدالة الجديدة ⬆️
-
-function editExpense(id) {
-    // ... (بقية الكود)
 
         async function updateExpense(id) {
             const date = document.getElementById('expenseDate').value, category = document.getElementById('expenseCategory').value, amount = parseFloat(document.getElementById('expenseAmount').value);
@@ -12484,9 +12456,6 @@ async function deleteSaleReturn(returnId) {
     updateDashboard();
     showNotification('✅ تم النقل', 'تم نقل مرتجع المبيعات إلى سلة المحذوفات', 'success');
 }
-// --- ⬇️  ابدأ الاستبدال من هذا السطر ⬇️ ---
-// --- ⬇️  ابدأ الحذف والاستبدال من هذا السطر ⬇️ ---
-// --- ⬇️  ابدأ الحذف والاستبدال من هذا السطر ⬇️ ---
 
 // --- حذف مرتجعات المشتريات ---
 async function deletePurchaseReturn(returnId) {
@@ -12518,7 +12487,6 @@ async function deletePurchaseReturn(returnId) {
     renderItems();
     updateDashboard();
     showNotification('✅ تم النقل', 'تم نقل مرتجع المشتريات إلى سلة المحذوفات', 'success');
-} // <-- هذا يغلق deletePurchaseReturn
 
 function loadSupplierAccount() {
     const supplierId = document.getElementById('accountSupplierSelect').value;
@@ -12560,20 +12528,11 @@ function loadRecentActivities() {
     console.log('جاري تحميل الأنشطة الحديثة...');
     return [];
 }
-// ⛔️ تم حذف القوس الزائد الذي كان موجوداً هنا ⛔️
-
-// ⬇️  الدالة التي نسيناها ⬇️
-function getSalePaymentMethodName(method) {
-    const names = {
-        'cash': 'نقداً',
-        'bank': 'شبكة/بنك',
-        'credit': 'آجل'
-    };
-    return names[method] || method || 'نقداً';
 }
-}
-</script>
 
+    </script>
+
+<!-- نظام الحوار الاحترافي -->
 <div id="confirm-overlay" class="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-body">
     <div class="confirm-dialog">
         <div id="confirm-header" class="confirm-header">
