@@ -6327,18 +6327,19 @@ let emailJsConfig = { ...EMAILJS_DEFAULTS };
 
        async function loadUsers() {
     try {
-        // مع القواعد الجديدة، نحتاج للمصادقة أولاً
+        // التحقق من المصادقة
         if (!auth.currentUser) {
-            console.log("لا يمكن تحميل المستخدمين بدون مصادقة");
+            console.log("لا يمكن تحميل المستخدمين بدون مصادقة - Firebase Auth:", auth.currentUser);
             users = [];
             return;
         }
         
+        console.log("تحميل المستخدمين من Firebase...");
         users = (await firebaseGet('diwan_users')) || [];
         console.log(`تم تحميل ${users.length} مستخدم من قاعدة البيانات`);
         
     } catch (error) {
-        console.log("خطأ في تحميل المستخدمين:", error.message);
+        console.error("خطأ في تحميل المستخدمين:", error);
         users = [];
     }
 }
@@ -6760,14 +6761,28 @@ let emailJsConfig = { ...EMAILJS_DEFAULTS };
         
         async function loadActivities() {
             try {
-                // مع القواعد الجديدة، نحتاج للمصادقة أولاً
+                // التحقق من المصادقة
                 if (!auth.currentUser) {
-                    console.log("لا يمكن تحميل الأنشطة بدون مصادقة");
+                    console.log("لا يمكن تحميل الأنشطة بدون مصادقة - Firebase Auth:", auth.currentUser);
                     activities = [];
                     return;
                 }
                 
-                activities = (await firebaseGet('diwan_activities')) || [];
+                console.log("تحميل الأنشطة من Firebase...");
+                const rawData = await firebaseGet('diwan_activities');
+                console.log("البيانات الخام من Firebase:", rawData);
+                
+                activities = rawData || [];
+                console.log(`تم تحميل ${activities.length} نشاط:`, activities);
+                
+                // التحقق من بنية البيانات
+                if (activities.length > 0) {
+                    console.log("عينة من الأنشطة:");
+                    activities.forEach((act, index) => {
+                        console.log(`النشاط ${index + 1}:`, { id: act.id, name: act.name });
+                    });
+                }
+                
                 const activitySelect = document.getElementById('userActivitySelect');
                 if (activitySelect) {
                     activitySelect.innerHTML = '<option value="">-- اختر النشاط التجاري أولاً --</option>';
@@ -6776,7 +6791,7 @@ let emailJsConfig = { ...EMAILJS_DEFAULTS };
                     });
                 }
             } catch (error) {
-                console.log("خطأ في تحميل الأنشطة:", error.message);
+                console.error("خطأ تفصيلي في تحميل الأنشطة:", error);
                 activities = [];
             }
         }
@@ -6788,18 +6803,24 @@ let emailJsConfig = { ...EMAILJS_DEFAULTS };
             }
         }
         
-        function showActivityModal() {
+        async function showActivityModal() {
+            // تحميل الأنشطة أولاً قبل عرض النافذة
+            await loadActivities();
+            
             document.getElementById('activity-overlay').style.display = 'flex';
             document.querySelector('.app-container').style.display = 'none';
             renderActivitiesInModal();
         }
         
         function renderActivitiesInModal() {
+            console.log(`عرض الأنشطة في النافذة - عدد الأنشطة: ${activities.length}`);
             const listDiv = document.getElementById('activity-list');
             listDiv.innerHTML = '';
             if (activities.length === 0) {
+                console.log("لا توجد أنشطة لعرضها");
                 listDiv.innerHTML = '<p>لم تقم بإنشاء أي نشاط بعد. قم بإنشاء واحد للبدء.</p>';
             } else {
+                console.log("عرض الأنشطة:", activities.map(a => a.name));
                 activities.forEach(activity => {
                     const button = document.createElement('button');
                     button.className = 'btn-primary activity-btn';
@@ -6834,12 +6855,16 @@ let emailJsConfig = { ...EMAILJS_DEFAULTS };
         }
         
         async function selectActivity(id) {
+            console.log(`محاولة اختيار النشاط: ${id}`);
             showLoading('جاري تحميل بيانات النشاط...');
             
             try {
                 currentActivityId = id;
                 sessionStorage.setItem('currentActivityId', id);
+                console.log(`تم حفظ النشاط في sessionStorage: ${id}`);
+                
                 const activity = activities.find(a => a.id == id);
+                console.log('تفاصيل النشاط:', activity);
                 
                 // حفظ بيانات النشاط الحالي في sessionStorage للاستخدام في رفع الشعار
                 if (activity) {
@@ -13185,7 +13210,7 @@ function loadActivitiesDropdown() {
 
         // ===== Initial App Load =====
         async function initializeApp() {
-            if (!currentActivityId) { showActivityModal(); return; }
+            if (!currentActivityId) { await showActivityModal(); return; }
             
             items = (await loadFromFirebase('items')) || [];
             customers = (await loadFromFirebase('customers')) || [];
@@ -13468,13 +13493,32 @@ function loadActivitiesDropdown() {
                     isLoggedIn = true;
                     console.log('تم العثور على مستخدم في sessionStorage:', user);
                     
-                    // تحميل البيانات أولاً بما أن المستخدم مسجل دخوله
-                    console.log('تحميل البيانات بعد استعادة الجلسة...');
-                    await loadUsers();
-                    await loadActivities();
+                    // انتظار Firebase Auth قبل تحميل البيانات
+                    console.log('انتظار Firebase Auth...');
+                    await new Promise((resolve) => {
+                        const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+                            console.log('حالة Firebase Auth:', firebaseUser ? 'مسجل دخوله' : 'غير مسجل');
+                            unsubscribe();
+                            resolve();
+                        });
+                    });
                     
-                    console.log('عدد المستخدمين:', users.length);
-                    console.log('عدد الأنشطة:', activities.length);
+                    // تحميل البيانات بعد تأكيد المصادقة
+                    if (auth.currentUser) {
+                        console.log('تحميل البيانات بعد استعادة الجلسة...');
+                        await loadUsers();
+                        await loadActivities();
+                        
+                        console.log('عدد المستخدمين:', users.length);
+                        console.log('عدد الأنشطة:', activities.length);
+                    } else {
+                        console.log('Firebase Auth غير مسجل - إزالة الجلسة المحلية');
+                        sessionStorage.removeItem('loggedInUser');
+                        sessionStorage.removeItem('isLoggedIn');
+                        sessionStorage.removeItem('currentActivityId');
+                        user = null;
+                        isLoggedIn = false;
+                    }
                     
                 } catch (e) {
                     console.error('خطأ في تحليل بيانات المستخدم من sessionStorage:', e);
@@ -13493,13 +13537,19 @@ function loadActivitiesDropdown() {
                 // استعادة النشاط للمدير
                 if (user.role === 'admin') {
                     const savedActivityId = sessionStorage.getItem('currentActivityId');
+                    console.log('النشاط المحفوظ:', savedActivityId);
+                    console.log('الأنشطة المتاحة:', activities.map(a => `${a.id}: ${a.name}`));
+                    
                     if (savedActivityId && activities.find(a => a.id == savedActivityId)) {
-                        selectActivity(savedActivityId);
+                        console.log('استعادة النشاط:', savedActivityId);
+                        await selectActivity(savedActivityId);
                     } else {
+                        console.log('لا يوجد نشاط محفوظ صحيح، الدخول بدون نشاط');
                         enterAdminWithoutActivity();
                     }
                 } else if (user.activityId) {
-                    selectActivity(user.activityId);
+                    console.log('استعادة نشاط المستخدم:', user.activityId);
+                    await selectActivity(user.activityId);
                 }
             } else {
                 console.log('لا توجد جلسة صحيحة');
