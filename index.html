@@ -12440,13 +12440,20 @@ if (data.length > 0) {
 
             } catch (error) {
                 hideLoading();
-                logError('addUser', error);
+                console.error('تفاصيل خطأ إضافة المستخدم:', error);
+                
                 if (error.code === 'auth/email-already-in-use') {
                     showNotification('⚠️ البريد موجود مسبقاً', 'هذا البريد الإلكتروني مستخدم بالفعل في Firebase', 'warning');
                 } else if (error.code === 'auth/weak-password') {
                     showNotification('⚠️ كلمة مرور ضعيفة', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'warning');
+                } else if (error.code === 'auth/invalid-email') {
+                    showNotification('⚠️ بريد إلكتروني غير صالح', 'تأكد من صحة البريد الإلكتروني', 'warning');
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    showNotification('⚠️ العملية غير مسموحة', 'تسجيل المستخدمين معطل في Firebase', 'warning');
                 } else {
-                    showNotification('❌ خطأ', 'فشل في إنشاء المستخدم: ' + (error.message || 'خطأ غير معروف'), 'error');
+                    // لا نستدعي logError هنا لتجنب رسالة "مراجعة الدعم الفني"
+                    console.error('خطأ غير معروف في إضافة المستخدم:', error);
+                    showNotification('❌ خطأ', `فشل في إنشاء المستخدم: ${error.message || 'خطأ غير معروف'}`, 'error');
                 }
             }
         }
@@ -13343,6 +13350,14 @@ function loadActivitiesDropdown() {
             // البيانات ستُحمل بعد تسجيل الدخول
             console.log("في انتظار تسجيل الدخول لتحميل البيانات...");
             
+            // مسح حقول تسجيل الدخول لمنع التعبئة التلقائية
+            setTimeout(() => {
+                const emailField = document.getElementById('loginEmail');
+                const passwordField = document.getElementById('loginPassword');
+                if (emailField) emailField.value = '';
+                if (passwordField) passwordField.value = '';
+            }, 100);
+            
             if (EMAILJS_FIXED) {
                 emailJsConfig = { ...EMAILJS_DEFAULTS };
             } else {
@@ -13372,7 +13387,7 @@ function loadActivitiesDropdown() {
             await handleResetFlowFromURL();
             
             // استعادة حالة تسجيل الدخول
-            restoreLoginState();
+            await restoreLoginState();
             
             // تفعيل الترتيب للجداول
             FilterSortHelper.makeSortable('itemsTable', 'items', renderItems);
@@ -13434,10 +13449,8 @@ function loadActivitiesDropdown() {
         });
         
         // دالة استعادة حالة تسجيل الدخول
-        function restoreLoginState() {
+        async function restoreLoginState() {
             console.log('استعادة حالة تسجيل الدخول...');
-            console.log('عدد المستخدمين:', users.length);
-            console.log('عدد الأنشطة:', activities.length);
             
             // التحقق من وجود جلسة نشطة في sessionStorage فقط
             const sessionUser = sessionStorage.getItem('loggedInUser');
@@ -13454,6 +13467,15 @@ function loadActivitiesDropdown() {
                     user = JSON.parse(sessionUser);
                     isLoggedIn = true;
                     console.log('تم العثور على مستخدم في sessionStorage:', user);
+                    
+                    // تحميل البيانات أولاً بما أن المستخدم مسجل دخوله
+                    console.log('تحميل البيانات بعد استعادة الجلسة...');
+                    await loadUsers();
+                    await loadActivities();
+                    
+                    console.log('عدد المستخدمين:', users.length);
+                    console.log('عدد الأنشطة:', activities.length);
+                    
                 } catch (e) {
                     console.error('خطأ في تحليل بيانات المستخدم من sessionStorage:', e);
                 }
