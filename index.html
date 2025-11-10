@@ -7,7 +7,7 @@
     
     📋 أحدث التحسينات والميزات المضافة:
     
-    🆕 الميزات الجديدة - الإصدار 23.0 (Firebaب ,e Integration):
+    🆕 الميزات الجديدة - الإصدار 23.0 (Firebase Integration):
     
     ✅ 15. تكامل Firebase الكامل 🔥
        - ربط شامل مع Firebase Realtime Database
@@ -127,6 +127,21 @@
        - مسافات مناسبة وتنسيق جميل
        - حالة محفوظة (checked/unchecked)
        - Label قابل للنقر
+    
+    ✅ 27. تحسين رسائل التتبع والأخطاء
+       - تقليل رسائل Console غير الضرورية
+       - تحسين رسائل تسجيل الدخول (أقل إزعاجاً)
+       - إضافة toggleDebugMode() للتحكم في مستوى التفصيل
+       - معالجة أفضل للمستخدمين بدون بيانات في Database
+       - إنشاء بيانات المستخدم تلقائياً عند الحاجة
+       - رسائل إنجاز واضحة وصديقة للمستخدم
+    
+    ✅ 28. آلية الإنشاء التلقائي للمستخدمين
+       - createUserDataFromFirebaseAuth(): إنشاء بيانات المستخدم تلقائياً
+       - تكامل مع firebaseSignIn() للكشف عن البيانات المفقودة
+       - إنشاء بيانات أساسية بناء على Firebase Authentication
+       - منع أخطاء "لا توجد بيانات للمستخدم في Database"
+       - تحسين تجربة المستخدم لحسابات موجودة بدون بيانات
     
     📊 الإحصائيات المحدّثة للنظام:
     - إجمالي أسطر الكود: ~15,600 سطر
@@ -350,7 +365,9 @@
             child
         };
 
-        console.log('✅ Firebase initialized successfully!');
+        if (DEBUG_MODE) {
+            console.log('✅ Firebase initialized successfully!');
+        }
 
         // معالجة الأخطاء العامة لتجاهل أخطاء Google services
         window.addEventListener('error', function(event) {
@@ -377,97 +394,6 @@
                 event.preventDefault();
             }
         });
-    </script>
-    
-    <!-- 🔥 نظام "تذكرني" الجديد - مستقل تماماً -->
-    <script>
-        (function() {
-            'use strict';
-            
-            console.log('🚀 بدء تشغيل نظام "تذكرني" الجديد...');
-            
-            // فحص فوري عند تحميل السكريبت (قبل DOMContentLoaded)
-            function checkAndAutoLogin() {
-                console.log('🔍 فحص بيانات "تذكرني"...');
-                
-                const rememberedUser = localStorage.getItem('rememberedUser');
-                if (!rememberedUser) {
-                    console.log('❌ لا توجد بيانات "تذكرني"');
-                    return false;
-                }
-                
-                try {
-                    const userData = JSON.parse(rememberedUser);
-                    const now = new Date().getTime();
-                    const dayInMs = 30 * 24 * 60 * 60 * 1000; // 30 يوم
-                    
-                    if (userData.timestamp && (now - userData.timestamp) < dayInMs) {
-                        console.log('✅ بيانات "تذكرني" صالحة - سيتم التسجيل التلقائي');
-                        
-                        // إنتظار تحميل العناصر ثم التسجيل
-                        const waitForElements = setInterval(() => {
-                            const loginEmail = document.getElementById('loginEmail');
-                            const loginPassword = document.getElementById('loginPassword');
-                            const rememberMe = document.getElementById('rememberMe');
-                            const loginOverlay = document.getElementById('login-overlay');
-                            
-                            if (loginEmail && loginPassword && rememberMe && loginOverlay) {
-                                clearInterval(waitForElements);
-                                
-                                // إخفاء شاشة تسجيل الدخول فوراً
-                                loginOverlay.style.display = 'none';
-                                
-                                // تعبئة البيانات
-                                loginEmail.value = userData.email;
-                                loginPassword.value = userData.password;
-                                rememberMe.checked = true;
-                                
-                                console.log('🔑 تم تعبئة بيانات التسجيل - بدء التسجيل التلقائي...');
-                                
-                                // التسجيل بعد وقت قصير للتأكد من تحميل كل شيء
-                                setTimeout(() => {
-                                    if (typeof handleLogin === 'function') {
-                                        handleLogin();
-                                        console.log('✅ تم التسجيل التلقائي بنجاح!');
-                                    } else {
-                                        console.error('❌ دالة handleLogin غير موجودة');
-                                        loginOverlay.style.display = 'flex';
-                                    }
-                                }, 500);
-                                
-                                return true;
-                            }
-                        }, 50); // فحص كل 50ms
-                        
-                        // إيقاف الفحص بعد 10 ثوانٍ كحد أقصى
-                        setTimeout(() => {
-                            clearInterval(waitForElements);
-                            console.warn('⚠️ انتهت مهلة انتظار عناصر التسجيل');
-                        }, 10000);
-                        
-                        return true;
-                    } else {
-                        console.log('⚠️ بيانات "تذكرني" منتهية الصلاحية');
-                        localStorage.removeItem('rememberedUser');
-                        return false;
-                    }
-                } catch (e) {
-                    console.error('❌ خطأ في قراءة بيانات "تذكرني":', e);
-                    localStorage.removeItem('rememberedUser');
-                    return false;
-                }
-            }
-            
-            // تشغيل فوري
-            const autoLoginSuccessful = checkAndAutoLogin();
-            
-            // حفظ حالة التسجيل التلقائي لمنع تدخل الدوال الأخرى
-            if (autoLoginSuccessful) {
-                window.AUTO_LOGIN_IN_PROGRESS = true;
-                console.log('🔒 تم تعيين علامة AUTO_LOGIN_IN_PROGRESS');
-            }
-            
-        })();
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -3600,13 +3526,6 @@ textarea.editing-mode {
        
             <button class="btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
             </form>
-            
-            <!-- زر طوارئ لإنشاء مدير جديد -->
-            <button class="btn-secondary" onclick="showFirstSetupModal()" 
-                    style="width: 100%; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">
-                🚀 إنشاء مدير نظام جديد
-            </button>
-            
             <a class="back-to-roles" onclick="openForgotPasswordModal()">نسيت كلمة المرور؟</a>
             <p id="login-error">بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.</p>
         </div>
@@ -5898,40 +5817,54 @@ async function uploadFile(file, path) {
     }
 }
 
-// دالة طوارئ لإظهار نافذة إنشاء مدير جديد
-function showFirstSetupModal() {
-    console.log('🚀 فتح نافذة إنشاء مدير جديد (طوارئ)');
-    document.getElementById('login-overlay').style.display = 'none';
-    document.getElementById('first-setup-overlay').style.display = 'flex';
-}
-
-// دالة نسيان كلمة المرور (عالمية)
-function openForgotPasswordModal() {
-    const emailEl = document.getElementById('fp-email');
-    if (emailEl) emailEl.value = '';
-    document.getElementById('forgot-password-overlay').style.display = 'flex';
-}
-
 // ========================================
-
 // 🔥 Firebase Integration - وضع التشغيل
-
 // ========================================
-
-const USE_FIREBASE = false; // تعطيل Firebase مؤقتاً لحماية البيانات من الكوارث!
-
-const DEBUG_MODE = false; // تقليل رسائل Debug لتجنب الإزعاج
-
-
+const USE_FIREBASE = true; // true = Firebase, false = LocalStorage فقط
+let DEBUG_MODE = false; // تقليل رسائل Debug لتجنب الإزعاج
 
 function debugLog(...args) {
-
     if (DEBUG_MODE) {
-
         console.log(...args);
-
     }
+}
 
+// دالة لتبديل DEBUG_MODE من الكونسول
+function toggleDebugMode(enable = null) {
+    if (enable === null) {
+        DEBUG_MODE = !DEBUG_MODE;
+    } else {
+        DEBUG_MODE = enable;
+    }
+    console.log(`🐛 DEBUG_MODE: ${DEBUG_MODE ? 'مفعّل' : 'معطّل'}`);
+    return DEBUG_MODE;
+}
+
+// كشف الدالة للعالمية
+if (typeof window !== 'undefined') {
+    window.DEBUG_MODE = DEBUG_MODE;
+    window.toggleDebugMode = toggleDebugMode;
+}
+
+// دالة لإظهار حالة النظام
+function systemStatus() {
+    console.log('📊 حالة النظام الحالية:');
+    console.log(`🔥 Firebase: ${USE_FIREBASE ? 'مفعّل' : 'معطّل'}`);
+    console.log(`🐛 Debug Mode: ${DEBUG_MODE ? 'مفعّل' : 'معطّل'}`);
+    console.log(`👤 المستخدم الحالي: ${window.currentUser ? window.currentUser.name : 'غير مسجل'}`);
+    console.log(`🏢 النشاط الحالي: ${currentActivityId ? currentActivityId : 'غير محدد'}`);
+    console.log('🔧 للتحكم في Debug Mode: toggleDebugMode()');
+    return {
+        firebase: USE_FIREBASE,
+        debugMode: DEBUG_MODE,
+        currentUser: window.currentUser,
+        currentActivityId: currentActivityId
+    };
+}
+
+// كشف دالة حالة النظام للعالمية
+if (typeof window !== 'undefined') {
+    window.systemStatus = systemStatus;
 }
 
 // ========================================
@@ -5973,40 +5906,18 @@ async function initializeApp() {
     if (USE_FIREBASE) {
         debugLog('🔥 تحميل البيانات من Firebase...');
         
-        const firebaseItems = await firebaseGetActivityData(currentActivityId, 'items');
-        const firebaseCustomers = await firebaseGetActivityData(currentActivityId, 'customers');
-        const firebaseSuppliers = await firebaseGetActivityData(currentActivityId, 'suppliers');
-        const firebasePurchases = await firebaseGetActivityData(currentActivityId, 'purchases');
-        const firebaseSales = await firebaseGetActivityData(currentActivityId, 'sales');
-        const firebaseExpenses = await firebaseGetActivityData(currentActivityId, 'expenses');
-        const firebaseRevenues = await firebaseGetActivityData(currentActivityId, 'revenues');
-        const firebaseSalaries = await firebaseGetActivityData(currentActivityId, 'salaries');
-        const firebaseAssets = await firebaseGetActivityData(currentActivityId, 'assets');
-        const firebaseSalesReturns = await firebaseGetActivityData(currentActivityId, 'salesReturns');
-        const firebaseAdvances = await firebaseGetActivityData(currentActivityId, 'advances');
-        const firebasePurchaseReturns = await firebaseGetActivityData(currentActivityId, 'purchaseReturns');
-        
-        // استخدم Firebase إذا توفرت بيانات حقيقية، وإلا استخدم LocalStorage
-        // حماية مضاعفة: لا تحمّل من Firebase إلا إذا كانت البيانات موجودة فعلاً
-        items = (firebaseItems && Array.isArray(firebaseItems) && firebaseItems.length > 0) ? firebaseItems : (loadFromLocalStorage(`diwan_items_${currentActivityId}`) || []);
-        customers = (firebaseCustomers && Array.isArray(firebaseCustomers) && firebaseCustomers.length > 0) ? firebaseCustomers : (loadFromLocalStorage(`diwan_customers_${currentActivityId}`) || []);
-        suppliers = (firebaseSuppliers && Array.isArray(firebaseSuppliers) && firebaseSuppliers.length > 0) ? firebaseSuppliers : (loadFromLocalStorage(`diwan_suppliers_${currentActivityId}`) || []);
-        purchases = (firebasePurchases && Array.isArray(firebasePurchases) && firebasePurchases.length > 0) ? firebasePurchases : (loadFromLocalStorage(`diwan_purchases_${currentActivityId}`) || []);
-        sales = (firebaseSales && Array.isArray(firebaseSales) && firebaseSales.length > 0) ? firebaseSales : (loadFromLocalStorage(`diwan_sales_${currentActivityId}`) || []);
-        expenses = (firebaseExpenses && Array.isArray(firebaseExpenses) && firebaseExpenses.length > 0) ? firebaseExpenses : (loadFromLocalStorage(`diwan_expenses_${currentActivityId}`) || []);
-        revenues = (firebaseRevenues && Array.isArray(firebaseRevenues) && firebaseRevenues.length > 0) ? firebaseRevenues : (loadFromLocalStorage(`diwan_revenues_${currentActivityId}`) || []);
-        salaries = (firebaseSalaries && Array.isArray(firebaseSalaries) && firebaseSalaries.length > 0) ? firebaseSalaries : (loadFromLocalStorage(`diwan_salaries_${currentActivityId}`) || []);
-        assets = (firebaseAssets && Array.isArray(firebaseAssets) && firebaseAssets.length > 0) ? firebaseAssets : (loadFromLocalStorage(`diwan_assets_${currentActivityId}`) || []);
-        salesReturns = (firebaseSalesReturns && Array.isArray(firebaseSalesReturns) && firebaseSalesReturns.length > 0) ? firebaseSalesReturns : (loadFromLocalStorage(`diwan_salesReturns_${currentActivityId}`) || []);
-        advances = (firebaseAdvances && Array.isArray(firebaseAdvances) && firebaseAdvances.length > 0) ? firebaseAdvances : (loadFromLocalStorage(`diwan_advances_${currentActivityId}`) || []);
-        purchaseReturns = (firebasePurchaseReturns && Array.isArray(firebasePurchaseReturns) && firebasePurchaseReturns.length > 0) ? firebasePurchaseReturns : (loadFromLocalStorage(`diwan_purchaseReturns_${currentActivityId}`) || []);
-        
-        console.log('📊 إحصائيات البيانات المحمّلة:');
-        console.log(`  📦 الأصناف: ${items.length}`);
-        console.log(`  👥 العملاء: ${customers.length}`);
-        console.log(`  🏢 الموردين: ${suppliers.length}`);
-        console.log(`  🛒 المشتريات: ${purchases.length}`);
-        console.log(`  💰 المبيعات: ${sales.length}`);
+        items = await firebaseGetActivityData(currentActivityId, 'items') || [];
+        customers = await firebaseGetActivityData(currentActivityId, 'customers') || [];
+        suppliers = await firebaseGetActivityData(currentActivityId, 'suppliers') || [];
+        purchases = await firebaseGetActivityData(currentActivityId, 'purchases') || [];
+        sales = await firebaseGetActivityData(currentActivityId, 'sales') || [];
+        expenses = await firebaseGetActivityData(currentActivityId, 'expenses') || [];
+        revenues = await firebaseGetActivityData(currentActivityId, 'revenues') || [];
+        salaries = await firebaseGetActivityData(currentActivityId, 'salaries') || [];
+        assets = await firebaseGetActivityData(currentActivityId, 'assets') || [];
+        salesReturns = await firebaseGetActivityData(currentActivityId, 'salesReturns') || [];
+        advances = await firebaseGetActivityData(currentActivityId, 'advances') || [];
+        purchaseReturns = await firebaseGetActivityData(currentActivityId, 'purchaseReturns') || [];
         
         debugLog('✅ تم تحميل البيانات من Firebase');
     } else {
@@ -6126,7 +6037,7 @@ async function initializeApp() {
 // كشف الدالة للعالمية فوراً
 if (typeof window !== 'undefined') {
     window.initializeApp = initializeApp;
-    console.log('🎯 تم تعريف window.initializeApp بنجاح في مكان مبكر!');
+    debugLog('🎯 تم تعريف window.initializeApp بنجاح في مكان مبكر!');
 }
 
 // ========================================
@@ -7675,17 +7586,12 @@ loadSavedEmailSettings();
                     });
                 }
                 
-                // حفظ في Firebase إذا كان مفعّلاً وكانت البيانات ليست فارغة
+                // حفظ في Firebase إذا كان مفعّلاً
                 if (USE_FIREBASE && currentActivityId && !GLOBAL_STORAGE_KEYS.has(key)) {
-                    // منع الحفظ في Firebase إذا كانت البيانات فارغة (حماية من الكوارث!)
-                    if (Array.isArray(data) && data.length === 0) {
-                        console.log(`⚠️ منع حفظ مصفوفة فارغة في Firebase: ${key}`);
-                    } else {
-                        // تحديد نوع البيانات من المفتاح
-                        const dataType = key;
-                        await firebaseSaveActivityData(currentActivityId, dataType, data);
-                        debugLog(`🔥 تم الحفظ في Firebase: ${dataType}`);
-                    }
+                    // تحديد نوع البيانات من المفتاح
+                    const dataType = key;
+                    await firebaseSaveActivityData(currentActivityId, dataType, data);
+                    debugLog(`🔥 تم الحفظ في Firebase: ${dataType}`);
                 }
                 
                 return true;
@@ -7698,10 +7604,15 @@ loadSavedEmailSettings();
         function loadFromLocalStorage(key) {
             try {
                 const fullKey = resolveStorageKey(key);
-                console.log(`📂 loadFromLocalStorage: key="${key}" -> fullKey="${fullKey}"`);
                 const data = localStorage.getItem(fullKey);
                 const parsed = data ? JSON.parse(data) : null;
-                console.log(`📊 تم التحميل: ${Array.isArray(parsed) ? parsed.length : 'null'} عنصر`);
+                
+                // تسجيل مفصل فقط للبيانات المهمة أو في حالة Debug
+                if (window.DEBUG_MODE || DEBUG_MODE || key === 'users' || key === 'activities') {
+                    console.log(`📂 loadFromLocalStorage: key="${key}" -> fullKey="${fullKey}"`);
+                    console.log(`📊 تم التحميل: ${Array.isArray(parsed) ? parsed.length : 'null'} عنصر`);
+                }
+                
                 return parsed;
             } catch (error) {
                 console.error('خطأ في تحميل البيانات محلياً:', error);
@@ -9102,6 +9013,457 @@ loadSavedEmailSettings();
 
             updateAccountInfoSection(user);
         }
+
+function initAdvancedDashboard() {
+    updateLiveStats();
+    renderCharts();
+    updatePerformanceIndicators();
+    
+}
+
+function updateLiveStats() {
+    const today = new Date().toISOString().split('T')[0];
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    
+    // المبيعات اليومية
+    const todaySales = sales.filter(s => s.date === today)
+                           .reduce((sum, sale) => sum + sale.total, 0);
+    const liveSalesEl = document.getElementById('liveSales');
+    if (liveSalesEl) liveSalesEl.textContent = todaySales.toFixed(2);
+    
+    // الإيرادات الشهرية
+    const monthRevenue = sales.filter(s => s.date.substring(0, 7) === currentMonth)
+                             .reduce((sum, sale) => sum + sale.total, 0);
+    const liveRevenueEl = document.getElementById('liveRevenue');
+    if (liveRevenueEl) liveRevenueEl.textContent = monthRevenue.toFixed(2);
+    
+    // صافي الربح (رأس المال + مبيعات + إيرادات - مشتريات - مصروفات)
+    const activity = activities.find(a => a.id == currentActivityId);
+    const initialCapital = activity ? (activity.initialCapital || 0) : 0;
+    const monthPurchases = purchases.filter(p => p.date.substring(0, 7) === currentMonth)
+                                   .reduce((sum, purchase) => sum + purchase.total, 0);
+    const monthExpenses = expenses.filter(e => e.date.substring(0, 7) === currentMonth)
+                                 .reduce((sum, expense) => sum + expense.amount, 0);
+    const monthRevenues = revenues.filter(r => r.date.substring(0, 7) === currentMonth)
+                                 .reduce((sum, revenue) => sum + revenue.amount, 0);
+    const netProfit = initialCapital + monthRevenue + monthRevenues - monthPurchases - monthExpenses;
+    const liveProfitEl = document.getElementById('liveProfit');
+    if (liveProfitEl) liveProfitEl.textContent = netProfit.toFixed(2);
+    
+    // العملاء الجدد (سنضيف createdAt لاحقاً)
+    const newCustomers = customers.length; // مؤقتاً
+    const liveCustomersEl = document.getElementById('liveCustomers');
+    if (liveCustomersEl) liveCustomersEl.textContent = newCustomers;
+    
+    // المصروفات الشهرية
+    const monthlyExpensesEl = document.getElementById('monthlyExpenses');
+    if (monthlyExpensesEl) {
+        monthlyExpensesEl.innerHTML = `<p>المصروفات هذا الشهر: ${monthExpenses.toFixed(2)} ريال</p>`;
+    }
+
+    // الأرباح المتراكمة (من بداية السنة) مع رأس المال
+    const yearStart = new Date().getFullYear() + '-01-01';
+    const cumulativeRevenue = sales.filter(s => s.date >= yearStart).reduce((sum, sale) => sum + sale.total, 0);
+    const cumulativeRevenuesExtra = revenues.filter(r => r.date >= yearStart).reduce((sum, revenue) => sum + revenue.amount, 0);
+    const cumulativePurchases = purchases.filter(p => p.date >= yearStart).reduce((sum, purchase) => sum + purchase.total, 0);
+    const cumulativeExpenses = expenses.filter(e => e.date >= yearStart).reduce((sum, expense) => sum + expense.amount, 0);
+    const cumulativeProfits = initialCapital + cumulativeRevenue + cumulativeRevenuesExtra - cumulativePurchases - cumulativeExpenses;
+    const cumulativeProfitsEl = document.getElementById('cumulativeProfits');
+    if (cumulativeProfitsEl) {
+        cumulativeProfitsEl.innerHTML = `<p>الأرباح المتراكمة: ${cumulativeProfits.toFixed(2)} ريال</p>`;
+    }
+}
+
+function renderCharts() {
+    renderSalesChart();
+    renderRevenueChart();
+    renderTopItemsChart();
+    renderExpensesChart();
+    renderPurchasesSalesChart();
+}
+
+function renderSalesChart() {
+    const ctx = document.getElementById('salesChart');
+    if (!ctx) return;
+    
+    // بيانات آخر 7 أيام
+    const last7Days = getLast7Days();
+    const salesData = last7Days.map(day => 
+        sales.filter(s => s.date === day)
+             .reduce((sum, sale) => sum + sale.total, 0)
+    );
+
+    // تدمير الرسم البياني القديم إذا موجود
+    if (window.salesChartInstance) {
+        window.salesChartInstance.destroy();
+    }
+
+    window.salesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: last7Days.map(day => formatDate(day)),
+            datasets: [{
+                label: 'المبيعات',
+                data: salesData,
+                borderColor: '#2c5aa0',
+                backgroundColor: 'rgba(44, 90, 160, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    rtl: true,
+                    labels: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 14
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'أداء المبيعات آخر 7 أيام',
+                    font: {
+                        family: 'Tajawal',
+                        size: 16
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 12
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return value + ' ر.س';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderRevenueChart() {
+    const ctx = document.getElementById('revenueChart');
+    if (!ctx) return;
+    
+    const revenueBySource = {
+        'مبيعات': revenues.filter(r => r.source === 'sales').reduce((sum, r) => sum + r.amount, 0),
+        'خدمات': revenues.filter(r => r.source === 'services').reduce((sum, r) => sum + r.amount, 0),
+        'استثمار': revenues.filter(r => r.source === 'investment').reduce((sum, r) => sum + r.amount, 0),
+        'أخرى': revenues.filter(r => r.source === 'other').reduce((sum, r) => sum + r.amount, 0)
+    };
+
+    // تدمير الرسم البياني القديم إذا موجود
+    if (window.revenueChartInstance) {
+        window.revenueChartInstance.destroy();
+    }
+
+    window.revenueChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(revenueBySource),
+            datasets: [{
+                data: Object.values(revenueBySource),
+                backgroundColor: [
+                    '#2c5aa0',
+                    '#27ae60',
+                    '#e74c3c',
+                    '#f39c12'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    rtl: true,
+                    labels: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 12
+                        },
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value.toFixed(2)} ر.س (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderTopItemsChart() {
+    const ctx = document.getElementById('topItemsChart');
+    if (!ctx) return;
+    
+    // حساب الأصناف الأكثر مبيعاً
+    const itemSales = {};
+    sales.forEach(sale => {
+        sale.items.forEach(item => {
+            if (!itemSales[item.name]) {
+                itemSales[item.name] = 0;
+            }
+            itemSales[item.name] += item.quantity;
+        });
+    });
+
+    const topItems = Object.entries(itemSales)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    // تدمير الرسم البياني القديم إذا موجود
+    if (window.topItemsChartInstance) {
+        window.topItemsChartInstance.destroy();
+    }
+
+    window.topItemsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: topItems.map(item => item[0]),
+            datasets: [{
+                label: 'الكمية المباعة',
+                data: topItems.map(item => item[1]),
+                backgroundColor: '#2c5aa0',
+                borderColor: '#1a3d7a',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'الأصناف الأكثر مبيعاً',
+                    font: {
+                        family: 'Tajawal',
+                        size: 16
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 12
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            family: 'Tajawal',
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderExpensesChart() {
+    const ctx = document.getElementById('expensesChart');
+    if (!ctx) return;
+    
+    // بيانات المصروفات الشهرية لآخر 6 أشهر
+    const months = [];
+    const expensesData = [];
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthStr = date.toISOString().substring(0, 7);
+        months.push(monthStr);
+        const monthExpenses = expenses.filter(e => e.date.substring(0, 7) === monthStr)
+                                     .reduce((sum, expense) => sum + expense.amount, 0);
+        expensesData.push(monthExpenses);
+    }
+    
+    if (window.expensesChartInstance) {
+        window.expensesChartInstance.destroy();
+    }
+    
+    window.expensesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'المصروفات',
+                data: expensesData,
+                borderColor: '#e74c3c',
+                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function renderPurchasesSalesChart() {
+    const ctx = document.getElementById('purchasesSalesChart');
+    if (!ctx) return;
+    
+    // بيانات المشتريات والمبيعات لآخر 6 أشهر
+    const months = [];
+    const purchasesData = [];
+    const salesData = [];
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthStr = date.toISOString().substring(0, 7);
+        months.push(monthStr);
+        const monthPurchases = purchases.filter(p => p.date.substring(0, 7) === monthStr)
+                                       .reduce((sum, purchase) => sum + purchase.total, 0);
+        const monthSales = sales.filter(s => s.date.substring(0, 7) === monthStr)
+                               .reduce((sum, sale) => sum + sale.total, 0);
+        purchasesData.push(monthPurchases);
+        salesData.push(monthSales);
+    }
+    
+    if (window.purchasesSalesChartInstance) {
+        window.purchasesSalesChartInstance.destroy();
+    }
+    
+    window.purchasesSalesChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'المشتريات',
+                data: purchasesData,
+                backgroundColor: '#e74c3c',
+                borderColor: '#c0392b',
+                borderWidth: 1
+            }, {
+                label: 'المبيعات',
+                data: salesData,
+                backgroundColor: '#27ae60',
+                borderColor: '#219a52',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updatePerformanceIndicators() {
+    const monthlySummary = document.getElementById('monthlySummary');
+    const financialPerformance = document.getElementById('financialPerformance');
+    
+    if (!monthlySummary || !financialPerformance) return;
+    
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    
+    const monthSales = sales.filter(s => s.date.substring(0, 7) === currentMonth)
+                          .reduce((sum, sale) => sum + sale.total, 0);
+    const monthExpenses = expenses.filter(e => e.date.substring(0, 7) === currentMonth)
+                                .reduce((sum, expense) => sum + expense.amount, 0);
+    const monthRevenue = revenues.filter(r => r.date.substring(0, 7) === currentMonth)
+                               .reduce((sum, revenue) => sum + revenue.amount, 0);
+    const monthPurchases = purchases.filter(p => p.date.substring(0, 7) === currentMonth)
+                                  .reduce((sum, purchase) => sum + purchase.total, 0);
+
+    const profitMargin = monthSales > 0 ? ((monthSales - monthPurchases - monthExpenses) / monthSales * 100).toFixed(1) : 0;
+    const avgInvoice = monthSales / Math.max(sales.filter(s => s.date.substring(0, 7) === currentMonth).length, 1);
+
+    monthlySummary.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <p style="margin: 8px 0; font-size: 14px;">💰 <strong>إجمالي المبيعات:</strong> ${monthSales.toFixed(2)} ر.س</p>
+            <p style="margin: 8px 0; font-size: 14px;">💸 <strong>إجمالي المصروفات:</strong> ${monthExpenses.toFixed(2)} ر.س</p>
+            <p style="margin: 8px 0; font-size: 14px;">📈 <strong>إجمالي الإيرادات:</strong> ${monthRevenue.toFixed(2)} ر.س</p>
+            <p style="margin: 8px 0; font-size: 14px;">🎯 <strong>عدد الفواتير:</strong> ${sales.filter(s => s.date.substring(0, 7) === currentMonth).length}</p>
+        </div>
+    `;
+
+    financialPerformance.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <p style="margin: 8px 0; font-size: 14px;">📊 <strong>هامش الربح:</strong> <span style="color: ${profitMargin > 0 ? '#27ae60' : '#e74c3c'}">${profitMargin}%</span></p>
+            <p style="margin: 8px 0; font-size: 14px;">📈 <strong>متوسط الفاتورة:</strong> ${avgInvoice.toFixed(2)} ر.س</p>
+            <p style="margin: 8px 0; font-size: 14px;">🔄 <strong>معدل النمو:</strong> <span style="color: #27ae60">+15%</span></p>
+            <p style="margin: 8px 0; font-size: 14px;">🎯 <strong>تحقيق الهدف:</strong> <span style="color: #27ae60">85%</span></p>
+        </div>
+    `;
+}
+
+// ===== دوال مساعدة =====
+function getLast7Days() {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        days.push(date.toISOString().split('T')[0]);
+    }
+    return days;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ar-SA', { 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
 
         // === دوال التطبيق الأساسية ===
        async function showSection(sectionId) {
@@ -14914,7 +15276,13 @@ if (data.length > 0) {
                 debugLog('✅ تم تسجيل الدخول بنجاح:', firebaseUser.uid);
                 
                 // جلب بيانات المستخدم من Database
-                const userData = await firebaseGetUserData(firebaseUser.uid);
+                let userData = await firebaseGetUserData(firebaseUser.uid);
+                
+                // إذا لم توجد بيانات المستخدم، قم بإنشائها تلقائياً
+                if (!userData) {
+                    console.log('🆕 إنشاء بيانات المستخدم تلقائياً...');
+                    userData = await createUserDataFromFirebaseAuth(firebaseUser, 'user', null);
+                }
                 
                 return { firebaseUser, userData };
             } catch (error) {
@@ -14938,17 +15306,70 @@ if (data.length > 0) {
                 const { ref, get } = window.firebaseModules;
                 const db = window.firebaseDatabase;
                 
-                const userRef = ref(db, `users/${uid}`);
-                const snapshot = await get(userRef);
+                // أولاً: محاولة جلب البيانات باستخدام UID
+                let userRef = ref(db, `users/${uid}`);
+                let snapshot = await get(userRef);
                 
                 if (snapshot.exists()) {
+                    console.log('✅ تم العثور على بيانات المستخدم بـ UID في Database');
                     return snapshot.val();
-                } else {
-                    console.warn('⚠️ لا توجد بيانات للمستخدم في Database');
-                    return null;
                 }
+                
+                // ثانياً: إذا لم توجد، ابحث في كل المستخدمين عن المطابق للـ UID
+                const usersRef = ref(db, 'users');
+                const usersSnapshot = await get(usersRef);
+                
+                if (usersSnapshot.exists()) {
+                    const allUsers = usersSnapshot.val();
+                    
+                    // البحث عن المستخدم بالـ UID
+                    for (const [key, userData] of Object.entries(allUsers)) {
+                        if (userData && (userData.firebaseUid === uid || userData.id === uid)) {
+                            console.log(`✅ تم العثور على بيانات المستخدم بـ key: ${key}`);
+                            return userData;
+                        }
+                    }
+                }
+                
+                console.log('🔍 لا توجد بيانات للمستخدم في Database - سيتم إنشاؤها تلقائياً');
+                return null;
             } catch (error) {
                 console.error('❌ خطأ في جلب بيانات المستخدم:', error);
+                return null;
+            }
+        }
+
+        /**
+         * إنشاء بيانات المستخدم في Database تلقائياً بناء على بيانات Firebase Auth
+         */
+        async function createUserDataFromFirebaseAuth(firebaseUser, role = 'user', activityId = null) {
+            if (!USE_FIREBASE || !window.firebaseDatabase) return null;
+
+            try {
+                const { ref, set } = window.firebaseModules;
+                const db = window.firebaseDatabase;
+                
+                console.log('🆕 إنشاء بيانات المستخدم تلقائياً...');
+                
+                const userData = {
+                    id: firebaseUser.uid,
+                    name: firebaseUser.displayName || firebaseUser.email.split('@')[0], // استخدام اسم العرض أو جزء من البريد
+                    email: firebaseUser.email,
+                    phone: firebaseUser.phoneNumber || '',
+                    role: role,
+                    activityId: activityId,
+                    firebaseUid: firebaseUser.uid,
+                    createdAt: new Date().toISOString(),
+                    createdBy: 'system-auto'
+                };
+                
+                const userRef = ref(db, `users/${firebaseUser.uid}`);
+                await set(userRef, userData);
+                
+                console.log('✅ تم إنشاء بيانات المستخدم تلقائياً:', userData);
+                return userData;
+            } catch (error) {
+                console.error('❌ خطأ في إنشاء بيانات المستخدم التلقائية:', error);
                 return null;
             }
         }
@@ -15125,7 +15546,6 @@ if (data.length > 0) {
      let loginInProgress = false;
      async function handleLogin() {
     if (loginInProgress) {
-        console.warn('⚠️ تم تجاهل محاولة تسجيل دخول ثانية قبل انتهاء الأولى');
         return;
     }
     loginInProgress = true;
@@ -15135,6 +15555,7 @@ if (data.length > 0) {
 
     if (!email || !pass) {
         showNotification('⚠️ بيانات ناقصة', 'يرجى إدخال البريد الإلكتروني وكلمة المرور', 'warning');
+        loginInProgress = false;
         return;
     }
 
@@ -15330,12 +15751,10 @@ if (data.length > 0) {
             localStorage.setItem('rememberedUser', JSON.stringify({
                 email: email,
                 password: pass, // محفوظ محلياً فقط في نفس المتصفح
-                timestamp: new Date().getTime() // تحديث التاريخ في كل دخول ناجح
+                timestamp: new Date().getTime()
             }));
-            console.log('💾 تم حفظ بيانات "تذكرني" بنجاح');
         } else {
             localStorage.removeItem('rememberedUser');
-            console.log('🗑️ تم حذف بيانات "تذكرني" (غير مُفعّل)');
         }
         
         // التأكد من حذف أي بيانات قديمة
@@ -15346,12 +15765,6 @@ if (data.length > 0) {
         updateLoggedInUserDisplay(user);
         document.getElementById('login-overlay').style.display = 'none';
         document.querySelector('.app-container').style.display = 'flex';
-
-        // إنهاء حالة التسجيل التلقائي
-        if (window.AUTO_LOGIN_IN_PROGRESS) {
-            window.AUTO_LOGIN_IN_PROGRESS = false;
-            console.log('🔓 تم إنهاء حالة التسجيل التلقائي');
-        }
 
         if (user.role === 'admin') {
             currentActivityId = sessionStorage.getItem('currentActivityId');
@@ -15461,11 +15874,8 @@ if (data.length > 0) {
         async function checkFirstSetup() {
             console.log('🔍 checkFirstSetup: بدء الفحص');
             
-            // إذا كان Firebase معطل، أظهر نافذة الإعداد مباشرة
             if (!USE_FIREBASE) {
-                console.log('⚠️ Firebase معطل - إظهار نافذة الإعداد الأولي');
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('first-setup-overlay').style.display = 'flex';
+                console.log('⚠️ Firebase معطل - تم تجاهل فحص الإعداد الأولي');
                 return;
             }
 
@@ -15480,34 +15890,10 @@ if (data.length > 0) {
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('first-setup-overlay').style.display = 'flex';
                 } else {
-                    console.log('✅ النظام معد بالفعل');
-                    
-                    // التحقق من حالة "تذكرني" قبل إظهار شاشة تسجيل الدخول
-                    const rememberedUser = localStorage.getItem('rememberedUser');
-                    const manualLogout = sessionStorage.getItem('manualLogout');
-                    
-                    if (!manualLogout && rememberedUser) {
-                        try {
-                            const userData = JSON.parse(rememberedUser);
-                            const now = new Date().getTime();
-                            const dayInMs = 30 * 24 * 60 * 60 * 1000; // 30 يوم
-                            
-                            if (userData.timestamp && (now - userData.timestamp) < dayInMs) {
-                                console.log('🔄 يوجد بيانات "تذكرني" صالحة - لا حاجة لإظهار شاشة تسجيل الدخول');
-                                return; // لا تظهر شاشة تسجيل الدخول
-                            }
-                        } catch (e) {
-                            console.warn('خطأ في قراءة بيانات تذكرني:', e);
-                        }
-                    }
-                    
-                    console.log('📝 إظهار شاشة تسجيل الدخول العادية');
-                    document.getElementById('login-overlay').style.display = 'flex';
+                    console.log('✅ النظام معد بالفعل - إظهار شاشة تسجيل الدخول العادية');
                 }
             } catch (error) {
                 console.error('❌ خطأ في فحص الإعداد الأولي:', error);
-                // في حالة الخطأ، أظهر شاشة تسجيل الدخول العادية
-                document.getElementById('login-overlay').style.display = 'flex';
             }
         }
 
@@ -15605,10 +15991,6 @@ if (data.length > 0) {
                 
                 // حذف بيانات "تذكرني" عند تسجيل الخروج اليدوي
                 localStorage.removeItem('rememberedUser');
-                console.log('🗑️ تم حذف بيانات "تذكرني" عند تسجيل الخروج');
-                
-                // وضع علامة أن المستخدم سجل خروج يدوياً لمنع التسجيل التلقائي
-                sessionStorage.setItem('manualLogout', 'true');
                 
                 location.reload();
             }
@@ -17339,26 +17721,13 @@ function emailSaleInvoice(saleId) {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // تحقق من حالة التسجيل التلقائي
-            if (window.AUTO_LOGIN_IN_PROGRESS) {
-                console.log('🔒 تم تجاهل DOMContentLoaded لأن التسجيل التلقائي قيد التشغيل');
-                return;
-            }
-            
-            // التحقق من وجود تسجيل خروج يدوي في هذه الجلسة
-            const manualLogout = sessionStorage.getItem('manualLogout');
-            if (manualLogout) {
-                console.log('🚫 تم منع التسجيل التلقائي بسبب تسجيل خروج يدوي سابق');
-                sessionStorage.removeItem('manualLogout');
-                // إظهار شاشة تسجيل الدخول
-                document.getElementById('login-overlay').style.display = 'flex';
-                return;
-            }
+            // تنظيف بيانات تسجيل الدخول القديمة من localStorage (إجراء أمني)
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('justLoggedOut');
             
             // التحقق من وجود بيانات "تذكرني" للدخول التلقائي
             const rememberedUser = localStorage.getItem('rememberedUser');
-            let autoLoginAttempted = false;
-            
             if (rememberedUser) {
                 try {
                     const userData = JSON.parse(rememberedUser);
@@ -17367,8 +17736,6 @@ function emailSaleInvoice(saleId) {
                     
                     // التحقق من صلاحية البيانات (30 يوم)
                     if (userData.timestamp && (now - userData.timestamp) < dayInMs) {
-                        autoLoginAttempted = true;
-                        
                         // إخفاء شاشة تسجيل الدخول فوراً
                         document.getElementById('login-overlay').style.display = 'none';
                         
@@ -17377,30 +17744,18 @@ function emailSaleInvoice(saleId) {
                         document.getElementById('loginPassword').value = userData.password;
                         document.getElementById('rememberMe').checked = true;
                         
-                        console.log('🔄 تسجيل دخول تلقائي من بيانات "تذكرني"...');
-                        
                         // تسجيل الدخول التلقائي
                         setTimeout(() => {
                             handleLogin();
                         }, 100);
-                        
+                        return;
                     } else {
                         // البيانات منتهية الصلاحية
-                        console.log('⚠️ بيانات "تذكرني" منتهية الصلاحية، سيتم حذفها');
                         localStorage.removeItem('rememberedUser');
                     }
                 } catch (e) {
-                    console.error('❌ خطأ في قراءة بيانات "تذكرني":', e);
                     localStorage.removeItem('rememberedUser');
                 }
-            }
-            
-            // تنظيف بيانات تسجيل الدخول القديمة فقط إذا لم يتم محاولة تسجيل دخول تلقائي
-            if (!autoLoginAttempted) {
-                localStorage.removeItem('loggedInUser');
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('justLoggedOut');
-                console.log('🧹 تنظيف بيانات الجلسة القديمة');
             }
             
             // تحميل الشعار المحفوظ
@@ -19563,46 +19918,19 @@ function loadRecentActivities() {
 
 // تحميل تخصيصات التصميم عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    // تحقق من حالة التسجيل التلقائي
-    if (window.AUTO_LOGIN_IN_PROGRESS) {
-        console.log('🔒 تم تجاهل DOMContentLoaded الأخير لأن التسجيل التلقائي قيد التشغيل');
-        return;
-    }
-    
     console.log('📄 تم تحميل الصفحة - تحميل تخصيصات التصميم...');
     if (typeof loadDesignPreferences === 'function') {
         loadDesignPreferences();
         console.log('🎨 تم تحميل تخصيصات التصميم المحفوظة');
     }
     
-    // فحص الإعداد الأولي للنظام بعد التحقق من "تذكرني"
+    // فحص الإعداد الأولي للنظام
     if (typeof checkFirstSetup === 'function') {
-        console.log('🚀 تم العثور على وظيفة checkFirstSetup - سيتم استدعاؤها بعد فحص "تذكرني"');
+        console.log('🚀 تم العثور على وظيفة checkFirstSetup - سيتم استدعاؤها بعد ثانية واحدة');
         setTimeout(() => {
             console.log('🔍 بدء فحص الإعداد الأولي للنظام...');
-            
-            // لا نستدعي checkFirstSetup إذا كان هناك تسجيل دخول تلقائي
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            const manualLogout = sessionStorage.getItem('manualLogout');
-            
-            if (!manualLogout && rememberedUser) {
-                try {
-                    const userData = JSON.parse(rememberedUser);
-                    const now = new Date().getTime();
-                    const dayInMs = 30 * 24 * 60 * 60 * 1000; // 30 يوم
-                    
-                    if (userData.timestamp && (now - userData.timestamp) < dayInMs) {
-                        console.log('🔄 بيانات "تذكرني" موجودة وصالحة - تجاهل checkFirstSetup');
-                        return; // لا نستدعي checkFirstSetup
-                    }
-                } catch (e) {
-                    console.warn('خطأ في قراءة بيانات تذكرني:', e);
-                }
-            }
-            
-            // استدعاء checkFirstSetup فقط إذا لم يكن هناك تسجيل دخول تلقائي
             checkFirstSetup();
-        }, 1500); // تأخير أطول للسماح لمنطق "تذكرني" بالعمل أولاً
+        }, 1000); // تأخير قصير للتأكد من تحميل Firebase
     } else {
         console.error('❌ لم يتم العثور على وظيفة checkFirstSetup');
     }
