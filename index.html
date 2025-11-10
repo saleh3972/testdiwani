@@ -5906,15 +5906,25 @@ function showFirstSetupModal() {
 }
 
 // ========================================
+
 // 🔥 Firebase Integration - وضع التشغيل
+
 // ========================================
-const USE_FIREBASE = true; // true = Firebase, false = LocalStorage فقط
+
+const USE_FIREBASE = false; // true = Firebase, false = LocalStorage فقط
+
 const DEBUG_MODE = false; // تقليل رسائل Debug لتجنب الإزعاج
 
+
+
 function debugLog(...args) {
+
     if (DEBUG_MODE) {
+
         console.log(...args);
+
     }
+
 }
 
 // ========================================
