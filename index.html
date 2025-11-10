@@ -3600,6 +3600,13 @@ textarea.editing-mode {
        
             <button class="btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
             </form>
+            
+            <!-- زر طوارئ لإنشاء مدير جديد -->
+            <button class="btn-secondary" onclick="showFirstSetupModal()" 
+                    style="width: 100%; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer;">
+                🚀 إنشاء مدير نظام جديد
+            </button>
+            
             <a class="back-to-roles" onclick="openForgotPasswordModal()">نسيت كلمة المرور؟</a>
             <p id="login-error">بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.</p>
         </div>
@@ -5891,10 +5898,17 @@ async function uploadFile(file, path) {
     }
 }
 
+// دالة طوارئ لإظهار نافذة إنشاء مدير جديد
+function showFirstSetupModal() {
+    console.log('🚀 فتح نافذة إنشاء مدير جديد (طوارئ)');
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('first-setup-overlay').style.display = 'flex';
+}
+
 // ========================================
 // 🔥 Firebase Integration - وضع التشغيل
 // ========================================
-const USE_FIREBASE = false; // true = Firebase, false = LocalStorage فقط
+const USE_FIREBASE = true; // true = Firebase, false = LocalStorage فقط
 const DEBUG_MODE = false; // تقليل رسائل Debug لتجنب الإزعاج
 
 function debugLog(...args) {
