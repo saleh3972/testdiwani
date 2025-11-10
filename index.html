@@ -5973,18 +5973,32 @@ async function initializeApp() {
     if (USE_FIREBASE) {
         debugLog('🔥 تحميل البيانات من Firebase...');
         
-        items = await firebaseGetActivityData(currentActivityId, 'items') || [];
-        customers = await firebaseGetActivityData(currentActivityId, 'customers') || [];
-        suppliers = await firebaseGetActivityData(currentActivityId, 'suppliers') || [];
-        purchases = await firebaseGetActivityData(currentActivityId, 'purchases') || [];
-        sales = await firebaseGetActivityData(currentActivityId, 'sales') || [];
-        expenses = await firebaseGetActivityData(currentActivityId, 'expenses') || [];
-        revenues = await firebaseGetActivityData(currentActivityId, 'revenues') || [];
-        salaries = await firebaseGetActivityData(currentActivityId, 'salaries') || [];
-        assets = await firebaseGetActivityData(currentActivityId, 'assets') || [];
-        salesReturns = await firebaseGetActivityData(currentActivityId, 'salesReturns') || [];
-        advances = await firebaseGetActivityData(currentActivityId, 'advances') || [];
-        purchaseReturns = await firebaseGetActivityData(currentActivityId, 'purchaseReturns') || [];
+        const firebaseItems = await firebaseGetActivityData(currentActivityId, 'items');
+        const firebaseCustomers = await firebaseGetActivityData(currentActivityId, 'customers');
+        const firebaseSuppliers = await firebaseGetActivityData(currentActivityId, 'suppliers');
+        const firebasePurchases = await firebaseGetActivityData(currentActivityId, 'purchases');
+        const firebaseSales = await firebaseGetActivityData(currentActivityId, 'sales');
+        const firebaseExpenses = await firebaseGetActivityData(currentActivityId, 'expenses');
+        const firebaseRevenues = await firebaseGetActivityData(currentActivityId, 'revenues');
+        const firebaseSalaries = await firebaseGetActivityData(currentActivityId, 'salaries');
+        const firebaseAssets = await firebaseGetActivityData(currentActivityId, 'assets');
+        const firebaseSalesReturns = await firebaseGetActivityData(currentActivityId, 'salesReturns');
+        const firebaseAdvances = await firebaseGetActivityData(currentActivityId, 'advances');
+        const firebasePurchaseReturns = await firebaseGetActivityData(currentActivityId, 'purchaseReturns');
+        
+        // استخدم Firebase إذا توفرت بيانات، وإلا استخدم LocalStorage
+        items = (firebaseItems && firebaseItems.length > 0) ? firebaseItems : (loadFromLocalStorage(`diwan_items_${currentActivityId}`) || []);
+        customers = (firebaseCustomers && firebaseCustomers.length > 0) ? firebaseCustomers : (loadFromLocalStorage(`diwan_customers_${currentActivityId}`) || []);
+        suppliers = (firebaseSuppliers && firebaseSuppliers.length > 0) ? firebaseSuppliers : (loadFromLocalStorage(`diwan_suppliers_${currentActivityId}`) || []);
+        purchases = (firebasePurchases && firebasePurchases.length > 0) ? firebasePurchases : (loadFromLocalStorage(`diwan_purchases_${currentActivityId}`) || []);
+        sales = (firebaseSales && firebaseSales.length > 0) ? firebaseSales : (loadFromLocalStorage(`diwan_sales_${currentActivityId}`) || []);
+        expenses = (firebaseExpenses && firebaseExpenses.length > 0) ? firebaseExpenses : (loadFromLocalStorage(`diwan_expenses_${currentActivityId}`) || []);
+        revenues = (firebaseRevenues && firebaseRevenues.length > 0) ? firebaseRevenues : (loadFromLocalStorage(`diwan_revenues_${currentActivityId}`) || []);
+        salaries = (firebaseSalaries && firebaseSalaries.length > 0) ? firebaseSalaries : (loadFromLocalStorage(`diwan_salaries_${currentActivityId}`) || []);
+        assets = (firebaseAssets && firebaseAssets.length > 0) ? firebaseAssets : (loadFromLocalStorage(`diwan_assets_${currentActivityId}`) || []);
+        salesReturns = (firebaseSalesReturns && firebaseSalesReturns.length > 0) ? firebaseSalesReturns : (loadFromLocalStorage(`diwan_salesReturns_${currentActivityId}`) || []);
+        advances = (firebaseAdvances && firebaseAdvances.length > 0) ? firebaseAdvances : (loadFromLocalStorage(`diwan_advances_${currentActivityId}`) || []);
+        purchaseReturns = (firebasePurchaseReturns && firebasePurchaseReturns.length > 0) ? firebasePurchaseReturns : (loadFromLocalStorage(`diwan_purchaseReturns_${currentActivityId}`) || []);
         
         debugLog('✅ تم تحميل البيانات من Firebase');
     } else {
