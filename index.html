@@ -5905,13 +5905,20 @@ function showFirstSetupModal() {
     document.getElementById('first-setup-overlay').style.display = 'flex';
 }
 
+// دالة نسيان كلمة المرور (عالمية)
+function openForgotPasswordModal() {
+    const emailEl = document.getElementById('fp-email');
+    if (emailEl) emailEl.value = '';
+    document.getElementById('forgot-password-overlay').style.display = 'flex';
+}
+
 // ========================================
 
 // 🔥 Firebase Integration - وضع التشغيل
 
 // ========================================
 
-const USE_FIREBASE = false; // true = Firebase, false = LocalStorage فقط
+const USE_FIREBASE = true; // true = Firebase, false = LocalStorage فقط
 
 const DEBUG_MODE = false; // تقليل رسائل Debug لتجنب الإزعاج
 
