@@ -8267,7 +8267,9 @@ loadSavedEmailSettings();
                 const usersObject = {};
                 usersArray.forEach(user => {
                     if (user.email) {
-                        usersObject[user.email.replace(/[.#$[\]]/g, '_')] = user; // تنظيف المفاتيح من الرموز المحظورة
+                        // إزالة حقل password قبل الحفظ (يُحفظ فقط في Authentication)
+                        const { password, ...userDataWithoutPassword } = user;
+                        usersObject[user.email.replace(/[.#$[\]]/g, '_')] = userDataWithoutPassword;
                     }
                 });
                 
