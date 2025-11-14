@@ -1930,24 +1930,26 @@
         .filter-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
         .toggle-filters-btn { 
             padding: 12px 24px; 
-            background: #2196F3; 
-            color: white; 
-            border: none; 
+            background: rgba(135, 206, 250, 0.6); 
+            color: #1565c0; 
+            border: 1px solid rgba(135, 206, 250, 0.8); 
             border-radius: var(--border-radius); 
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
             transition: all 0.3s ease;
             font-family: var(--font-family);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(135, 206, 250, 0.3);
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(5px);
         }
         .toggle-filters-btn:hover { 
-            background: #1976D2; 
+            background: rgba(135, 206, 250, 0.8); 
+            color: #0d47a1;
             transform: translateY(-2px); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(135, 206, 250, 0.4);
         }
         
         /* Sortable Table Headers */
@@ -4381,13 +4383,10 @@ textarea.editing-mode {
         <input type="number" id="itemCost" placeholder="سعر الشراء">
     </div>
     
-    <div class="form-grid grid-2">
+    <div class="form-grid grid-3">
         <input type="number" id="itemPrice" placeholder="سعر البيع">
         <input type="number" id="itemStock" placeholder="الرصيد الأولي">
-    </div>
-    
-    <div class="form-grid grid-1">
-        <button class="btn-primary btn-add" onclick="addItem()">➕ إضافة صنف</button>
+        <button class="btn-primary btn-add" onclick="addItem()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">إضافة صنف</button>
     </div>
 
     <div class="search-container">
@@ -4455,9 +4454,12 @@ textarea.editing-mode {
         <input type="text" id="customerCode" placeholder="كود العميل">
         <input type="text" id="customerName" placeholder="اسم العميل *" required>
         <input type="text" id="customerPhone" placeholder="الهاتف">
+    </div>
+    
+    <div class="form-grid grid-3">
         <input type="email" id="customerEmail" placeholder="البريد الإلكتروني">
         <input type="text" id="customerAddress" placeholder="العنوان">
-    <button class="btn-primary btn-add" onclick="addCustomer()">➕ إضافة عميل</button>
+        <button class="btn-primary btn-add" onclick="addCustomer()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">إضافة عميل</button>
     </div>
 
     <div class="search-container">
@@ -4499,9 +4501,12 @@ textarea.editing-mode {
         <input type="text" id="supplierCode" placeholder="كود المورد">
         <input type="text" id="supplierName" placeholder="اسم المورد *" required>
         <input type="text" id="supplierPhone" placeholder=" الهاتف">
+    </div>
+    
+    <div class="form-grid grid-3">
         <input type="email" id="supplierEmail" placeholder="البريد الإلكتروني">
         <input type="text" id="supplierAddress" placeholder="العنوان">
-    <button class="btn-primary btn-add" onclick="addSupplier()">➕ إضافة مورد</button>
+        <button class="btn-primary btn-add" onclick="addSupplier()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">إضافة مورد</button>
     </div>
 
     <div class="search-container">
@@ -4560,10 +4565,6 @@ textarea.editing-mode {
     </div>
     
     <div class="form-grid grid-4">
-        <input type="text" id="purchaseNotes" placeholder="ملاحظات">
-    </div>
-    
-    <div class="form-grid grid-4">
         <select id="purchaseItem">
             <option value="">اختر الصنف</option>
         </select>
@@ -4573,7 +4574,11 @@ textarea.editing-mode {
             <option value="درزن">درزن</option>
         </select>
         <input type="number" id="purchasePrice" placeholder="سعر الشراء">
-    <button class="btn-primary btn-add" onclick="addPurchaseItem()">➕ إضافة صنف</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+        <input type="text" id="purchaseNotes" placeholder="ملاحظات" style="grid-column: span 3;">
+        <button class="btn-primary btn-add" onclick="addPurchaseItem()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease; white-space: nowrap;"> إضافة صنف</button>
     </div>
     
     <div class="invoice-items">
@@ -4616,8 +4621,7 @@ textarea.editing-mode {
     </div>
     
    <div style="display: flex; gap: 10px; margin-top: 20px; align-items: center; flex-wrap: wrap;">
-    <button class="btn-primary" id="savePurchaseBtn" onclick="savePurchase()">💾 حفظ الفاتورة</button>
-    <button class="btn-secondary" onclick="newPurchase()">🆕 فاتورة جديدة</button>
+    <button class="btn-primary" id="savePurchaseBtn" onclick="savePurchase()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 40px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">💾 حفظ الفاتورة</button>
 
     <input type="file" id="purchaseAttachment" accept="image/*,application/pdf" style="flex: 1; min-width: 250px; padding: 10px; border: 2px dashed var(--primary-color); background: #f8f9fa;">
 </div>
@@ -4699,10 +4703,6 @@ textarea.editing-mode {
     </div>
     
     <div class="form-grid grid-4">
-        <input type="text" id="saleNotes" placeholder="ملاحظات">
-    </div>
-    
-    <div class="form-grid grid-4">
         <select id="saleItem">
             <option value="">اختر الصنف</option>
         </select>
@@ -4712,7 +4712,11 @@ textarea.editing-mode {
             <option value="درزن">درزن</option>
         </select>
         <input type="number" id="salePrice" placeholder="سعر البيع">
-    <button class="btn-primary btn-add" onclick="addSaleItem()">➕ إضافة صنف</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+        <input type="text" id="saleNotes" placeholder="ملاحظات" style="grid-column: span 3;">
+        <button class="btn-primary btn-add" onclick="addSaleItem()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease; white-space: nowrap;"> إضافة صنف</button>
     </div>
     
     <div class="invoice-items">
@@ -4774,8 +4778,7 @@ textarea.editing-mode {
     </div>
     
     <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn-primary" id="saveSaleBtn" onclick="saveSale()">💾 حفظ الفاتورة</button>
-        <button class="btn-secondary" onclick="newSale()">🆕 فاتورة جديدة</button>
+        <button class="btn-primary" id="saveSaleBtn" onclick="saveSale()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 40px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">💾 حفظ الفاتورة</button>
     </div>
     
     <h3 style="margin-top: 30px;">فواتير المبيعات السابقة</h3>
@@ -4974,9 +4977,9 @@ textarea.editing-mode {
         <input type="text" id="expenseReference" placeholder="رقم المرجع (اختياري)">
     </div>
     
-    <div class="form-grid grid-2">
-        <input type="file" id="expenseAttachment" accept="image/*,application/pdf" style="padding: 10px; border: 2px dashed var(--primary-color); background: #f8f9fa;">
-        <button class="btn-primary btn-add" onclick="addExpense()">➕ إضافة مصروف</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <button class="btn-primary btn-add" onclick="addExpense()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة مصروف</button>
+        <input type="file" id="expenseAttachment" accept="image/*,application/pdf" style="padding: 10px; border: 2px dashed var(--primary-color); background: #f8f9fa; grid-column: span 2;">
     </div>
     <div class="search-container">
         <input type="text" id="searchExpenses" class="search-input" placeholder="🔍 بحث في المصروفات...">
@@ -5025,7 +5028,7 @@ textarea.editing-mode {
         </select>
     </div>
     
-    <div class="form-grid grid-3">
+    <div class="form-grid grid-4">
         <input type="text" id="revenueDescription" placeholder="وصف الإيراد">
         <select id="revenueSource">
             <option value="sales">مبيعات</option>
@@ -5034,10 +5037,7 @@ textarea.editing-mode {
             <option value="other">أخرى</option>
         </select>
         <input type="text" id="revenueReference" placeholder="رقم المرجع (اختياري)">
-    </div>
-    
-    <div class="form-grid grid-1">
-        <button class="btn-primary btn-add" onclick="addRevenue()">➕ إضافة إيراد</button>
+        <button class="btn-primary btn-add" onclick="addRevenue()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة إيراد</button>
     </div>
 
     <div class="search-container">
@@ -5099,7 +5099,7 @@ textarea.editing-mode {
             <option value="مسدد">مسدد</option>
             <option value="جزئي">مسدد جزئياً</option>
         </select>
-        <button class="btn-primary btn-add" onclick="addAdvance()">➕ إضافة عهدة/سلفة</button>
+        <button class="btn-primary btn-add" onclick="addAdvance()">إضافة عهدة/سلفة</button>
     </div>
 
     <div class="search-container">
@@ -5163,11 +5163,11 @@ textarea.editing-mode {
             <input type="number" id="salaryTransport" placeholder="بدل النقل" min="0" step="0.01">
             <input type="number" id="salaryOtherAllowances" placeholder="بدلات أخرى" min="0" step="0.01">
             <input type="number" id="salaryOvertime" placeholder="مكافآت إضافية" min="0" step="0.01">
-            <input type="number" id="salaryOtherDeductions" placeholder="استقطاعات أخرى" min="0" step="0.01">
-            <textarea id="salaryNotes" placeholder="ملاحظات حول المسير" rows="2"></textarea>
         </div>
-        <div class="salary-actions">
-            <button class="btn-primary" onclick="addSalary()">➕ حفظ المسير</button>
+        <div class="form-grid">
+            <input type="number" id="salaryOtherDeductions" placeholder="استقطاعات أخرى" min="0" step="0.01">
+            <input type="text" id="salaryNotes" placeholder="ملاحظات حول المسير">
+            <button class="btn-primary" onclick="addSalary()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">حفظ المسير</button>
             <button class="btn-secondary" onclick="clearSalaryForm()">↺ تفريغ الحقول</button>
         </div>
     </div>
@@ -5253,7 +5253,7 @@ textarea.editing-mode {
     <!-- أزرار الطباعة والتصدير -->
     <div class="export-options" style="margin: 20px 0;">
         <div class="form-grid grid-2">
-            <button class="btn-success" onclick="exportSalariesToExcel()">📊 تصدير إلى Excel</button>
+            <button class="btn-success" onclick="exportSalariesToExcel()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">📊 تصدير إلى Excel</button>
             <button class="btn-secondary" onclick="printSalariesReport()">🖨️ طباعة التقرير</button>
         </div>
     </div>
@@ -5322,7 +5322,7 @@ textarea.editing-mode {
         </div>
         
         <div class="asset-actions">
-            <button class="btn-primary" onclick="addAsset()">➕ إضافة الأصل</button>
+            <button class="btn-primary" onclick="addAsset()">إضافة الأصل</button>
         </div>
     </div>
 
@@ -5388,7 +5388,7 @@ textarea.editing-mode {
     <!-- أزرار الطباعة والتصدير -->
     <div class="export-options" style="margin: 20px 0;">
         <div class="form-grid grid-2">
-            <button class="btn-success" onclick="exportAssetsToExcel()">📊 تصدير إلى Excel</button>
+            <button class="btn-success" onclick="exportAssetsToExcel()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">📊 تصدير إلى Excel</button>
             <button class="btn-secondary" onclick="printAssetsReport()">🖨️ طباعة التقرير</button>
         </div>
     </div>
@@ -5489,7 +5489,7 @@ textarea.editing-mode {
         <div class="export-options">
             <div class="form-grid grid-3">
                 <button class="btn-primary" onclick="generateReport()">🔍 عرض التقرير</button>
-                <button class="btn-success" onclick="exportToExcel()">📊 تصدير إلى Excel</button>
+                <button class="btn-success" onclick="exportToExcel()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">📊 تصدير إلى Excel</button>
                 <button class="btn-secondary" onclick="exportToWeb()">🖨️ طباعة التقرير</button>
             </div>
         </div>
@@ -5623,36 +5623,33 @@ textarea.editing-mode {
         <div id="userManagementSection" class="user-management settings-card">
             <h3>👥 إدارة المستخدمين</h3>
             
-            <!-- بيانات المستخدم الحالي -->
-            <div class="current-user-info" style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-right: 4px solid var(--primary-color);">
-                <h4 style="color: var(--primary-color); margin-bottom: 15px; font-size: 1.1em;">👤 المستخدم الحالي</h4>
-                <div class="form-grid grid-2" style="margin-bottom: 15px;">
-                    <div>
-                        <strong>الاسم:</strong> <span id="currentUserNameDisplay">-</span>
-                    </div>
-                    <div>
-                        <strong>البريد الإلكتروني:</strong> <span id="currentUserEmailDisplay">-</span>
-                    </div>
-                    <div>
-                        <strong>رقم الجوال:</strong> <span id="currentUserPhoneDisplay">-</span>
-                    </div>
-                    <div>
-                        <strong>الصلاحية:</strong> <span id="currentUserRoleDisplay">-</span>
-                    </div>
-                </div>
-                <div id="currentActivityDisplay" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                    <strong>🏢 النشاط الحالي:</strong> <span id="currentActivityNameDisplay">لم يتم تحديد نشاط</span>
-                </div>
+            <!-- إضافة مستخدم جديد -->
+            <div style="margin-bottom: 25px;">
+                <h4 style="background: linear-gradient(135deg, rgba(40, 167, 69, 0.15), rgba(32, 201, 151, 0.15)); color: #28a745; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2); border: 2px solid rgba(40, 167, 69, 0.3);"> إضافة مستخدم جديد</h4>
+                <form id="newUserForm" onsubmit="return false;">
                 <div class="form-grid grid-3">
-                    <button class="btn-primary" onclick="openSelfEditUserModal()">✏️ تعديل بياناتي</button>
-                    <button class="btn-warning" id="changeActivityBtn" onclick="showActivityModal()" style="display: none;">🔄 تغيير النشاط</button>
-                    <button class="btn-warning" onclick="openChangePasswordModal()">🔒 تغيير كلمة المرور</button>
+                    <input type="text" id="newUserName" placeholder="اسم المستخدم *" autocomplete="name">
+                    <select id="newUserRole">
+                        <option value="admin">مدير</option>
+                        <option value="manager">مدير نشاط</option>
+                        <option value="user">مستخدم</option>
+                    </select>
+                    <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني *" autocomplete="email">
                 </div>
+                <div class="form-grid grid-4">
+                    <input type="tel" id="newUserPhone" placeholder="رقم الجوال *" autocomplete="tel">
+                    <input type="password" id="newUserPassword" placeholder="كلمة المرور *" autocomplete="new-password">
+                    <select id="newUserActivity">
+                        <option value="">-- تعيين لنشاط --</option>
+                    </select>
+                    <button class="btn-primary btn-add" onclick="addUser()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease;"> إضافة المستخدم</button>
+                </div>
+                </form>
             </div>
             
             <!-- قائمة المستخدمين -->
             <div class="user-selector" style="margin-bottom: 25px;">
-                <h4 style="color: var(--secondary-color); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0;">📋 قائمة المستخدمين</h4>
+                <h4 style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.15), rgba(66, 165, 245, 0.15)); color: #1976d2; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2); border: 2px solid rgba(25, 118, 210, 0.3);">📋 قائمة المستخدمين</h4>
                 <label for="usersDropdown" class="user-selector-label">قائمة المستخدمين:</label>
                 <div class="user-selector-controls">
                     <select id="usersDropdown" onchange="handleUserSelection()">
@@ -5689,34 +5686,32 @@ textarea.editing-mode {
                 </div>
             </div>
             
-            <!-- إضافة مستخدم جديد -->
-            <div style="margin-bottom: 25px;">
-                <h4 style="color: var(--secondary-color); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0;"> إضافة مستخدم جديد</h4>
-                <form id="newUserForm" onsubmit="return false;">
-                <div class="form-grid grid-3">
-                    <input type="text" id="newUserName" placeholder="اسم المستخدم *" autocomplete="name">
-                    <select id="newUserRole">
-                        <option value="admin">مدير</option>
-                        <option value="manager">مدير نشاط</option>
-                        <option value="user">مستخدم</option>
-                    </select>
-                    <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني *" autocomplete="email">
-                </div>
-                <div class="form-grid grid-3">
-                    <input type="tel" id="newUserPhone" placeholder="رقم الجوال *" autocomplete="tel">
-                    <input type="password" id="newUserPassword" placeholder="كلمة المرور *" autocomplete="new-password">
-                    <select id="newUserActivity">
-                        <option value="">-- تعيين لنشاط --</option>
-                    </select>
-                </div>
-                    <!-- زر إضافة المستخدم -->
-                    <div class="form-grid grid-3" style="margin-top: 15px;">
-                        <button class="btn-primary btn-add" onclick="addUser()" style="padding: 15px; font-size: 1.1em; font-weight: 600;"> إضافة المستخدم</button>
-                        <div></div>
-                        <div></div>
+            <!-- بيانات المستخدم الحالي -->
+            <div class="current-user-info" style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-right: 4px solid var(--primary-color);">
+                <h4 style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.15), rgba(66, 165, 245, 0.15)); color: #1976d2; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2); border: 2px solid rgba(25, 118, 210, 0.3);">👤 المستخدم الحالي</h4>
+                <div class="form-grid grid-2" style="margin-bottom: 15px;">
+                    <div>
+                        <strong>الاسم:</strong> <span id="currentUserNameDisplay">-</span>
                     </div>
-                </form>
+                    <div>
+                        <strong>البريد الإلكتروني:</strong> <span id="currentUserEmailDisplay">-</span>
+                    </div>
+                    <div>
+                        <strong>رقم الجوال:</strong> <span id="currentUserPhoneDisplay">-</span>
+                    </div>
+                    <div>
+                        <strong>الصلاحية:</strong> <span id="currentUserRoleDisplay">-</span>
+                    </div>
+                </div>
+                <div id="currentActivityDisplay" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong>🏢 النشاط الحالي:</strong> <span id="currentActivityNameDisplay">لم يتم تحديد نشاط</span>
+                </div>
+                <div class="form-grid grid-2">
+                    <button class="btn-primary" onclick="openSelfEditUserModal()" style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">✏️ تعديل بياناتي</button>
+                    <button class="btn-warning" id="changeActivityBtn" onclick="showActivityModal()" style="display: none; background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">🔄 تغيير النشاط</button>
+                </div>
             </div>
+            
         </div>
     </div>
 
@@ -5724,30 +5719,30 @@ textarea.editing-mode {
     <div id="activitiesTabContent" class="settings-tab-content">
         <div id="activityManagementSection" class="activities-management settings-card">
             <h3>🏢 إدارة الأنشطة التجارية</h3>
-            <div class="form-grid grid-3">
-                <input type="text" id="settingNewActivityName" placeholder="اسم النشاط الجديد">
-                <button class="btn-primary btn-add" onclick="addNewActivity(true)"> إضافة نشاط</button>
-                <button class="btn-secondary" onclick="migrateActivitiesToFirebase()" style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); opacity: 0.7;">
-                    � مزامنة الأنشطة القديمة لـ Firebase
-                </button>
-                <p style="font-size: 0.8em; color: #666; margin: 5px 0; font-style: italic;">
-                    💡 ملاحظة: الأنشطة الجديدة تحفظ تلقائياً في Firebase
-                </p>
-                <button class="btn-secondary" onclick="migrateActivityDataToFirebase()" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); opacity: 0.7;">
-                    � مزامنة بيانات النشاط القديمة
-                </button>
-                <p style="font-size: 0.8em; color: #666; margin: 5px 0; font-style: italic;">
-                    💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase
-                </p>
-            </div>
-            <div class="activity-selector" style="margin-top: 20px;">
+            
+            <div class="activity-selector" style="margin-bottom: 20px;">
                 <label for="activitiesDropdown" class="activity-selector-label">قائمة الأنشطة:</label>
-                <div class="activity-selector-controls">
+                <div class="form-grid grid-3">
                     <select id="activitiesDropdown" onchange="handleActivitySelection()">
                         <option value="">اختر نشاطًا</option>
                     </select>
+                    <button class="btn-secondary" onclick="migrateActivitiesToFirebase()" style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">
+                        🔄 مزامنة الأنشطة القديمة لـ Firebase
+                    </button>
+                    <button class="btn-secondary" onclick="migrateActivityDataToFirebase()" style="background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">
+                        📤 مزامنة بيانات النشاط القديمة
+                    </button>
                 </div>
-                <div id="selectedActivityInfo" class="selected-activity-info" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <p style="font-size: 0.8em; color: #666; margin: 0; font-style: italic;">
+                        💡 ملاحظة: الأنشطة الجديدة تحفظ تلقائياً في Firebase
+                    </p>
+                    <p style="font-size: 0.8em; color: #666; margin: 0; font-style: italic;">
+                        💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase
+                    </p>
+                </div>
+                
+                <div id="selectedActivityInfo" class="selected-activity-info" style="display: none; margin-top: 20px;">
                     <div class="selected-activity-field">
                         <label for="selectedActivityName">اسم النشاط</label>
                         <input type="text" id="selectedActivityName" readonly>
@@ -5757,6 +5752,11 @@ textarea.editing-mode {
                         <button class="btn-danger" id="deleteSelectedActivityBtn" onclick="handleDeleteSelectedActivity()" disabled>🗑️ حذف</button>
                     </div>
                 </div>
+            </div>
+            
+            <div class="form-grid grid-2">
+                <button class="btn-primary btn-add" onclick="addNewActivity(true)" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة نشاط جديد</button>
+                <input type="text" id="settingNewActivityName" placeholder="اسم النشاط الجديد">
             </div>
         </div>
 
@@ -5769,7 +5769,7 @@ textarea.editing-mode {
             
             <div class="form-grid grid-2" style="margin-bottom: 20px;">
                 <input type="text" id="newBranchName" placeholder="اسم الفرع الجديد (مثال: الرياض - حي النخيل)">
-                <button class="btn-primary btn-add" onclick="addBranch()">➕ إضافة فرع</button>
+                <button class="btn-primary btn-add" onclick="addBranch()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">إضافة فرع</button>
             </div>
             
             <div id="branchesTableContainer">
@@ -5875,9 +5875,9 @@ textarea.editing-mode {
 
     <!-- محتوى التبويبة الرابعة: النسخ والمزامنة -->
     <div id="backupTabContent" class="settings-tab-content">
-        <div class="backup-settings settings-card" style="background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%); color: white; border: none;">
-            <h3 style="color: white;">� النسخ الاحتياطي والاستعادة</h3>
-            <p style="opacity: 0.95; margin-bottom: 20px;">إدارة النسخ الاحتياطية وحفظها محلياً على جهازك</p>
+        <div class="backup-settings settings-card" style="background: rgba(25, 118, 210, 0.1); color: #1976d2; border: 2px solid rgba(25, 118, 210, 0.3);">
+            <h3 style="color: #1976d2;">💾 النسخ الاحتياطي والاستعادة</h3>
+            <p style="opacity: 0.85; margin-bottom: 20px;">إدارة النسخ الاحتياطية وحفظها محلياً على جهازك</p>
             
             <div class="data-actions-grid" style="gap: 15px;">
                 <button class="btn-success" onclick="createBackup()" style="background: #10b981;">
@@ -5913,9 +5913,9 @@ textarea.editing-mode {
                 </button>
             </div>
             
-            <div style="background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 8px; margin-top: 20px; backdrop-filter: blur(10px);">
-                <h4 style="color: white; margin-bottom: 10px;">💡 نصائح مهمة:</h4>
-                <ul style="margin: 0; padding-right: 20px; opacity: 0.95;">
+            <div style="background: rgba(25, 118, 210, 0.08); padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid rgba(25, 118, 210, 0.2);">
+                <h4 style="color: #1976d2; margin-bottom: 10px;">💡 نصائح مهمة:</h4>
+                <ul style="margin: 0; padding-right: 20px; opacity: 0.85; color: #333;">
                     <li>جميع الإجراءات أعلاه خاصة بالنشاط المحدد حالياً فقط</li>
                     <li>احفظ نسخة احتياطية لكل نشاط بشكل دوري</li>
                     <li>تأكد من اختيار النشاط الصحيح قبل استيراد أو مسح البيانات</li>
@@ -9526,11 +9526,11 @@ loadSavedEmailSettings();
                     sadaqaSection.className = 'section';
                     sadaqaSection.innerHTML = `
                         <h2>🤲 حساب الصدقة</h2>
-                        <div class="form-grid grid-3">
+                        <div class="form-grid grid-4">
                             <input type="number" id="sadaqaAmount" placeholder="المبلغ (ريال) *" min="1" required>
                             <input type="date" id="sadaqaDate" required>
                             <input type="text" id="sadaqaDesc" placeholder="وصف أو اسم المستفيد">
-                            <button class="btn-primary btn-add" onclick="addSadaqa()">➕ إضافة صدقة</button>
+                            <button class="btn-primary btn-add" onclick="addSadaqa()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة صدقة</button>
                         </div>
                         <div id="sadaqaList" style="margin-top:2em;"></div>
                         <div id="sadaqaTotal" style="margin-top:1em; font-weight:bold;"></div>
@@ -11399,7 +11399,7 @@ function loadCustomersToSelect() {
                         }
                         
                         const addButton = document.querySelector('#items .btn-primary');
-                        addButton.textContent = '➕ إضافة صنف';
+                        addButton.textContent = ' إضافة صنف';
                         addButton.onclick = addItem;
                         showNotification('✅ نجاح', `تم تحديث الصنف بنجاح!\n- تم تحديث ${salesCount} صنف في فواتير المبيعات\n- تم تحديث ${purchasesCount} صنف في فواتير المشتريات`, 'success');
                     } else {
@@ -11410,6 +11410,9 @@ function loadCustomersToSelect() {
                 hideLoading();
                 logError('Update Item', error);
             }
+
+
+
         }
 
         async function deleteItem(id) {
@@ -11467,7 +11470,7 @@ function loadCustomersToSelect() {
             document.getElementById('itemPrice').value = '';
             document.getElementById('itemStock').value = '';
             const addButton = document.querySelector('#items .btn-primary');
-            addButton.textContent = '➕ إضافة صنف';
+            addButton.textContent = ' إضافة صنف';
             addButton.onclick = addItem;
             generateItemCode(); // توليد كود جديد تلقائياً بعد التفريغ
             
@@ -11662,7 +11665,7 @@ function loadCustomersToSelect() {
                         renderCustomers();
                         
                         const addButton = document.querySelector('#customers .btn-primary');
-                        addButton.textContent = '➕ إضافة عميل';
+                        addButton.textContent = ' إضافة عميل';
                         addButton.onclick = addCustomer;
                         
                         showNotification('✅ نجاح', 'تم تحديث العميل بنجاح', 'success');
@@ -11903,7 +11906,7 @@ function loadCustomersToSelect() {
                         renderSuppliers();
                         
                         const addButton = document.querySelector('#suppliers .btn-primary');
-                        addButton.textContent = '➕ إضافة مورد';
+                        addButton.textContent = ' إضافة مورد';
                         addButton.onclick = addSupplier;
                         
                         showNotification('✅ نجاح', 'تم تحديث المورد بنجاح', 'success');
@@ -11953,7 +11956,7 @@ function loadCustomersToSelect() {
             document.getElementById('supplierEmail').value = '';
             document.getElementById('supplierAddress').value = '';
             const addButton = document.querySelector('#suppliers .btn-primary');
-            addButton.textContent = '➕ إضافة مورد';
+            addButton.textContent = ' إضافة مورد';
             addButton.onclick = addSupplier;
             generateSupplierCode(); // توليد كود جديد تلقائياً بعد التفريغ
             
@@ -13803,7 +13806,7 @@ function renderPurchaseReturns() {
     document.getElementById('expenseAttachment').value = null; 
     
     const btn = document.querySelector('#expenses .btn-primary');
-    btn.textContent = '➕ إضافة مصروف';
+    btn.textContent = ' إضافة مصروف';
     btn.onclick = addExpense;
     
     // إزالة المؤثر البصري
@@ -13922,7 +13925,7 @@ function renderPurchaseReturns() {
             ['revenueCategory', 'revenueAmount', 'revenueDescription', 'revenueReference'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('revenueSource').value = 'sales';
             const btn = document.querySelector('#revenues .btn-primary');
-            btn.textContent = '➕ إضافة إيراد';
+            btn.textContent = ' إضافة إيراد';
             btn.onclick = addRevenue;
             
             // إزالة المؤثر البصري
@@ -14178,7 +14181,7 @@ function renderPurchaseReturns() {
 
             const addBtn = document.querySelector('#salaries .btn-primary');
             if (addBtn) {
-                addBtn.textContent = '➕ حفظ المسير';
+                addBtn.textContent = ' حفظ المسير';
                 addBtn.onclick = addSalary;
             }
             
