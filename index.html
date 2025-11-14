@@ -515,10 +515,23 @@
                                 console.log('🔑 تم تعبئة بيانات التسجيل - بدء التسجيل التلقائي...');
                                 
                                 // التسجيل بعد وقت قصير للتأكد من تحميل كل شيء
-                                setTimeout(() => {
+                                setTimeout(async () => {
                                     if (typeof handleLogin === 'function') {
-                                        handleLogin();
-                                        console.log('✅ تم التسجيل التلقائي بنجاح!');
+                                        try {
+                                            await handleLogin();
+                                            console.log('✅ تم التسجيل التلقائي بنجاح!');
+                                        } catch (error) {
+                                            console.error('❌ فشل التسجيل التلقائي:', error);
+                                            // حذف البيانات المحفوظة إذا فشل التسجيل
+                                            localStorage.removeItem('rememberedUser');
+                                            loginOverlay.style.display = 'flex';
+                                            // إظهار رسالة خطأ للمستخدم
+                                            const errorMsg = document.getElementById('login-error');
+                                            if (errorMsg) {
+                                                errorMsg.textContent = 'بيانات "تذكرني" غير صحيحة. يرجى تسجيل الدخول مجدداً.';
+                                                errorMsg.style.display = 'block';
+                                            }
+                                        }
                                     } else {
                                         console.error('❌ دالة handleLogin غير موجودة');
                                         loginOverlay.style.display = 'flex';
@@ -1808,20 +1821,21 @@
         
         .settings-tab {
             padding: 15px 30px;
-            background: #f5f5f5;
-            border: none;
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.1), rgba(66, 165, 245, 0.1));
+            border: 2px solid rgba(25, 118, 210, 0.2);
             border-radius: 8px 8px 0 0;
             cursor: pointer;
             font-size: 1em;
             font-weight: 600;
-            color: #546e7a;
+            color: #1565c0;
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
         }
         
         .settings-tab:hover {
-            background: #e3f2fd;
-            color: #1976d2;
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.2), rgba(66, 165, 245, 0.2));
+            color: #0d47a1;
+            border-color: rgba(25, 118, 210, 0.4);
         }
         
         .settings-tab.active {
@@ -3902,6 +3916,74 @@ textarea.editing-mode {
         </div>
     </div>
 
+    <!-- نافذة تخصيص معلومات حول البرنامج -->
+    <div id="about-settings-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 10002; backdrop-filter: blur(5px);" onclick="if(event.target === this) closeAboutSettingsModal();">
+        <div style="background: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto;" onclick="event.stopPropagation();">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="color: var(--primary-color); margin: 0;">ℹ️ تخصيص معلومات حول البرنامج</h2>
+                <button onclick="closeAboutSettingsModal()" style="background: #f0f0f0; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #666; font-size: 18px;" title="إغلاق">✕</button>
+            </div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 0.95em;">
+                قم بتخصيص المعلومات التي تظهر في صفحة "حول البرنامج"
+            </p>
+            
+            <form id="aboutSettingsForm" onsubmit="return false;">
+                <div style="margin-bottom: 20px;">
+                    <!-- اسم البرنامج -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="aboutProgramNameInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">📱 اسم البرنامج</label>
+                        <input type="text" id="aboutProgramNameInput" class="login-input" placeholder="مثال: ديواني - نظام المحاسبة" value="ديواني - نظام المحاسبة">
+                    </div>
+                    
+                    <!-- رقم الإصدار -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="aboutVersionInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">🔢 رقم الإصدار</label>
+                        <input type="text" id="aboutVersionInput" class="login-input" placeholder="مثال: الإصدار 2.0" value="الإصدار 2.0">
+                    </div>
+                    
+                    <!-- وصف البرنامج -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="aboutDescriptionInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">📝 وصف البرنامج</label>
+                        <textarea id="aboutDescriptionInput" class="login-input" rows="4" placeholder="أدخل وصفاً تفصيلياً للبرنامج..." style="resize: vertical; min-height: 100px;">نظام محاسبي متكامل لإدارة الأنشطة التجارية، يوفر إدارة المبيعات والمشتريات والمخزون والحسابات المالية بطريقة سهلة وفعالة. يدعم النظام التشغيل المحلي والسحابي باستخدام Firebase، مع واجهة مستخدم حديثة وسهلة الاستخدام.</textarea>
+                    </div>
+                    
+                    <!-- اسم المطور -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="aboutDeveloperInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">👨‍💻 اسم المطور/الفريق</label>
+                        <input type="text" id="aboutDeveloperInput" class="login-input" placeholder="مثال: فريق التطوير" value="فريق التطوير">
+                    </div>
+                    
+                    <!-- سنة الإصدار -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="aboutYearInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">📅 سنة الإصدار</label>
+                        <input type="text" id="aboutYearInput" class="login-input" placeholder="مثال: 2025" value="2025">
+                    </div>
+                    
+                    <!-- معلومات التواصل -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label for="aboutWebsiteInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">🌐 الموقع الإلكتروني</label>
+                            <input type="text" id="aboutWebsiteInput" class="login-input" placeholder="مثال: www.example.com">
+                        </div>
+                        <div>
+                            <label for="aboutEmailInput" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">📧 البريد الإلكتروني</label>
+                            <input type="email" id="aboutEmailInput" class="login-input" placeholder="مثال: info@example.com">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; color: #555;">
+                    <strong>💡 نصيحة:</strong> يمكنك ترك أي حقل فارغاً إذا لم تكن بحاجة إليه، وسيتم عرض القيم الافتراضية.
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-success" onclick="saveAboutSettings()" style="flex: 1;">💾 حفظ التخصيصات</button>
+                    <button class="btn-secondary" onclick="closeAboutSettingsModal()" style="flex: 1;">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- نافذة تغيير كلمة المرور (للمستخدم المسجل) -->
     <div id="change-password-overlay" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:10002; backdrop-filter: blur(5px);">
         <div style="background:white; padding: 24px; border-radius: var(--border-radius); width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
@@ -4042,8 +4124,6 @@ textarea.editing-mode {
             </div>
         </div>
 
-        <button class="design-toggle" onclick="toggleControlPanel()">🎨</button>
-
         <div class="control-panel" id="controlPanel">
             <h3>🎨 تخصيص الواجهة</h3>
             
@@ -4130,8 +4210,6 @@ textarea.editing-mode {
             <h1 id="activityHeaderTitle">ديواني</h1>
             <div class="subtitle" id="activityHeaderSubtitle">نظام محاسبي متكامل</div>
         </div>
-        
-        <div class="developer-credit">برمجة وتطوير: صالح الصملة</div>
     </div>
 
     <!-- حاوية الإشعارات -->
@@ -5625,7 +5703,7 @@ textarea.editing-mode {
             
             <!-- إضافة مستخدم جديد -->
             <div style="margin-bottom: 25px;">
-                <h4 style="background: linear-gradient(135deg, rgba(40, 167, 69, 0.15), rgba(32, 201, 151, 0.15)); color: #28a745; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2); border: 2px solid rgba(40, 167, 69, 0.3);"> إضافة مستخدم جديد</h4>
+                <h4 style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.15), rgba(66, 165, 245, 0.15)); color: #1976d2; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2); border: 2px solid rgba(25, 118, 210, 0.3);"> إضافة مستخدم جديد</h4>
                 <form id="newUserForm" onsubmit="return false;">
                 <div class="form-grid grid-3">
                     <input type="text" id="newUserName" placeholder="اسم المستخدم *" autocomplete="name">
@@ -5722,10 +5800,20 @@ textarea.editing-mode {
             
             <div class="activity-selector" style="margin-bottom: 20px;">
                 <label for="activitiesDropdown" class="activity-selector-label">قائمة الأنشطة:</label>
-                <div class="form-grid grid-3">
-                    <select id="activitiesDropdown" onchange="handleActivitySelection()">
+                <div class="form-grid grid-3" style="align-items: center;">
+                    <select id="activitiesDropdown" onchange="handleActivitySelection()" style="height: 48px; padding: 10px 12px; font-size: 1em;">
                         <option value="">اختر نشاطًا</option>
                     </select>
+                    <div id="selectedActivityInfo" class="selected-activity-info" style="display: none;">
+                        <input type="text" id="selectedActivityName" placeholder="اسم النشاط" readonly style="width: 100%; height: 48px; padding: 10px 12px; font-size: 1em;">
+                    </div>
+                    <div id="selectedActivityActions" class="selected-activity-actions" style="display: none; display: flex; gap: 10px; align-items: stretch;">
+                        <button class="btn-warning edit-btn" id="editSelectedActivityBtn" onclick="handleEditSelectedActivity()" disabled style="flex: 1; height: 48px; padding: 0; font-size: 1em; display: flex; align-items: center; justify-content: center; line-height: 1;">✏️ تعديل</button>
+                        <button class="btn-danger" id="deleteSelectedActivityBtn" onclick="handleDeleteSelectedActivity()" disabled style="flex: 1; height: 48px; padding: 0; font-size: 1em; display: flex; align-items: center; justify-content: center; line-height: 1;">🗑️ حذف</button>
+                    </div>
+                </div>
+                
+                <div class="form-grid grid-2" style="margin-top: 15px;">
                     <button class="btn-secondary" onclick="migrateActivitiesToFirebase()" style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">
                         🔄 مزامنة الأنشطة القديمة لـ Firebase
                     </button>
@@ -5733,6 +5821,7 @@ textarea.editing-mode {
                         📤 مزامنة بيانات النشاط القديمة
                     </button>
                 </div>
+                
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
                     <p style="font-size: 0.8em; color: #666; margin: 0; font-style: italic;">
                         💡 ملاحظة: الأنشطة الجديدة تحفظ تلقائياً في Firebase
@@ -5741,22 +5830,11 @@ textarea.editing-mode {
                         💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase
                     </p>
                 </div>
-                
-                <div id="selectedActivityInfo" class="selected-activity-info" style="display: none; margin-top: 20px;">
-                    <div class="selected-activity-field">
-                        <label for="selectedActivityName">اسم النشاط</label>
-                        <input type="text" id="selectedActivityName" readonly>
-                    </div>
-                    <div class="selected-activity-actions">
-                        <button class="btn-warning edit-btn" id="editSelectedActivityBtn" onclick="handleEditSelectedActivity()" disabled>✏️ تعديل</button>
-                        <button class="btn-danger" id="deleteSelectedActivityBtn" onclick="handleDeleteSelectedActivity()" disabled>🗑️ حذف</button>
-                    </div>
-                </div>
             </div>
             
             <div class="form-grid grid-2">
-                <button class="btn-primary btn-add" onclick="addNewActivity(true)" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة نشاط جديد</button>
                 <input type="text" id="settingNewActivityName" placeholder="اسم النشاط الجديد">
+                <button class="btn-primary btn-add" onclick="addNewActivity(true)" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة نشاط جديد</button>
             </div>
         </div>
 
@@ -5796,31 +5874,40 @@ textarea.editing-mode {
 
     <!-- محتوى التبويبة الثالثة: الإعدادات العامة -->
     <div id="generalTabContent" class="settings-tab-content">
-        <!-- 📄 قسم إعدادات التذييل - جديد -->
-        <div id="footerSettingsSection" class="footer-settings settings-card">
-            <h3>📄 إعدادات التذييل</h3>
+        <!-- 📄 قسم إعدادات التذييل والواجهة - جديد -->
+        <div class="settings-card">
+            <h3>⚙️ إعدادات عامة</h3>
             <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
-                قم بتخصيص معلومات التذييل التي تظهر في نهاية الصفحة
+                تخصيص إعدادات التذييل والواجهة والبرنامج
             </p>
             
-            <button class="btn-primary" onclick="openFooterSettingsModal()" style="padding: 15px 30px; font-size: 1.1em;">
-                ⚙️ تخصيص بيانات التذييل
-            </button>
+            <div class="form-grid grid-3" style="gap: 15px;">
+                <button class="btn-primary" onclick="openFooterSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #1976d2, #42a5f5);">
+                    📄 تخصيص بيانات التذييل
+                </button>
+                <button class="btn-info" onclick="openAboutSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #0d47a1, #1565c0);">
+                    ℹ️ تخصيص حول البرنامج
+                </button>
+                <button class="btn-success" onclick="toggleControlPanel()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #7b1fa2, #9c27b0);">
+                    🎨 تخصيص الواجهة
+                </button>
+            </div>
             
-            <div class="tips-container" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.85em;">
+            <div class="tips-container" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.85em; border: 1px solid rgba(25, 118, 210, 0.2);">
                 <p><strong>💡 نصائح:</strong></p>
                 <ul style="margin: 5px 0; padding-right: 20px;">
-                    <li>يمكنك ترك أي حقل فارغاً إذا لم تكن بحاجة إليه</li>
-                    <li>سيتم إخفاء الروابط الفارغة تلقائياً من التذييل</li>
-                    <li>يُحفظ التذييل تلقائياً على الجهاز المحلي</li>
-                    <li>استخدم أيقونات مناسبة لوصف بيانات التواصل</li>
+                    <li>استخدم زر "تخصيص بيانات التذييل" لتحديث معلومات التواصل</li>
+                    <li>استخدم زر "تخصيص حول البرنامج" لتعديل معلومات البرنامج</li>
+                    <li>استخدم زر "تخصيص الواجهة" لتغيير الألوان والخطوط</li>
+                    <li>جميع الإعدادات تُحفظ تلقائياً على الجهاز المحلي</li>
                 </ul>
             </div>
         </div>
 
         <!-- شعار البرنامج وشعار النشاط التجاري -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div id="programLogoSection" class="logo-settings settings-card">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch;">
+            <div id="programLogoSection" class="logo-settings settings-card" style="display: flex; flex-direction: column; min-height: 450px;">
+                <div style="flex: 1;">
                 <h3>� شعار البرنامج</h3>
                 <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">اختر شعاراً يظهر في شاشة تسجيل الدخول</p>
                 
@@ -5834,8 +5921,9 @@ textarea.editing-mode {
                     <button class="btn-primary" onclick="document.getElementById('logoFileInput').click()">📤 اختيار شعار</button>
                     <button class="btn-danger" id="removeLogoBtn" onclick="removeLogo()" style="display: none;">🗑️ حذف الشعار</button>
                 </div>
+                </div>
                 
-                <div class="tips-container" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: auto; font-size: 0.85em;">
+                <div class="tips-container" style="background: #e3f2fd; padding: 15px; border-radius: 8px; font-size: 0.85em; border: 1px solid rgba(25, 118, 210, 0.2);">
                     <p><strong>💡 نصائح:</strong></p>
                     <ul style="margin: 5px 0; padding-right: 20px;">
                         <li>يُفضل استخدام صورة بخلفية شفافة (PNG)</li>
@@ -5845,7 +5933,8 @@ textarea.editing-mode {
                 </div>
             </div>
 
-            <div id="activityLogoSection" class="activity-logo-settings settings-card" style="display: none;">
+            <div id="activityLogoSection" class="activity-logo-settings settings-card" style="display: none; flex-direction: column; min-height: 450px;">
+                <div style="flex: 1;">
                 <h3>� شعار النشاط التجاري</h3>
                 <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">اختر شعاراً للنشاط التجاري الحالي (يظهر في الترويسة والفواتير)</p>
                 
@@ -5854,13 +5943,14 @@ textarea.editing-mode {
                     <p id="noActivityLogoText" style="color: #999; font-style: italic;">لم يتم رفع شعار للنشاط بعد</p>
                 </div>
                 
-                <div class="logo-actions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
+                <div class="logo-actions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
                     <input type="file" id="activityLogoFileInput" accept="image/*" style="display: none;" onchange="handleActivityLogoUpload(this)">
                     <button class="btn-primary" onclick="document.getElementById('activityLogoFileInput').click()">📤 اختيار شعار النشاط</button>
                     <button class="btn-danger" id="removeActivityLogoBtn" onclick="removeActivityLogo()" style="display: none;">🗑️ حذف الشعار</button>
                 </div>
+                </div>
                 
-                <div class="tips-container" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: auto; font-size: 0.85em;">
+                <div class="tips-container" style="background: #e3f2fd; padding: 15px; border-radius: 8px; font-size: 0.85em; border: 1px solid rgba(25, 118, 210, 0.2);">
                     <p><strong>💡 نصائح:</strong></p>
                     <ul style="margin: 5px 0; padding-right: 20px;">
                         <li>سيظهر الشعار في وسط الترويسة مع اسم النشاط تحته</li>
@@ -5882,9 +5972,6 @@ textarea.editing-mode {
             <div class="data-actions-grid" style="gap: 15px;">
                 <button class="btn-success" onclick="createBackup()" style="background: #10b981;">
                     💾 إنشاء نسخة احتياطية الآن
-                </button>
-                <button class="btn-warning" onclick="showBackupInfoWithRestore()" style="background: #f59e0b;">
-                    📋 استعادة آخر نسخة
                 </button>
                 <button class="btn-secondary" onclick="downloadAutoBackup()" style="background: #6366f1;">
                     📥 تنزيل النسخة كملف
@@ -5927,26 +6014,10 @@ textarea.editing-mode {
         </div>
 
         <!-- أدوات المزامنة مع Firebase -->
-        <div class="settings-card" style="margin-top: 20px;">
-            <h3>🔥 أدوات المزامنة مع Firebase</h3>
+        <div class="settings-card" style="margin-top: 20px; background: rgba(25, 118, 210, 0.1); border: 2px solid rgba(25, 118, 210, 0.3);">
+            <h3 style="color: #1976d2;">🔥 أدوات المزامنة مع Firebase</h3>
             
-            <!-- معلومات حالة النظام -->
-            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 2px solid #1976d2; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
-                <h4 style="margin: 0 0 15px 0; color: #0d47a1; font-size: 1.1em; display: flex; align-items: center; gap: 8px;">
-                    🔥 حالة النظام الهجين
-                </h4>
-                <div style="font-size: 0.95em; color: #1565c0; line-height: 1.6;">
-                    ✅ <strong>المستخدمين الجدد:</strong> يحفظون تلقائياً في Firebase + LocalStorage<br>
-                    ✅ <strong>الأنشطة الجديدة:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
-                    ✅ <strong>بيانات النشاط:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
-                    💡 <strong>الأزرار أدناه:</strong> فقط لمزامنة البيانات القديمة أو إعادة المزامنة
-                </div>
-            </div>
-            
-            <div class="form-grid grid-3">
-                <button class="btn-secondary" onclick="fixUsersPhoneField()">
-                    📱 إصلاح حقل الهاتف
-                </button>
+            <div class="form-grid grid-4">
                 <button class="btn-secondary" onclick="migrateUsersToFirebase()">
                     👥 مزامنة المستخدمين القدامى
                 </button>
@@ -5960,8 +6031,120 @@ textarea.editing-mode {
                     📊 مزامنة بيانات النشاط القديمة
                 </button>
             </div>
+            
+            <!-- معلومات حالة النظام -->
+            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 2px solid #1976d2; border-radius: 12px; padding: 20px; margin-top: 20px;">
+                <h4 style="margin: 0 0 15px 0; color: #0d47a1; font-size: 1.1em; display: flex; align-items: center; gap: 8px;">
+                    🔥 حالة النظام الهجين
+                </h4>
+                <div style="font-size: 0.95em; color: #1565c0; line-height: 1.6;">
+                    ✅ <strong>المستخدمين الجدد:</strong> يحفظون تلقائياً في Firebase + LocalStorage<br>
+                    ✅ <strong>الأنشطة الجديدة:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
+                    ✅ <strong>بيانات النشاط:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
+                    💡 <strong>الأزرار أعلاه:</strong> فقط لمزامنة البيانات القديمة أو إعادة المزامنة
+                </div>
+            </div>
+            
             <p style="font-size: 0.9em; color: #666; margin: 15px 0; font-style: italic; text-align: center;">
                 💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase + LocalStorage
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- 📱 صفحة حول البرنامج -->
+<div id="about" class="section">
+    <h2>ℹ️ حول البرنامج</h2>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <!-- بطاقة معلومات البرنامج الرئيسية -->
+        <div class="settings-card" style="text-align: center; background: white; border: 1px solid #ddd; padding: 30px;">
+            <!-- شعار البرنامج -->
+            <img id="aboutProgramLogo" src="https://res.cloudinary.com/dgjcr2bgq/image/upload/v1762349658/logo_vlldbc.png" alt="شعار البرنامج" style="width: 100px; height: 100px; margin: 0 auto 15px; border-radius: 8px; display: block;">
+            
+            <!-- اسم البرنامج والإصدار -->
+            <h1 id="aboutProgramName" style="color: #1976d2; margin: 0 0 5px 0; font-size: 1.8em;">ديواني - نظام المحاسبة</h1>
+            <p id="aboutVersion" style="color: #666; font-size: 1em; margin: 0 0 20px 0;">الإصدار 2.0</p>
+            
+            <!-- وصف البرنامج -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e1e5e9;">
+                <p id="aboutDescription" style="color: #555; line-height: 1.8; text-align: justify; font-size: 1em; margin: 0;">
+                    نظام محاسبي متكامل لإدارة الأنشطة التجارية، يوفر إدارة المبيعات والمشتريات والمخزون والحسابات المالية بطريقة سهلة وفعالة. 
+                    يدعم النظام التشغيل المحلي والسحابي باستخدام Firebase، مع واجهة مستخدم حديثة وسهلة الاستخدام.
+                </p>
+            </div>
+        </div>
+
+        <!-- معلومات البرنامج النصية -->
+        <div class="settings-card" style="background: white; border: 1px solid #ddd; padding: 25px; margin-top: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+                <div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">👨‍💻 المطور</div>
+                    <div id="aboutDeveloper" style="font-size: 1.1em; font-weight: 600; color: #333;">فريق التطوير</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">📅 سنة الإصدار</div>
+                    <div id="aboutYear" style="font-size: 1.1em; font-weight: 600; color: #333;">2025</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">📜 الترخيص</div>
+                    <div style="font-size: 1.1em; font-weight: 600; color: #333;">مفتوح المصدر</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- مميزات البرنامج -->
+        <div class="settings-card" style="margin-top: 20px; background: rgba(25, 118, 210, 0.05); border: 2px solid rgba(25, 118, 210, 0.2);">
+            <h3 style="color: #1976d2; margin-bottom: 20px; font-size: 1.5em;">✨ مميزات البرنامج</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #1976d2;">
+                    <strong style="color: #1976d2;">📊 إدارة متكاملة</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">إدارة المبيعات والمشتريات والمخزون والحسابات</p>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #2e7d32;">
+                    <strong style="color: #2e7d32;">☁️ التخزين السحابي</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">دعم Firebase للتخزين السحابي والمزامنة التلقائية</p>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #e65100;">
+                    <strong style="color: #e65100;">🔒 الأمان</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">نظام تسجيل دخول آمن مع صلاحيات متعددة</p>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #7b1fa2;">
+                    <strong style="color: #7b1fa2;">📱 واجهة حديثة</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">تصميم عصري وسهل الاستخدام مع دعم الأجهزة المختلفة</p>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #c62828;">
+                    <strong style="color: #c62828;">📈 تقارير مفصلة</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">تقارير مالية شاملة وإحصائيات دقيقة</p>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-right: 4px solid #0277bd;">
+                    <strong style="color: #0277bd;">💾 نسخ احتياطي</strong>
+                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.95em;">نظام نسخ احتياطي متقدم لحماية بياناتك</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- معلومات التواصل والدعم -->
+        <div class="settings-card" style="margin-top: 20px; text-align: center; background: rgba(25, 118, 210, 0.1); border: 2px solid rgba(25, 118, 210, 0.3); color: #333;">
+            <h3 style="color: #1976d2; margin-bottom: 15px; font-size: 1.3em;">📞 الدعم والتواصل</h3>
+            <p style="font-size: 1em; margin: 10px 0; color: #555;">
+                💡 للاستفسارات والدعم الفني، يمكنك التواصل معنا في أي وقت
+            </p>
+            <div style="background: rgba(25, 118, 210, 0.08); padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid rgba(25, 118, 210, 0.2);">
+                <p style="margin: 0; font-size: 0.95em; color: #333;">
+                    🌐 <strong>الموقع الإلكتروني:</strong> قريباً<br>
+                    📧 <strong>البريد الإلكتروني:</strong> قريباً
+                </p>
+            </div>
+        </div>
+
+        <!-- شكر وتقدير -->
+        <div style="text-align: center; margin-top: 25px; padding: 15px; color: #666;">
+            <p style="font-size: 1em; margin: 0;">
+                ❤️ شكراً لاستخدامك برنامج ديواني
+            </p>
+            <p style="font-size: 0.85em; margin: 8px 0 0 0; color: #999;">
+                جميع الحقوق محفوظة © 2025
             </p>
         </div>
     </div>
@@ -9493,8 +9676,9 @@ loadSavedEmailSettings();
                 { id: 'sadaqa', label: '🤲 حساب الصدقة' },
                 { id: 'salaries', label: '💼 إدارة الرواتب' },
                 { id: 'assets', label: '🏢 إدارة الأصول' },
-                { id: 'reports', label: '� الحسابات والتقارير' },
-                { id: 'settings', label: '⚙️ الإعدادات والنظام' }
+                { id: 'reports', label: '📊 الحسابات والتقارير' },
+                { id: 'settings', label: '⚙️ الإعدادات والنظام' },
+                { id: 'about', label: 'ℹ️ حول البرنامج' }
             ];
 
             let sectionsToRender;
@@ -10023,6 +10207,17 @@ function formatDate(dateString) {
         
         // فتح التبويبة الافتراضية (المستخدمين)
         switchSettingsTab('users');
+        
+        // التمرير للأعلى عند فتح صفحة الإعدادات
+        setTimeout(() => {
+            const settingsSection = document.getElementById('settings');
+            if (settingsSection) {
+                settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    } else if (sectionId === 'about') {
+        // 📱 تحميل معلومات حول البرنامج عند فتح الصفحة
+        loadAboutPageOnOpen();
     }
 }
 
@@ -10528,6 +10723,7 @@ console.log('🔍 Reached line ~10000 in main script...');
         function handleActivitySelection() {
             const dropdown = document.getElementById('activitiesDropdown');
             const infoBox = document.getElementById('selectedActivityInfo');
+            const actionsBox = document.getElementById('selectedActivityActions');
             const nameInput = document.getElementById('selectedActivityName');
             const editBtn = document.getElementById('editSelectedActivityBtn');
             const deleteBtn = document.getElementById('deleteSelectedActivityBtn');
@@ -10539,13 +10735,15 @@ console.log('🔍 Reached line ~10000 in main script...');
 
             if (!activity) {
                 if (infoBox) infoBox.style.display = 'none';
+                if (actionsBox) actionsBox.style.display = 'none';
                 if (nameInput) nameInput.value = '';
                 if (editBtn) editBtn.disabled = true;
                 if (deleteBtn) deleteBtn.disabled = true;
                 return;
             }
 
-            if (infoBox) infoBox.style.display = 'flex';
+            if (infoBox) infoBox.style.display = 'block';
+            if (actionsBox) actionsBox.style.display = 'flex';
             if (nameInput) nameInput.value = activity.name;
             if (editBtn) editBtn.disabled = false;
             if (deleteBtn) deleteBtn.disabled = false;
@@ -11715,7 +11913,7 @@ function loadCustomersToSelect() {
             document.getElementById('customerEmail').value = '';
             document.getElementById('customerAddress').value = '';
             const addButton = document.querySelector('#customers .btn-primary');
-            addButton.textContent = '➕ إضافة عميل';
+            addButton.textContent = ' إضافة عميل';
             addButton.onclick = addCustomer;
             generateCustomerCode(); // توليد كود جديد تلقائياً بعد التفريغ
             
@@ -12719,6 +12917,133 @@ function loadCustomersToSelect() {
             saveFooterSettings();
             closeFooterSettingsModal();
         }
+        
+        // === دوال إدارة تخصيص معلومات حول البرنامج ===
+        
+        // فتح نافذة تخصيص حول البرنامج
+        function openAboutSettingsModal() {
+            const modal = document.getElementById('about-settings-overlay');
+            if (modal) {
+                modal.style.display = 'flex';
+                loadAboutSettingsToModal();
+            }
+        }
+        
+        // إغلاق نافذة تخصيص حول البرنامج
+        function closeAboutSettingsModal() {
+            const modal = document.getElementById('about-settings-overlay');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // تحميل الإعدادات الحالية إلى النافذة المنبثقة
+        function loadAboutSettingsToModal() {
+            const aboutData = loadFromLocalStorage('about_info') || {
+                programName: 'ديواني - نظام المحاسبة',
+                version: 'الإصدار 2.0',
+                description: 'نظام محاسبي متكامل لإدارة الأنشطة التجارية، يوفر إدارة المبيعات والمشتريات والمخزون والحسابات المالية بطريقة سهلة وفعالة. يدعم النظام التشغيل المحلي والسحابي باستخدام Firebase، مع واجهة مستخدم حديثة وسهلة الاستخدام.',
+                developer: 'فريق التطوير',
+                year: '2025',
+                website: '',
+                email: ''
+            };
+            
+            document.getElementById('aboutProgramNameInput').value = aboutData.programName || '';
+            document.getElementById('aboutVersionInput').value = aboutData.version || '';
+            document.getElementById('aboutDescriptionInput').value = aboutData.description || '';
+            document.getElementById('aboutDeveloperInput').value = aboutData.developer || '';
+            document.getElementById('aboutYearInput').value = aboutData.year || '';
+            document.getElementById('aboutWebsiteInput').value = aboutData.website || '';
+            document.getElementById('aboutEmailInput').value = aboutData.email || '';
+        }
+        
+        // حفظ تخصيصات حول البرنامج
+        function saveAboutSettings() {
+            const aboutData = {
+                programName: document.getElementById('aboutProgramNameInput').value.trim() || 'ديواني - نظام المحاسبة',
+                version: document.getElementById('aboutVersionInput').value.trim() || 'الإصدار 2.0',
+                description: document.getElementById('aboutDescriptionInput').value.trim() || 'نظام محاسبي متكامل لإدارة الأنشطة التجارية',
+                developer: document.getElementById('aboutDeveloperInput').value.trim() || 'فريق التطوير',
+                year: document.getElementById('aboutYearInput').value.trim() || '2025',
+                website: document.getElementById('aboutWebsiteInput').value.trim(),
+                email: document.getElementById('aboutEmailInput').value.trim()
+            };
+            
+            // حفظ في LocalStorage
+            saveToLocalStorage('about_info', aboutData);
+            
+            // تحديث صفحة حول البرنامج إذا كانت مفتوحة
+            updateAboutPage(aboutData);
+            
+            // إغلاق النافذة
+            closeAboutSettingsModal();
+            
+            showNotification('✅ نجاح', 'تم حفظ تخصيصات حول البرنامج بنجاح', 'success');
+        }
+        
+        // تحديث صفحة حول البرنامج بالبيانات الجديدة
+        function updateAboutPage(aboutData) {
+            const programNameEl = document.getElementById('aboutProgramName');
+            const versionEl = document.getElementById('aboutVersion');
+            const descriptionEl = document.getElementById('aboutDescription');
+            const developerEl = document.getElementById('aboutDeveloper');
+            const yearEl = document.getElementById('aboutYear');
+            const logoEl = document.getElementById('aboutProgramLogo');
+            
+            if (programNameEl) programNameEl.textContent = aboutData.programName;
+            if (versionEl) versionEl.textContent = aboutData.version;
+            if (descriptionEl) descriptionEl.textContent = aboutData.description;
+            if (developerEl) developerEl.textContent = aboutData.developer;
+            if (yearEl) yearEl.textContent = aboutData.year;
+            
+            // تحديث الشعار من localStorage
+            if (logoEl) {
+                const logoData = loadFromLocalStorage('programLogo');
+                if (logoData) {
+                    logoEl.src = logoData;
+                    logoEl.style.display = 'block';
+                } else {
+                    // عرض الشعار الافتراضي
+                    logoEl.src = 'https://res.cloudinary.com/dgjcr2bgq/image/upload/v1762349658/logo_vlldbc.png';
+                    logoEl.style.display = 'block';
+                }
+            }
+            
+            // تحديث معلومات التواصل
+            updateContactInfo(aboutData);
+        }
+        
+        // تحديث معلومات التواصل في صفحة حول البرنامج
+        function updateContactInfo(aboutData) {
+            // البحث عن عنصر معلومات التواصل وتحديثه
+            const contactInfoDiv = document.querySelector('#about .settings-card:nth-last-of-type(2) > div:last-child');
+            if (contactInfoDiv) {
+                let html = '<p style="margin: 0; font-size: 0.95em; color: #333;">';
+                if (aboutData.website) {
+                    html += `🌐 <strong>الموقع الإلكتروني:</strong> ${aboutData.website}<br>`;
+                } else {
+                    html += '🌐 <strong>الموقع الإلكتروني:</strong> قريباً<br>';
+                }
+                if (aboutData.email) {
+                    html += `📧 <strong>البريد الإلكتروني:</strong> ${aboutData.email}`;
+                } else {
+                    html += '📧 <strong>البريد الإلكتروني:</strong> قريباً';
+                }
+                html += '</p>';
+                contactInfoDiv.innerHTML = html;
+            }
+        }
+        
+        // تحميل معلومات حول البرنامج عند فتح الصفحة
+        function loadAboutPageOnOpen() {
+            const aboutData = loadFromLocalStorage('about_info');
+            if (aboutData) {
+                updateAboutPage(aboutData);
+            }
+        }
+        
+        // === نهاية دوال تخصيص حول البرنامج ===
         
         // === نهاية دوال إدارة إعدادات التذييل ===
         
@@ -17047,10 +17372,16 @@ function updateAllCharts() {
                 const { ref, set } = window.firebaseModules;
                 const db = window.firebaseDatabase;
                 
-                const userRef = ref(db, `users/${uid}`);
+                // استخدام البريد الإلكتروني كـ key بدلاً من UID لتوحيد الطريقة
+                const sanitizedEmail = userData.email.replace(/[.#$[\]]/g, '_');
+                const userRef = ref(db, `users/${sanitizedEmail}`);
+                
+                // إزالة حقل password قبل الحفظ (يُحفظ فقط في Authentication)
+                const { password, ...userDataWithoutPassword } = userData;
+                
                 await set(userRef, {
-                    ...userData,
-                    uid: uid,
+                    ...userDataWithoutPassword,
+                    firebaseUid: uid,
                     createdAt: userData.createdAt || new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 });
@@ -17586,6 +17917,11 @@ function updateAllCharts() {
         if (footer) {
             footer.style.display = 'block';
             setTimeout(() => { footer.style.opacity = '1'; }, 100);
+        }
+        
+        // التحقق من التذكير بالنسخ الاحتياطي (كل 24 ساعة)
+        if (typeof checkBackupReminder === 'function') {
+            checkBackupReminder();
         }
 
         if (user.role === 'admin') {
@@ -18578,14 +18914,54 @@ function updateAllCharts() {
                 'إلغاء'
             );
             if (confirmed) {
-                users = users.filter(u => String(u.id) !== targetId);
-                await saveUsers();
-                renderUsersInSettings();
+                showLoading('جاري حذف المستخدم...');
+                
+                try {
+                    // حذف من Firebase Database أولاً
+                    if (USE_FIREBASE && userToDelete.email) {
+                        const { ref, remove } = window.firebaseModules;
+                        const db = window.firebaseDatabase;
+                        
+                        // حذف من users/
+                        const sanitizedEmail = userToDelete.email.replace(/[.#$[\]]/g, '_');
+                        const userRef = ref(db, `users/${sanitizedEmail}`);
+                        await remove(userRef);
+                        console.log('🔥 تم حذف المستخدم من Firebase Database');
+                        
+                        // حذف من Firebase Authentication إذا كان لديه firebaseUid
+                        if (userToDelete.firebaseUid) {
+                            try {
+                                // ملاحظة: حذف المستخدم من Authentication يتطلب Admin SDK من جانب الخادم
+                                // لكن يمكن حذفه من Database فقط
+                                console.log('⚠️ تنبيه: حساب Firebase Authentication للمستخدم لا يزال موجوداً. يجب حذفه يدوياً من Firebase Console');
+                            } catch (authError) {
+                                console.warn('⚠️ تعذر حذف المستخدم من Firebase Authentication:', authError);
+                            }
+                        }
+                    }
+                    
+                    // حذف من المصفوفة المحلية
+                    users = users.filter(u => String(u.id) !== targetId);
+                    
+                    // حفظ في LocalStorage
+                    await saveUsers();
+                    
+                    // تحديث العرض
+                    renderUsersInSettings();
+                    
+                    hideLoading();
+                    showNotification('✅ تم الحذف', 'تم حذف المستخدم بنجاح', 'success');
+                    
+                } catch (error) {
+                    hideLoading();
+                    console.error('❌ خطأ في حذف المستخدم:', error);
+                    showNotification('❌ خطأ', 'حدث خطأ في حذف المستخدم', 'error');
+                }
             }
         }
 
         // دالة إضافة مستخدم جديد
-        function addUser() {
+        async function addUser() {
             const name = document.getElementById('newUserName').value.trim();
             const email = document.getElementById('newUserEmail').value.trim();
             const phone = document.getElementById('newUserPhone').value.trim();
@@ -18690,6 +19066,25 @@ function updateAllCharts() {
                 // إضافة المستخدم إلى المصفوفة
                 users.push(newUser);
 
+                // 🔥 إنشاء حساب في Firebase Authentication
+                if (USE_FIREBASE) {
+                    try {
+                        console.log('🔥 إنشاء حساب Firebase Authentication للمستخدم:', email);
+                        const firebaseUser = await firebaseCreateUser(email, password, normalizedRole, normalizedActivityId);
+                        
+                        if (firebaseUser && firebaseUser.uid) {
+                            newUser.firebaseUid = firebaseUser.uid;
+                            console.log('✅ تم إنشاء حساب Firebase بنجاح. UID:', firebaseUser.uid);
+                            
+                            // حفظ بيانات المستخدم في Firebase Database
+                            await firebaseSaveUserData(firebaseUser.uid, newUser);
+                        }
+                    } catch (firebaseError) {
+                        console.error('⚠️ خطأ في إنشاء حساب Firebase:', firebaseError);
+                        // نكمل العملية حتى لو فشل Firebase
+                    }
+                }
+
                 // حفظ المستخدمين
                 saveUsers();
                 
@@ -18713,6 +19108,76 @@ function updateAllCharts() {
                 hideLoading();
                 console.error('خطأ في إضافة المستخدم:', error);
                 showNotification('❌ خطأ', 'حدث خطأ في إضافة المستخدم', 'error');
+            }
+        }
+
+        /**
+         * إصلاح حساب Firebase لمستخدم موجود
+         * استخدم هذه الدالة في Console للمستخدمين الذين تم إنشاؤهم قبل تفعيل Firebase Authentication
+         */
+        async function fixUserFirebaseAuth(email, password) {
+            try {
+                console.log('🔧 بدء إصلاح حساب Firebase للمستخدم:', email);
+                
+                // البحث عن المستخدم في قاعدة البيانات
+                const users = loadFromLocalStorage('diwan_users') || [];
+                const user = users.find(u => u.email === email);
+                
+                if (!user) {
+                    console.error('❌ المستخدم غير موجود في قاعدة البيانات');
+                    return { success: false, message: 'المستخدم غير موجود' };
+                }
+                
+                if (user.firebaseUid) {
+                    console.log('⚠️ المستخدم لديه firebaseUid بالفعل:', user.firebaseUid);
+                    console.log('سيتم إنشاء حساب جديد إذا لم يكن موجوداً في Firebase');
+                }
+                
+                // محاولة إنشاء حساب Firebase
+                let firebaseUser;
+                try {
+                    firebaseUser = await firebaseCreateUser(email, password, user.role, user.activityId);
+                    console.log('✅ تم إنشاء حساب Firebase:', firebaseUser.uid);
+                } catch (error) {
+                    // إذا كان الحساب موجوداً بالفعل، حاول تسجيل الدخول للحصول على UID
+                    if (error.code === 'auth/email-already-in-use') {
+                        console.log('ℹ️ الحساب موجود بالفعل في Firebase، محاولة تسجيل الدخول...');
+                        const result = await firebaseSignIn(email, password);
+                        if (result && result.firebaseUser) {
+                            firebaseUser = result.firebaseUser;
+                            console.log('✅ تم الحصول على UID من Firebase:', firebaseUser.uid);
+                        } else {
+                            throw new Error('كلمة المرور غير صحيحة');
+                        }
+                    } else {
+                        throw error;
+                    }
+                }
+                
+                // تحديث بيانات المستخدم
+                user.firebaseUid = firebaseUser.uid;
+                
+                // حفظ في LocalStorage
+                const userIndex = users.findIndex(u => u.email === email);
+                users[userIndex] = user;
+                saveToLocalStorage('diwan_users', users);
+                
+                // حفظ في Firebase Database
+                await firebaseSaveUserData(firebaseUser.uid, user);
+                
+                console.log('✅ تم إصلاح حساب المستخدم بنجاح');
+                return { 
+                    success: true, 
+                    message: 'تم إصلاح الحساب بنجاح',
+                    firebaseUid: firebaseUser.uid 
+                };
+                
+            } catch (error) {
+                console.error('❌ خطأ في إصلاح حساب Firebase:', error);
+                return { 
+                    success: false, 
+                    message: error.message || 'حدث خطأ غير متوقع' 
+                };
             }
         }
 
@@ -21842,6 +22307,51 @@ function loadRecentActivities() {
     // دالة مؤقتة لحل الخطأ
     console.log('جاري تحميل الأنشطة الحديثة...');
     return [];
+}
+
+/**
+ * نظام التذكير بالنسخ الاحتياطي التلقائي (كل 24 ساعة)
+ */
+function checkBackupReminder() {
+    try {
+        const lastBackupReminder = localStorage.getItem('lastBackupReminder');
+        const now = new Date().getTime();
+        const dayInMs = 24 * 60 * 60 * 1000; // 24 ساعة
+        
+        // إذا لم يكن هناك تذكير سابق أو مر أكثر من 24 ساعة
+        if (!lastBackupReminder || (now - parseInt(lastBackupReminder)) > dayInMs) {
+            // الانتظار 5 ثوانٍ بعد تسجيل الدخول قبل إظهار التنبيه
+            setTimeout(() => {
+                // التأكد من أن المستخدم مسجل دخول
+                const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+                if (isLoggedIn === 'true') {
+                    showConfirmDialog(
+                        '💾 تذكير: النسخ الاحتياطي',
+                        'مرت 24 ساعة على آخر تذكير. هل تريد عمل نسخة احتياطية الآن؟\n\n• يمكنك الضغط على "نعم" للذهاب إلى صفحة النسخ الاحتياطي\n• أو "لاحقاً" للتذكير غداً',
+                        'info',
+                        'نعم، انتقل للنسخ الاحتياطي',
+                        'لاحقاً'
+                    ).then(confirmed => {
+                        // تحديث وقت آخر تذكير
+                        localStorage.setItem('lastBackupReminder', now.toString());
+                        
+                        if (confirmed) {
+                            // الانتقال لصفحة الإعدادات وفتح تبويبة النسخ الاحتياطي
+                            showSection('settings');
+                            setTimeout(() => {
+                                switchSettingsTab('backup');
+                            }, 500);
+                        }
+                    });
+                }
+            }, 5000); // 5 ثوانٍ بعد تسجيل الدخول
+        } else {
+            const hoursLeft = Math.round((dayInMs - (now - parseInt(lastBackupReminder))) / (60 * 60 * 1000));
+            console.log(`⏰ التذكير القادم بالنسخ الاحتياطي بعد ${hoursLeft} ساعة`);
+        }
+    } catch (error) {
+        console.error('❌ خطأ في نظام التذكير بالنسخ الاحتياطي:', error);
+    }
 }
 
 // تحميل تخصيصات التصميم عند تحميل الصفحة
