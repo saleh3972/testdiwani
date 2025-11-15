@@ -3835,13 +3835,13 @@ textarea.editing-mode {
 
     <!-- نافذة تعديل المستخدم -->
     <div id="user-edit-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);">
-        <div id="user-edit-box" style="background: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 480px; text-align: center;">
+        <div id="user-edit-box" style="background: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 500px; text-align: center; max-height: 90vh; overflow-y: auto;">
             <h2 style="color: var(--primary-color); margin-bottom: 20px;">✏️ تعديل بيانات المستخدم</h2>
             <form id="editUserForm" onsubmit="return false;">
             <input type="text" id="editUserName" class="login-input" placeholder="اسم المستخدم" autocomplete="name">
             <input type="email" id="editUserEmail" class="login-input" placeholder="البريد الإلكتروني" autocomplete="email">
             <input type="tel" id="editUserPhone" class="login-input" placeholder="رقم الجوال" autocomplete="tel">
-            <input type="password" id="editUserPassword" class="login-input" placeholder="كلمة المرور" autocomplete="new-password">
+            <input type="password" id="editUserPassword" class="login-input" placeholder="كلمة المرور (اتركه فارغاً للإبقاء على الحالي)" autocomplete="new-password">
             <select id="editUserRole" class="login-input">
                 <option value="admin">مدير</option>
                 <option value="manager">مدير نشاط</option>
@@ -3850,6 +3850,24 @@ textarea.editing-mode {
             <select id="editUserActivity" class="login-input" style="display: none;">
                 <option value="">-- تعيين لنشاط --</option>
             </select>
+            <!-- سؤال الأمان -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: right; border-right: 3px solid #ffc107;">
+                <h5 style="color: #856404; margin: 0 0 10px 0; font-size: 14px;">🔐 تحديث سؤال الأمان (اختياري)</h5>
+                <div id="securityQuestionWarning" style="display: none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 8px; margin-bottom: 10px; font-size: 12px; color: #856404;">
+                    ⚠️ <strong>تنبيه:</strong> لا يوجد سؤال أمان محدد لهذا المستخدم. يُنصح بتحديد سؤال أمان لضمان إمكانية استعادة كلمة المرور.
+                </div>
+                <select id="editUserSecurityQuestion" class="login-input" style="margin-bottom: 10px;">
+                    <option value="">-- اختر سؤال أمان --</option>
+                    <option value="ما هو اسم والدتك؟">ما هو اسم والدتك؟</option>
+                    <option value="ما هي مدينة ميلادك؟">ما هي مدينة ميلادك؟</option>
+                    <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
+                    <option value="ما هو اسم حيوانك الأليف الأول؟">ما هو اسم حيوانك الأليف الأول؟</option>
+                    <option value="ما هو لقبك في الطفولة؟">ما هو لقبك في الطفولة؟</option>
+                    <option value="ما هو رقمك المفضل؟">ما هو رقمك المفضل؟</option>
+                </select>
+                <input type="text" id="editUserSecurityAnswer" class="login-input" placeholder="إجابة سؤال الأمان">
+                <p style="font-size: 11px; color: #856404; margin: 8px 0 0 0; text-align: right;">💡 اترك فارغاً للإبقاء على السؤال الحالي</p>
+            </div>
             </form>
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button class="btn-success" onclick="saveEditedUser()" style="flex:1;">حفظ</button>
@@ -4002,14 +4020,14 @@ textarea.editing-mode {
 
     <!-- نافذة نسيت كلمة المرور (طلب رابط) -->
     <div id="forgot-password-overlay" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:10002; backdrop-filter: blur(5px);">
-        <div style="background:white; padding: 24px; border-radius: var(--border-radius); width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align:center;">
-            <h2 style="margin-top:0; color: var(--primary-color);">📧 استعادة كلمة المرور</h2>
-            <p style="margin: 0 0 10px;">أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.</p>
+        <div style="background:white; padding: 30px; border-radius: var(--border-radius); width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h2 style="margin-top:0; color: var(--primary-color); text-align: center;">📧 استعادة كلمة المرور</h2>
+            <p style="margin: 0 0 20px; text-align: center; color: #666;">أدخل بريدك الإلكتروني المسجل في النظام</p>
             <form id="forgotPasswordForm" onsubmit="return false;">
-            <input type="email" id="fp-email" class="login-input" placeholder="البريد الإلكتروني" autocomplete="email">
+            <input type="email" id="fp-email" class="login-input" placeholder="البريد الإلكتروني" autocomplete="email" style="margin-bottom: 20px;">
             </form>
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btn-success" onclick="requestPasswordReset()" style="flex:1;">إرسال الرابط</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-success" onclick="requestPasswordReset()" style="flex:1;">إرسال</button>
                 <button class="btn-secondary" onclick="closeForgotPasswordModal()" style="flex:1;">إلغاء</button>
             </div>
         </div>
@@ -4017,13 +4035,14 @@ textarea.editing-mode {
 
     <!-- نافذة إدخال كلمة مرور جديدة عبر الرابط -->
     <div id="reset-password-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:10003; backdrop-filter: blur(5px);">
-        <div style="background:white; padding: 24px; border-radius: var(--border-radius); width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align:center;">
-            <h2 style="margin-top:0; color: var(--primary-color);">🔁 تعيين كلمة مرور جديدة</h2>
+        <div style="background:white; padding: 30px; border-radius: var(--border-radius); width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <h2 style="margin-top:0; color: var(--primary-color); text-align: center;">🔑 تعيين كلمة مرور جديدة</h2>
+            <p style="margin: 0 0 20px; text-align: center; color: #666;">أدخل كلمة المرور الجديدة (6 أحرف على الأقل)</p>
             <form id="resetPasswordForm" onsubmit="return false;">
-            <input type="password" id="rp-new" class="login-input" placeholder="كلمة المرور الجديدة" autocomplete="new-password">
-            <input type="password" id="rp-confirm" class="login-input" placeholder="تأكيد كلمة المرور الجديدة" autocomplete="new-password">
+            <input type="password" id="rp-new" class="login-input" placeholder="كلمة المرور الجديدة" autocomplete="new-password" style="margin-bottom: 15px;">
+            <input type="password" id="rp-confirm" class="login-input" placeholder="تأكيد كلمة المرور الجديدة" autocomplete="new-password" style="margin-bottom: 20px;">
             </form>
-            <div style="display:flex; gap:10px; margin-top:10px;">
+            <div style="display:flex; gap:10px;">
                 <button class="btn-success" onclick="submitTokenPasswordReset()" style="flex:1;">حفظ</button>
                 <button class="btn-secondary" onclick="closeResetPasswordModal()" style="flex:1;">إلغاء</button>
             </div>
@@ -5720,8 +5739,25 @@ textarea.editing-mode {
                     <select id="newUserActivity">
                         <option value="">-- تعيين لنشاط --</option>
                     </select>
-                    <button class="btn-primary btn-add" onclick="addUser()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease;"> إضافة المستخدم</button>
                 </div>
+                <!-- سؤال الأمان -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-right: 3px solid #ffc107;">
+                    <h5 style="color: #856404; margin: 0 0 10px 0;">🔐 سؤال الأمان (اختياري - موصى به)</h5>
+                    <div class="form-grid grid-2">
+                        <select id="newUserSecurityQuestion" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
+                            <option value="">-- اختر سؤال أمان --</option>
+                            <option value="ما هو اسم والدتك؟">ما هو اسم والدتك؟</option>
+                            <option value="ما هي مدينة ميلادك؟">ما هي مدينة ميلادك؟</option>
+                            <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
+                            <option value="ما هو اسم حيوانك الأليف الأول؟">ما هو اسم حيوانك الأليف الأول؟</option>
+                            <option value="ما هو لقبك في الطفولة؟">ما هو لقبك في الطفولة؟</option>
+                            <option value="ما هو رقمك المفضل؟">ما هو رقمك المفضل؟</option>
+                        </select>
+                        <input type="text" id="newUserSecurityAnswer" placeholder="إجابة سؤال الأمان" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
+                    </div>
+                    <p style="font-size: 12px; color: #856404; margin: 8px 0 0 0;">💡 سؤال الأمان يساعد المستخدم في استعادة كلمة المرور بشكل آمن</p>
+                </div>
+                <button class="btn-primary btn-add" onclick="addUser()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease; width: 100%;"> إضافة المستخدم</button>
                 </form>
             </div>
             
@@ -6454,6 +6490,665 @@ if (typeof window !== 'undefined') {
     window.toggleDebugMode = toggleDebugMode;
 }
 
+// ========================================
+// 🔒 دوال استعادة كلمة المرور - يجب أن تكون متاحة مبكراً
+// ========================================
+function openForgotPasswordModal() {
+    console.log('🔓 فتح نافذة استعادة كلمة المرور');
+    const emailEl = document.getElementById('fp-email');
+    if (emailEl) emailEl.value = '';
+    const overlay = document.getElementById('forgot-password-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    } else {
+        console.error('❌ لم يتم العثور على نافذة استعادة كلمة المرور');
+    }
+}
+
+function closeForgotPasswordModal() {
+    console.log('🔒 إغلاق نافذة استعادة كلمة المرور');
+    const overlay = document.getElementById('forgot-password-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function requestPasswordReset() {
+    console.log('📧 طلب استعادة كلمة المرور');
+    const email = document.getElementById('fp-email').value.trim();
+    if (!email) { 
+        alert('يرجى إدخال البريد الإلكتروني.'); 
+        return; 
+    }
+    
+    console.log('🔍 البحث عن المستخدم بالبريد:', email);
+    
+    // تحميل المستخدمين مباشرة من localStorage
+    let tempUsers = [];
+    
+    // محاولة تحميل من المفاتيح المختلفة
+    try {
+        // محاولة 1: المفتاح الرئيسي diwan_users
+        const storedUsers1 = localStorage.getItem('diwan_users');
+        if (storedUsers1) {
+            tempUsers = JSON.parse(storedUsers1);
+            console.log(`✅ تم تحميل ${tempUsers.length} مستخدم من diwan_users`);
+        }
+        
+        // محاولة 2: المفتاح البديل users (إذا لم نجد في diwan_users)
+        if (tempUsers.length === 0) {
+            const storedUsers2 = localStorage.getItem('users');
+            if (storedUsers2) {
+                tempUsers = JSON.parse(storedUsers2);
+                console.log(`✅ تم تحميل ${tempUsers.length} مستخدم من users`);
+            }
+        }
+        
+        // محاولة 3: استخدام متغير users العالمي إذا كان متاحاً
+        if (tempUsers.length === 0 && typeof users !== 'undefined' && Array.isArray(users)) {
+            tempUsers = users;
+            console.log(`✅ استخدام متغير users العالمي: ${tempUsers.length} مستخدم`);
+        }
+        
+        if (tempUsers.length === 0) {
+            console.log('❌ لم يتم العثور على أي مستخدمين في النظام');
+            alert('لا توجد بيانات مستخدمين في النظام. يرجى التواصل مع مدير النظام.');
+            return;
+        }
+        
+        console.log('📋 جميع المستخدمين المتاحين:', tempUsers.map(u => u.email));
+        
+        // البحث عن المستخدم
+        const user = tempUsers.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+        
+        if (!user) { 
+            console.log('❌ لم يتم العثور على المستخدم بالبريد:', email);
+            alert('لا يوجد مستخدم بهذا البريد الإلكتروني.\nيرجى التحقق من البريد والمحاولة مرة أخرى.'); 
+            return; 
+        }
+        
+        console.log('✅ تم العثور على المستخدم:', user.name);
+        
+        // ✨ التحقق من وجود سؤال أمان
+        if (!user.securityQuestion || !user.securityAnswer) {
+            // المستخدم لم يحدد سؤال أمان بعد
+            createCustomAlertDialog({
+                title: 'تنبيه أمان',
+                icon: '⚠️',
+                content: `
+                    <div style="padding: 20px 0; text-align: right;">
+                        <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-right: 3px solid #ffc107;">
+                            <p style="margin: 8px 0; color: #856404; font-size: 15px;"><strong>👤 الاسم:</strong> ${user.name}</p>
+                            <p style="margin: 8px 0; color: #856404; font-size: 15px;"><strong>📧 البريد:</strong> ${email}</p>
+                        </div>
+                        <p style="font-size: 15px; color: #34495e; line-height: 1.6; margin: 15px 0;">
+                            ⚠️ لم يتم تعيين سؤال أمان لهذا الحساب.
+                        </p>
+                        <p style="font-size: 14px; color: #7f8c8d; line-height: 1.5; margin: 10px 0;">
+                            📞 يرجى التواصل مع مدير النظام لاستعادة كلمة المرور أو تفعيل سؤال الأمان.
+                        </p>
+                    </div>
+                `,
+                buttonText: 'حسناً',
+                onClose: () => {
+                    closeForgotPasswordModal();
+                }
+            });
+            return;
+        }
+        
+        // عرض سؤال الأمان للتحقق
+        createSecurityQuestionDialog({
+            user: user,
+            tempUsers: tempUsers,
+            email: email
+        });
+        
+    } catch (error) {
+        console.error('❌ خطأ في تحميل بيانات المستخدمين:', error);
+        alert('حدث خطأ في تحميل البيانات. يرجى المحاولة لاحقاً.');
+    }
+}
+
+// دالة لعرض سؤال الأمان
+function createSecurityQuestionDialog({ user, tempUsers, email }) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10100; backdrop-filter: blur(4px);';
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = 'background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 500px; animation: fadeIn 0.3s ease;';
+    
+    dialog.innerHTML = `
+        <div style="padding: 25px 30px; border-bottom: 1px solid #ecf0f1;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 32px;">🔐</span>
+                <h3 style="margin: 0; color: var(--primary-color); font-size: 1.4em;">سؤال الأمان</h3>
+            </div>
+        </div>
+        <div style="padding: 25px 30px;">
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-right: 3px solid var(--primary-color);">
+                <p style="margin: 8px 0; color: #2c3e50; font-size: 15px;"><strong>👤 الاسم:</strong> ${user.name}</p>
+                <p style="margin: 8px 0; color: #2c3e50; font-size: 15px;"><strong>📧 البريد:</strong> ${email}</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #34495e; font-size: 15px;">
+                    ❓ ${user.securityQuestion}
+                </label>
+                <input type="text" id="securityAnswerInput" placeholder="أدخل إجابة سؤال الأمان" 
+                       style="width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; font-family: var(--font-family);">
+            </div>
+            <p id="securityError" style="color: #e74c3c; font-size: 14px; margin: 10px 0; display: none;"></p>
+            <p style="font-size: 13px; color: #7f8c8d; line-height: 1.5; margin: 15px 0;">
+                💡 <strong>ملاحظة:</strong> الإجابة حساسة لحالة الأحرف (كبيرة/صغيرة)
+            </p>
+        </div>
+        <div style="padding: 20px 30px; border-top: 1px solid #ecf0f1; display: flex; gap: 10px; justify-content: flex-end;">
+            <button id="securityCancelBtn" style="padding: 12px 30px; border: 1px solid #ddd; background: white; color: #666; border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.3s;">
+                إلغاء
+            </button>
+            <button id="securityVerifyBtn" style="padding: 12px 30px; border: none; background: var(--primary-color); color: white; border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                التحقق
+            </button>
+        </div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    const answerInput = dialog.querySelector('#securityAnswerInput');
+    const errorMsg = dialog.querySelector('#securityError');
+    const verifyBtn = dialog.querySelector('#securityVerifyBtn');
+    const cancelBtn = dialog.querySelector('#securityCancelBtn');
+    
+    // Focus على حقل الإدخال
+    setTimeout(() => answerInput.focus(), 100);
+    
+    // التحقق من الإجابة
+    verifyBtn.addEventListener('click', () => {
+        const answer = answerInput.value.trim();
+        
+        if (!answer) {
+            errorMsg.textContent = '⚠️ يرجى إدخال إجابة سؤال الأمان';
+            errorMsg.style.display = 'block';
+            answerInput.style.borderColor = '#e74c3c';
+            return;
+        }
+        
+        // التحقق من الإجابة (حساس لحالة الأحرف)
+        if (answer === user.securityAnswer) {
+            // الإجابة صحيحة ✅
+            document.body.removeChild(overlay);
+            closeForgotPasswordModal();
+            openAdminPasswordReset(user, tempUsers);
+        } else {
+            // الإجابة خاطئة ❌
+            errorMsg.textContent = '❌ الإجابة غير صحيحة. يرجى المحاولة مرة أخرى.';
+            errorMsg.style.display = 'block';
+            answerInput.style.borderColor = '#e74c3c';
+            answerInput.value = '';
+            answerInput.focus();
+        }
+    });
+    
+    // الإلغاء
+    cancelBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+        closeForgotPasswordModal();
+    });
+    
+    // Enter للتحقق
+    answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verifyBtn.click();
+        }
+    });
+    
+    // إزالة رسالة الخطأ عند الكتابة
+    answerInput.addEventListener('input', () => {
+        errorMsg.style.display = 'none';
+        answerInput.style.borderColor = '#ddd';
+    });
+    
+    // Hover effects
+    verifyBtn.addEventListener('mouseenter', () => {
+        verifyBtn.style.transform = 'translateY(-2px)';
+        verifyBtn.style.boxShadow = '0 4px 12px rgba(44, 90, 160, 0.3)';
+    });
+    verifyBtn.addEventListener('mouseleave', () => {
+        verifyBtn.style.transform = 'translateY(0)';
+        verifyBtn.style.boxShadow = 'none';
+    });
+    
+    cancelBtn.addEventListener('mouseenter', () => {
+        cancelBtn.style.background = '#f8f9fa';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+        cancelBtn.style.background = 'white';
+    });
+}
+
+// دالة خاصة لإعادة تعيين كلمة مرور المدير
+function openAdminPasswordReset(adminUser, usersArray) {
+    console.log('🔐 فتح نافذة إعادة تعيين كلمة مرور المدير');
+    
+    const overlay = document.getElementById('reset-password-overlay');
+    if (!overlay) {
+        console.error('❌ لم يتم العثور على نافذة إعادة التعيين');
+        return;
+    }
+    
+    // حفظ بيانات المستخدم مؤقتاً
+    window.tempAdminReset = { user: adminUser, users: usersArray };
+    
+    // تنظيف الحقول
+    const newPass = document.getElementById('rp-new');
+    const confirmPass = document.getElementById('rp-confirm');
+    if (newPass) newPass.value = '';
+    if (confirmPass) confirmPass.value = '';
+    
+    overlay.style.display = 'flex';
+}
+
+// دالة لحفظ كلمة المرور الجديدة للمدير
+function submitTokenPasswordReset() {
+    console.log('💾 حفظ كلمة المرور الجديدة للمدير');
+    
+    if (!window.tempAdminReset) {
+        alert('حدث خطأ في استعادة بيانات الجلسة. يرجى المحاولة مرة أخرى.');
+        closeResetPasswordModal();
+        return;
+    }
+    
+    const newPass = document.getElementById('rp-new').value;
+    const confirmPass = document.getElementById('rp-confirm').value;
+    
+    if (!newPass || !confirmPass) {
+        alert('يرجى إدخال كلمة المرور وتأكيدها.');
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+        return;
+    }
+    
+    if (newPass !== confirmPass) {
+        alert('كلمة المرور وتأكيدها غير متطابقين.');
+        return;
+    }
+    
+    try {
+        const { user, users: tempUsers } = window.tempAdminReset;
+        
+        // تحديث كلمة المرور
+        const userIndex = tempUsers.findIndex(u => u.id === user.id);
+        if (userIndex === -1) {
+            alert('حدث خطأ في العثور على المستخدم.');
+            return;
+        }
+        
+        tempUsers[userIndex].password = newPass;
+        
+        // حفظ في localStorage
+        localStorage.setItem('diwan_users', JSON.stringify(tempUsers));
+        
+        // تحديث المتغير العالمي إذا كان موجوداً
+        if (typeof users !== 'undefined' && Array.isArray(users)) {
+            users = tempUsers;
+        }
+        
+        console.log('✅ تم تحديث كلمة المرور بنجاح');
+        
+        // تنظيف البيانات المؤقتة
+        delete window.tempAdminReset;
+        
+        closeResetPasswordModal();
+        
+        alert(`✅ تم تغيير كلمة المرور بنجاح!\n\n👤 ${user.name}\n📧 ${user.email}\n\nيمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.`);
+        
+    } catch (error) {
+        console.error('❌ خطأ في حفظ كلمة المرور:', error);
+        alert('حدث خطأ في حفظ كلمة المرور. يرجى المحاولة مرة أخرى.');
+    }
+}
+
+function openResetPasswordModal(token) {
+    // في النظام المحلي، نعرض رسالة
+    console.log('⚠️ محاولة فتح نافذة إعادة تعيين كلمة المرور عبر رابط');
+    alert('ميزة إعادة تعيين كلمة المرور عبر الرابط غير متاحة في النظام المحلي.\nيرجى التواصل مع مدير النظام لتغيير كلمة المرور.');
+}
+
+function closeResetPasswordModal() {
+    const overlay = document.getElementById('reset-password-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+// كشف دوال استعادة كلمة المرور للعالمية
+if (typeof window !== 'undefined') {
+    window.openForgotPasswordModal = openForgotPasswordModal;
+    window.closeForgotPasswordModal = closeForgotPasswordModal;
+    window.requestPasswordReset = requestPasswordReset;
+    window.openResetPasswordModal = openResetPasswordModal;
+    window.closeResetPasswordModal = closeResetPasswordModal;
+    window.openAdminPasswordReset = openAdminPasswordReset;
+    window.submitTokenPasswordReset = submitTokenPasswordReset;
+}
+
+// ==========================================
+// دوال إرسال الفاتورة عبر واتساب
+// ==========================================
+
+// دالة لتجهيز رقم الهاتف للواتساب (مهمة جداً)
+function formatPhoneNumberForWhatsApp(phone) {
+    if (!phone) return null;
+
+    // إزالة أي مسافات أو شرطات أو علامة +
+    let cleaned = phone.replace(/[\s\-+]/g, '');
+
+    // إذا كان الرقم يبدأ بـ 05 (الشكل السعودي المحلي)
+    if (cleaned.startsWith('05')) {
+        // استبدال الصفر الأول بـ 966
+        return '966' + cleaned.substring(1);
+    }
+
+    // إذا كان الرقم يبدأ بـ 5 مباشرة
+    if (cleaned.length === 9 && cleaned.startsWith('5')) {
+        return '966' + cleaned;
+    }
+
+    // إذا كان الرقم مكتوباً بالشكل الدولي الصحيح بالفعل
+    if (cleaned.startsWith('966')) {
+        return cleaned;
+    }
+
+    // إذا لم يتعرف على الصيغة، أرجع الرقم كما هو (قد يعمل)
+    return cleaned;
+}
+
+// الدالة الرئيسية التي يتم استدعاؤها عند الضغط على الزر
+function sendWhatsAppInvoice(saleId) {
+    const sale = typeof sales !== 'undefined' ? sales.find(s => s.id === saleId) : null;
+    if (!sale) {
+        alert('لم يتم العثور على الفاتورة!');
+        return;
+    }
+
+    const customer = typeof customers !== 'undefined' ? customers.find(c => c.id === sale.customerId) : null;
+    if (!customer || !customer.phone) {
+        alert('لا يوجد رقم هاتف مسجل لهذا العميل.');
+        return;
+    }
+
+    const formattedPhone = formatPhoneNumberForWhatsApp(customer.phone);
+    if (!formattedPhone) {
+        alert('رقم الهاتف غير صالح.');
+        return;
+    }
+
+    // --- تجهيز نص رسالة الفاتورة ---
+    const activityList = (typeof activities !== 'undefined' && Array.isArray(activities)) ? activities : [];
+    const activity = activityList.find(a => a.id == currentActivityId);
+    const activityName = activity && activity.name ? activity.name : 'نشاطك التجاري';
+    let message = `*فاتورة مبيعات - ${activityName}*\n\n`;
+    message += `مرحباً ${customer.name},\n`;
+    message += `إليك تفاصيل الفاتورة رقم: *SAL${sale.number.toString().padStart(3, '0')}*\n`;
+    message += `التاريخ: ${sale.date}\n\n`;
+
+    message += "*الأصناف:*\n";
+    sale.items.forEach(item => {
+        message += `- ${item.name} (الكمية: ${item.quantity}, السعر: ${item.price.toFixed(2)}) = *${item.total.toFixed(2)}*\n`;
+    });
+
+    message += `\n*الإجمالي النهائي: ${sale.total.toFixed(2)} ريال سعودي*\n`;
+    message += `المبلغ المدفوع: ${sale.paidAmount.toFixed(2)}\n`;
+    message += `المبلغ المتبقي: ${sale.remainingAmount.toFixed(2)}\n\n`;
+    message += `شكراً لتعاملكم معنا.`;
+    // --- نهاية نص الرسالة ---
+
+    // تحويل النص ليكون متوافقاً مع الرابط
+    const encodedMessage = encodeURIComponent(message);
+
+    // الرابط النهائي لفتح الواتساب
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodedMessage}`;
+
+    // فتح الرابط في نافذة جديدة
+    window.open(whatsappUrl, '_blank');
+}
+
+// كشف دوال واتساب للعالمية
+if (typeof window !== 'undefined') {
+    window.formatPhoneNumberForWhatsApp = formatPhoneNumberForWhatsApp;
+    window.sendWhatsAppInvoice = sendWhatsAppInvoice;
+}
+
+// ==========================================
+// دالة إرسال الفاتورة عبر البريد الإلكتروني
+// ==========================================
+
+function emailSaleInvoice(saleId) {
+    if (!emailJsConfig.serviceID || !emailJsConfig.templateID || !emailJsConfig.publicKey) {
+        showNotification('⚠️ يرجى تكوين إعدادات البريد الإلكتروني أولاً من صفحة الإعدادات.', 'warning');
+        return;
+    }
+
+    const sale = typeof sales !== 'undefined' ? sales.find(s => s.id === saleId) : null;
+    if (!sale) return;
+
+    const customer = typeof customers !== 'undefined' ? customers.find(c => c.id === sale.customerId) : null;
+    if (!customer || !customer.email) {
+        showNotification('❌ لا يوجد بريد إلكتروني مسجل لهذا العميل.', 'error');
+        return;
+    }
+
+    // الحصول على اسم النشاط الحالي
+    const activityList = (typeof activities !== 'undefined' && Array.isArray(activities)) ? activities : [];
+    const currentActivity = activityList.find(a => a.id == currentActivityId);
+    const activityName = currentActivity ? currentActivity.name : 'بسمة بوتيك';
+
+    // بناء محتوى البريد مع معلومات الفاتورة الكاملة
+    let emailContent = `
+        <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
+            <h2 style="color: #2c5aa0; border-bottom: 2px solid #2c5aa0; padding-bottom: 10px;">فاتورة مبيعات</h2>
+            
+            <!-- معلومات الفاتورة الأساسية -->
+            <div style="margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <p><strong>رقم الفاتورة:</strong> SAL${sale.number.toString().padStart(3, '0')}</p>
+                <p><strong>التاريخ:</strong> ${sale.date}</p>
+                <p><strong>العميل:</strong> ${customer.name}</p>
+                <p><strong>ملاحظات:</strong> ${sale.notes || 'لا توجد ملاحظات'}</p>
+            </div>
+
+            <!-- جدول الأصناف -->
+            <h3 style="color: #34495e;">أصناف الفاتورة:</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                <tr style="background-color: #2c5aa0; color: white;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">الصنف</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">الكمية</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">سعر البيع</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">الإجمالي</th>
+                </tr>
+    `;
+
+    // إضافة الأصناف
+    sale.items.forEach(item => {
+        emailContent += `
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.quantity}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${item.price.toFixed(2)}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${item.total.toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    // إضافة المجاميع
+    emailContent += `
+            </table>
+            
+            <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left; max-width: 350px; margin-left: 0; margin-right: auto;">
+                <p style="display: flex; justify-content: space-between; margin: 8px 0;"><span>المجموع:</span> <strong>${sale.subtotal.toFixed(2)}</strong></p>
+                <p style="display: flex; justify-content: space-between; margin: 8px 0;"><span>الضريبة:</span> <strong>${sale.tax.toFixed(2)}</strong></p>
+                <p style="display: flex; justify-content: space-between; margin: 8px 0;"><span>المدفوع:</span> <strong>${(sale.paidAmount || 0).toFixed(2)}</strong></p>
+                <p style="display: flex; justify-content: space-between; margin: 8px 0;"><span>المتبقي:</span> <strong>${(sale.remainingAmount ?? sale.total).toFixed(2)}</strong></p>
+                <h3 style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #2c5aa0; color: #2c5aa0; display: flex; justify-content: space-between;"><span>الإجمالي النهائي:</span> <strong>${sale.total.toFixed(2)}</strong></h3>
+            </div>
+
+            <!-- التحية -->
+            <div style="margin-top: 30px; text-align: center; font-style: italic; border-top: 1px solid #ddd; padding-top: 15px;">
+                <p>شكراً لتعاملكم مع ${activityName}</p>
+            </div>
+        </div>
+    `;
+
+    const templateParams = {
+        to_name: customer.name,
+        to_email: customer.email,
+        from_name: activityName,
+        invoice_number: `SAL${sale.number.toString().padStart(3, '0')}`,
+        invoice_details: emailContent,
+        email_subject: `فاتورة ${activityName} - SAL${sale.number.toString().padStart(3, '0')}`
+    };
+
+    emailjs.send(emailJsConfig.serviceID, emailJsConfig.templateID, templateParams, emailJsConfig.publicKey)
+        .then(function(response) {
+           showNotification('✅ تم إرسال الفاتورة بنجاح!', 'success');
+        }, function(error) {
+           showNotification('❌ فشل إرسال الفاتورة: ' + error.text, 'error');
+        });
+}
+
+// كشف دالة البريد للعالمية
+if (typeof window !== 'undefined') {
+    window.emailSaleInvoice = emailSaleInvoice;
+}
+
+// ========================================
+// 🎨 دوال الحوارات المخصصة البسيطة
+// ========================================
+function createCustomConfirmDialog({ title, icon, content, confirmText, cancelText, onConfirm }) {
+    // إنشاء overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10100; backdrop-filter: blur(4px);';
+    
+    // إنشاء صندوق الحوار
+    const dialog = document.createElement('div');
+    dialog.style.cssText = 'background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 450px; animation: fadeIn 0.3s ease;';
+    
+    dialog.innerHTML = `
+        <div style="padding: 25px 30px; border-bottom: 1px solid #ecf0f1;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 32px;">${icon}</span>
+                <h3 style="margin: 0; color: var(--primary-color); font-size: 1.4em;">${title}</h3>
+            </div>
+        </div>
+        <div style="padding: 25px 30px;">
+            ${content}
+        </div>
+        <div style="padding: 20px 30px; border-top: 1px solid #ecf0f1; display: flex; gap: 10px; justify-content: flex-end;">
+            <button id="customCancelBtn" style="padding: 12px 30px; border: 1px solid #ddd; background: white; color: #666; border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.3s;">
+                ${cancelText}
+            </button>
+            <button id="customConfirmBtn" style="padding: 12px 30px; border: none; background: var(--primary-color); color: white; border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                ${confirmText}
+            </button>
+        </div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    // الأحداث
+    const confirmBtn = dialog.querySelector('#customConfirmBtn');
+    const cancelBtn = dialog.querySelector('#customCancelBtn');
+    
+    confirmBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+        if (onConfirm) onConfirm();
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+    
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+        }
+    });
+    
+    // Hover effects
+    confirmBtn.addEventListener('mouseenter', () => {
+        confirmBtn.style.transform = 'translateY(-2px)';
+        confirmBtn.style.boxShadow = '0 4px 12px rgba(44, 90, 160, 0.3)';
+    });
+    confirmBtn.addEventListener('mouseleave', () => {
+        confirmBtn.style.transform = 'translateY(0)';
+        confirmBtn.style.boxShadow = 'none';
+    });
+    
+    cancelBtn.addEventListener('mouseenter', () => {
+        cancelBtn.style.background = '#f8f9fa';
+        cancelBtn.style.borderColor = '#bbb';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+        cancelBtn.style.background = 'white';
+        cancelBtn.style.borderColor = '#ddd';
+    });
+}
+
+function createCustomAlertDialog({ title, icon, content, buttonText, onClose }) {
+    // إنشاء overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10100; backdrop-filter: blur(4px);';
+    
+    // إنشاء صندوق الحوار
+    const dialog = document.createElement('div');
+    dialog.style.cssText = 'background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 90%; max-width: 450px; animation: fadeIn 0.3s ease;';
+    
+    dialog.innerHTML = `
+        <div style="padding: 25px 30px; border-bottom: 1px solid #ecf0f1;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 32px;">${icon}</span>
+                <h3 style="margin: 0; color: var(--primary-color); font-size: 1.4em;">${title}</h3>
+            </div>
+        </div>
+        <div style="padding: 25px 30px;">
+            ${content}
+        </div>
+        <div style="padding: 20px 30px; border-top: 1px solid #ecf0f1; display: flex; justify-content: center;">
+            <button id="customOkBtn" style="padding: 12px 40px; border: none; background: var(--primary-color); color: white; border-radius: 8px; font-size: 15px; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                ${buttonText}
+            </button>
+        </div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    // الأحداث
+    const okBtn = dialog.querySelector('#customOkBtn');
+    
+    okBtn.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+        if (onClose) onClose();
+    });
+    
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+            if (onClose) onClose();
+        }
+    });
+    
+    // Hover effect
+    okBtn.addEventListener('mouseenter', () => {
+        okBtn.style.transform = 'translateY(-2px)';
+        okBtn.style.boxShadow = '0 4px 12px rgba(44, 90, 160, 0.3)';
+    });
+    okBtn.addEventListener('mouseleave', () => {
+        okBtn.style.transform = 'translateY(0)';
+        okBtn.style.boxShadow = 'none';
+    });
+}
+
 // دالة لإظهار حالة النظام
 function systemStatus() {
     console.log('📊 حالة النظام الحالية:');
@@ -6978,8 +7673,8 @@ const EMAILJS_FIXED = false; // true = استخدام الإعدادات الث�
 
 const EMAILJS_DEFAULTS = {
     serviceID: 'service_hu6ucxi',
-    templateID: 'VH3waGBnucCE-S4eeM0I4', // قالب الفواتير
-    resetTemplateID: 'template_aqp69jt', // قالب إعادة كلمة المرور
+    templateID: 'VH3waGBnucCE-S4eeM0I4',
+    resetTemplateID: 'template_aqp69jt',
     publicKey: '-FKicwCTdzG90IoY6'
 };
 let emailJsConfig = { ...EMAILJS_DEFAULTS };
@@ -18406,6 +19101,8 @@ function updateAllCharts() {
             const emailInput = document.getElementById('editUserEmail');
             const phoneInput = document.getElementById('editUserPhone');
             const passwordInput = document.getElementById('editUserPassword');
+            const securityQuestionSelect = document.getElementById('editUserSecurityQuestion');
+            const securityAnswerInput = document.getElementById('editUserSecurityAnswer');
             const roleSelect = document.getElementById('editUserRole');
             const actSel = document.getElementById('editUserActivity');
 
@@ -18430,7 +19127,22 @@ function updateAllCharts() {
             console.log('✅ طول القيمة:', phoneInput.value.length);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             
-            passwordInput.value = user.password || '';
+            passwordInput.value = '';  // دائماً فارغ للأمان، يمكن تغييره فقط
+            passwordInput.placeholder = 'كلمة المرور (اتركه فارغاً للإبقاء على الحالي)';
+            
+            // تعبئة حقول سؤال الأمان (إذا كان موجوداً)
+            securityQuestionSelect.value = user.securityQuestion || '';
+            securityAnswerInput.value = user.securityAnswer || '';
+            
+            // إظهار تحذير إذا لم يكن لديه سؤال أمان
+            const securityWarning = document.getElementById('securityQuestionWarning');
+            if (!user.securityQuestion) {
+                securityWarning.style.display = 'block';
+                console.log('⚠️ المستخدم ليس لديه سؤال أمان محدد');
+            } else {
+                securityWarning.style.display = 'none';
+            }
+            
             roleSelect.value = user.role;
 
             // إعداد قائمة الأنشطة
@@ -18653,6 +19365,8 @@ function updateAllCharts() {
             const email = document.getElementById('editUserEmail').value.trim();
             const phone = document.getElementById('editUserPhone').value.trim();
             const password = document.getElementById('editUserPassword').value.trim();
+            const securityQuestion = document.getElementById('editUserSecurityQuestion').value.trim();
+            const securityAnswer = document.getElementById('editUserSecurityAnswer').value.trim();
             let role = document.getElementById('editUserRole').value;
             let activityId = document.getElementById('editUserActivity').value;
             const phonePattern = /^[+\d]{6,20}$/;
@@ -18685,6 +19399,16 @@ function updateAllCharts() {
                 return; 
             }
             if (!role) { showNotification('⚠️ صلاحية مطلوبة', 'اختر الصلاحية', 'warning'); return; }
+            
+            // التحقق من سؤال الأمان (إذا تم اختيار سؤال، يجب إدخال الإجابة)
+            if (securityQuestion && !securityAnswer) {
+                showNotification('⚠️ إجابة مطلوبة', 'إذا اخترت سؤال أمان، يجب إدخال الإجابة', 'warning');
+                return;
+            }
+            if (!securityQuestion && securityAnswer) {
+                showNotification('⚠️ سؤال مطلوب', 'إذا أدخلت إجابة، يجب اختيار سؤال الأمان', 'warning');
+                return;
+            }
 
             const idx = users.findIndex(u => String(u.id) === String(editingUserId));
             console.log('🔍 البحث عن المستخدم:');
@@ -18767,6 +19491,13 @@ function updateAllCharts() {
             if (password) targetUser.password = password; // تحديث كلمة المرور فقط إذا تم إدخال قيمة
             targetUser.role = role;
             targetUser.activityId = (role === 'user' || role === 'manager') ? activityId : null;
+            
+            // تحديث سؤال الأمان (فقط إذا تم إدخال قيم جديدة)
+            if (securityQuestion && securityAnswer) {
+                targetUser.securityQuestion = securityQuestion;
+                targetUser.securityAnswer = securityAnswer;
+                console.log('🔐 تم تحديث سؤال الأمان');
+            }
 
             console.log('✅ تم تحديث targetUser:');
             console.log('  📱 oldPhone:', `"${oldPhone}"`);
@@ -18821,18 +19552,24 @@ function updateAllCharts() {
                     const existingUser = await userRef.once('value');
                     if (existingUser.exists()) {
                         console.log('👤 المستخدم موجود في Firebase، جاري التحديث...');
-                        await userRef.update({
+                        const updateData = {
                             name: updatedUser.name,
                             email: updatedUser.email,
                             phone: updatedUser.phone,
                             role: updatedUser.role,
                             activityId: updatedUser.activityId,
                             updatedAt: new Date().toISOString()
-                        });
+                        };
+                        // إضافة سؤال الأمان إذا تم تحديثه
+                        if (updatedUser.securityQuestion) {
+                            updateData.securityQuestion = updatedUser.securityQuestion;
+                            updateData.securityAnswer = updatedUser.securityAnswer;
+                        }
+                        await userRef.update(updateData);
                         console.log('✅ تم تحديث المستخدم في Firebase بنجاح');
                     } else {
                         console.log('👤 المستخدم غير موجود في Firebase، جاري إنشاؤه...');
-                        await userRef.set({
+                        const newData = {
                             id: updatedUser.id,
                             name: updatedUser.name,
                             email: updatedUser.email,
@@ -18841,7 +19578,13 @@ function updateAllCharts() {
                             activityId: updatedUser.activityId,
                             createdAt: updatedUser.createdAt || new Date().toISOString(),
                             updatedAt: new Date().toISOString()
-                        });
+                        };
+                        // إضافة سؤال الأمان إذا كان موجوداً
+                        if (updatedUser.securityQuestion) {
+                            newData.securityQuestion = updatedUser.securityQuestion;
+                            newData.securityAnswer = updatedUser.securityAnswer;
+                        }
+                        await userRef.set(newData);
                         console.log('✅ تم إنشاء المستخدم في Firebase بنجاح');
                     }
                     
@@ -18968,6 +19711,8 @@ function updateAllCharts() {
             const password = document.getElementById('newUserPassword').value.trim();
             const role = document.getElementById('newUserRole').value;
             const activityId = document.getElementById('newUserActivity').value;
+            const securityQuestion = document.getElementById('newUserSecurityQuestion').value;
+            const securityAnswer = document.getElementById('newUserSecurityAnswer').value.trim();
             const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
             const isAdmin = loggedInUser && loggedInUser.role === 'admin';
             const isManager = loggedInUser && loggedInUser.role === 'manager';
@@ -18975,6 +19720,12 @@ function updateAllCharts() {
             // التحقق من الحقول المطلوبة
             if (!name || !email || !phone || !password) {
                 showNotification('⚠️ حقول مطلوبة', 'يرجى ملء جميع الحقول المطلوبة', 'warning');
+                return;
+            }
+            
+            // التحقق من سؤال الأمان (إذا تم اختيار سؤال، يجب كتابة الإجابة)
+            if (securityQuestion && !securityAnswer) {
+                showNotification('⚠️ إجابة مطلوبة', 'يرجى إدخال إجابة سؤال الأمان', 'warning');
                 return;
             }
 
@@ -19050,6 +19801,8 @@ function updateAllCharts() {
                     phone: phone,
                     role: normalizedRole,
                     activityId: (normalizedRole === 'user' || normalizedRole === 'manager') ? normalizedActivityId : null,
+                    securityQuestion: securityQuestion || null,
+                    securityAnswer: securityAnswer || null,
                     createdAt: new Date().toISOString()
                 };
 
@@ -19097,6 +19850,8 @@ function updateAllCharts() {
                 document.getElementById('newUserPassword').value = '';
                 document.getElementById('newUserRole').value = 'user';
                 document.getElementById('newUserActivity').value = '';
+                document.getElementById('newUserSecurityQuestion').value = '';
+                document.getElementById('newUserSecurityAnswer').value = '';
 
                 // تحديث القوائم
                 renderUsersInSettings();
@@ -21276,43 +22031,7 @@ console.log('🔍 Reached exportAssetsToExcel function...');
             alert('✅ تم تغيير كلمة المرور بنجاح.');
         }
 
-        function openForgotPasswordModal() {
-            const emailEl = document.getElementById('fp-email');
-            if (emailEl) emailEl.value = '';
-            document.getElementById('forgot-password-overlay').style.display = 'flex';
-        }
-        function closeForgotPasswordModal() {
-            const overlay = document.getElementById('forgot-password-overlay');
-            if (overlay) overlay.style.display = 'none';
-        }
-        function requestPasswordReset() {
-            const email = document.getElementById('fp-email').value.trim();
-            if (!email) { 
-                alert('يرجى إدخال البريد الإلكتروني.'); 
-                return; 
-            }
-            
-            const user = users.find(u => u.email === email);
-            if (!user) { 
-                alert('لا يوجد مستخدم بهذا البريد.'); 
-                return; 
-            }
-            
-            // للنظام المحلي، ننبه المستخدم بالاتصال بالإدارة
-            alert(`تم العثور على حسابك.\nللحصول على كلمة مرور جديدة، يرجى التواصل مع مدير النظام.\nالبريد المسجل: ${email}`);
-            closeForgotPasswordModal();
-        }
-        // دوال معالجة استعادة كلمة المرور (مبسطة للنظام المحلي)
-        function openResetPasswordModal(token) {
-            // في النظام المحلي، نعرض رسالة
-            alert('ميزة إعادة تعيين كلمة المرور عبر الرابط غير متاحة في النظام المحلي.\nيرجى التواصل مع مدير النظام لتغيير كلمة المرور.');
-        }
-        
-        function closeResetPasswordModal() {
-            const overlay = document.getElementById('reset-password-overlay');
-            if (overlay) overlay.style.display = 'none';
-            activeResetToken = null;
-        }
+        // ملاحظة: دوال استعادة كلمة المرور تم نقلها إلى بداية السكريبت لتكون متاحة مبكراً
         
         // دالة مبسطة للتحقق من روابط الاستعادة (للمحافظة على التوافق)
         function handleResetFlowFromURL() {
@@ -21871,83 +22590,6 @@ function formatDate(dateString) {
         month: 'short', 
         day: 'numeric' 
     });
-}
-
-// دالة لتجهيز رقم الهاتف للواتساب (مهمة جداً)
-function formatPhoneNumberForWhatsApp(phone) {
-    if (!phone) return null;
-
-    // إزالة أي مسافات أو شرطات أو علامة +
-    let cleaned = phone.replace(/[\s\-+]/g, '');
-
-    // إذا كان الرقم يبدأ بـ 05 (الشكل السعودي المحلي)
-    if (cleaned.startsWith('05')) {
-        // استبدال الصفر الأول بـ 966
-        return '966' + cleaned.substring(1);
-    }
-
-    // إذا كان الرقم يبدأ بـ 5 مباشرة
-    if (cleaned.length === 9 && cleaned.startsWith('5')) {
-        return '966' + cleaned;
-    }
-
-    // إذا كان الرقم مكتوباً بالشكل الدولي الصحيح بالفعل
-    if (cleaned.startsWith('966')) {
-        return cleaned;
-    }
-
-    // إذا لم يتعرف على الصيغة، أرجع الرقم كما هو (قد يعمل)
-    return cleaned;
-}
-
-// الدالة الرئيسية التي يتم استدعاؤها عند الضغط على الزر
-function sendWhatsAppInvoice(saleId) {
-    const sale = sales.find(s => s.id === saleId);
-    if (!sale) {
-        alert('لم يتم العثور على الفاتورة!');
-        return;
-    }
-
-    const customer = customers.find(c => c.id === sale.customerId);
-    if (!customer || !customer.phone) {
-        alert('لا يوجد رقم هاتف مسجل لهذا العميل.');
-        return;
-    }
-
-    const formattedPhone = formatPhoneNumberForWhatsApp(customer.phone);
-    if (!formattedPhone) {
-        alert('رقم الهاتف غير صالح.');
-        return;
-    }
-
-    // --- تجهيز نص رسالة الفاتورة ---
-    const activityList = (typeof activities !== 'undefined' && Array.isArray(activities)) ? activities : [];
-    const activity = activityList.find(a => a.id == currentActivityId);
-    const activityName = activity && activity.name ? activity.name : 'نشاطك التجاري';
-    let message = `*فاتورة مبيعات - ${activityName}*\n\n`;
-    message += `مرحباً ${customer.name},\n`;
-    message += `إليك تفاصيل الفاتورة رقم: *SAL${sale.number.toString().padStart(3, '0')}*\n`;
-    message += `التاريخ: ${sale.date}\n\n`;
-
-    message += "*الأصناف:*\n";
-    sale.items.forEach(item => {
-        message += `- ${item.name} (الكمية: ${item.quantity}, السعر: ${item.price.toFixed(2)}) = *${item.total.toFixed(2)}*\n`;
-    });
-
-    message += `\n*الإجمالي النهائي: ${sale.total.toFixed(2)} ريال سعودي*\n`;
-    message += `المبلغ المدفوع: ${sale.paidAmount.toFixed(2)}\n`;
-    message += `المبلغ المتبقي: ${sale.remainingAmount.toFixed(2)}\n\n`;
-    message += `شكراً لتعاملكم معنا.`;
-    // --- نهاية نص الرسالة ---
-
-    // تحويل النص ليكون متوافقاً مع الرابط
-    const encodedMessage = encodeURIComponent(message);
-
-    // الرابط النهائي لفتح الواتساب
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodedMessage}`;
-
-    // فتح الرابط في نافذة جديدة
-    window.open(whatsappUrl, '_blank');
 }
 
 // دالة لتحديد كل العملاء أو إلغاء تحديدهم
