@@ -2134,6 +2134,148 @@
         .user-status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 10px; }
         .status-active { background: #27ae60; }
         .status-inactive { background: #e74c3c; }
+        
+        /* ===== 💰 Payment System Styles - أنماط نظام الدفعات ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s ease;
+        }
+        
+        .payment-modal {
+            max-width: 700px;
+        }
+        
+        .payments-history-modal {
+            max-width: 900px;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), #1565c0);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+        }
+        
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .payment-info-card {
+            background: linear-gradient(135deg, #e3f2fd, #f5f9ff);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-info-card p {
+            margin: 10px 0;
+            font-size: 1.05em;
+        }
+        
+        .payment-info-card .remaining-amount {
+            font-size: 1.2em;
+            color: var(--accent-color);
+            font-weight: bold;
+            border-top: 2px solid #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .payment-summary-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { 
+                opacity: 0; 
+                transform: scale(0.9) translateY(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+            }
+        }
+        
         @media (max-width: 1024px) { 
             .sidebar { width: 250px; } 
             .container { margin-right: 250px; } 
@@ -3807,11 +3949,32 @@ textarea.editing-mode {
         body.dark-mode .stat-card,
         body.dark-mode #login-box,
         body.dark-mode .control-panel,
-        body.dark-mode .settings-card {
+        body.dark-mode .settings-card,
+        body.dark-mode .modal-content,
+        body.dark-mode .payment-modal,
+        body.dark-mode .payments-history-modal {
             background: var(--dark-card-bg) !important;
             color: var(--dark-text) !important;
             border-color: var(--dark-border) !important;
             box-shadow: var(--dark-shadow) !important;
+        }
+        
+        body.dark-mode .modal-body,
+        body.dark-mode .modal-footer {
+            background: var(--dark-card-bg) !important;
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        body.dark-mode .payment-info-card,
+        body.dark-mode .payment-summary-card {
+            background: var(--dark-bg-secondary) !important;
+            color: var(--dark-text) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .summary-row {
+            border-color: var(--dark-border) !important;
         }
         
         /* تأكيد إصلاح بطاقات لوحة التحكم */
@@ -7911,6 +8074,7 @@ let items = [], customers = [], suppliers = [], purchases = [], sales = [], expe
 let branches = []; // 🏢 الفروع - جديد
 let advances = [];
 let salesReturns = [], purchaseReturns = [];
+let salePayments = [], purchasePayments = []; // 💰 نظام الدفعات - جديد
 let currentPurchaseItems = [], currentSaleItems = [];
 let editingPurchaseId = null, editingSaleId = null, editingSalaryId = null;
 let currentPurchaseNumber = 1, currentSaleNumber = 1;
@@ -7984,6 +8148,12 @@ async function initializeApp() {
         const firebaseBranches = await firebaseGetActivityData(currentActivityId, 'branches') || [];
         console.log(`🏪 تم تحميل ${firebaseBranches.length} فرع من Firebase`);
         
+        const firebaseSalePayments = await firebaseGetActivityData(currentActivityId, 'salePayments') || [];
+        console.log(`💰 تم تحميل ${firebaseSalePayments.length} دفعة مبيعات من Firebase`);
+        
+        const firebasePurchasePayments = await firebaseGetActivityData(currentActivityId, 'purchasePayments') || [];
+        console.log(`💳 تم تحميل ${firebasePurchasePayments.length} دفعة مشتريات من Firebase`);
+        
         // تعيين البيانات مباشرة
         items = firebaseItems;
         customers = firebaseCustomers;
@@ -7998,6 +8168,8 @@ async function initializeApp() {
         advances = firebaseAdvances;
         branches = firebaseBranches;
         purchaseReturns = firebasePurchaseReturns;
+        salePayments = firebaseSalePayments;
+        purchasePayments = firebasePurchasePayments;
         
         debugLog('✅ تم تحميل البيانات من Firebase');
     } else {
@@ -8016,6 +8188,8 @@ async function initializeApp() {
         advances = (loadFromLocalStorage('advances')) || [];
         purchaseReturns = (loadFromLocalStorage('purchaseReturns')) || [];
         branches = (loadFromLocalStorage('branches')) || []; // 🏪 تحميل الفروع
+        salePayments = (loadFromLocalStorage('salePayments')) || []; // 💰 دفعات المبيعات
+        purchasePayments = (loadFromLocalStorage('purchasePayments')) || []; // 💳 دفعات المشتريات
     }
 
     currentPurchaseNumber = purchases.length > 0 ? Math.max(0, ...purchases.map(p => p.number)) + 1 : 1;
@@ -8078,6 +8252,7 @@ async function initializeApp() {
     setTimeout(() => {
         if (typeof checkLowStock === 'function') checkLowStock();
         if (typeof checkUnpaidDebts === 'function') checkUnpaidDebts();
+        if (typeof checkOverduePayments === 'function') checkOverduePayments();
     }, 10000);
     
     // إضافة event listeners للأصول
@@ -8873,6 +9048,60 @@ loadSavedEmailSettings();
             showNotification(
                 '💰 تذكير: ديون غير مدفوعة',
                 `لديك ${unpaidSales.length} فاتورة بإجمالي ${totalDebt.toFixed(2)} ر.س غير مدفوعة.`,
+                'warning',
+                6000
+            );
+        }
+    }
+    
+    // 💰 فحص الديون المتأخرة (نظام الدفعات الجديد)
+    function checkOverduePayments() {
+        const today = new Date();
+        const overdueThreshold = 30; // عدد الأيام للاعتبار كمتأخر
+        
+        const overdueSales = sales.filter(sale => {
+            const totalPaid = getTotalPaid(sale.id, 'sale');
+            const remaining = sale.total - totalPaid;
+            
+            if (remaining <= 0.5) return false; // تم السداد بالكامل
+            
+            const saleDate = new Date(sale.date);
+            const daysDiff = Math.floor((today - saleDate) / (1000 * 60 * 60 * 24));
+            
+            return daysDiff > overdueThreshold;
+        });
+        
+        if (overdueSales.length > 0) {
+            const totalOverdue = overdueSales.reduce((sum, sale) => {
+                const totalPaid = getTotalPaid(sale.id, 'sale');
+                return sum + (sale.total - totalPaid);
+            }, 0);
+            
+            showNotification(
+                '🚨 تنبيه: ديون متأخرة',
+                `لديك ${overdueSales.length} فاتورة متأخرة بإجمالي ${totalOverdue.toFixed(2)} ر.س (أكثر من ${overdueThreshold} يوم)`,
+                'error',
+                8000
+            );
+        }
+        
+        // فحص الديون القريبة من التأخر (15-30 يوم)
+        const upcomingOverdue = sales.filter(sale => {
+            const totalPaid = getTotalPaid(sale.id, 'sale');
+            const remaining = sale.total - totalPaid;
+            
+            if (remaining <= 0.5) return false;
+            
+            const saleDate = new Date(sale.date);
+            const daysDiff = Math.floor((today - saleDate) / (1000 * 60 * 60 * 24));
+            
+            return daysDiff >= 15 && daysDiff <= overdueThreshold;
+        });
+        
+        if (upcomingOverdue.length > 0) {
+            showNotification(
+                '⚠️ تحذير: ديون قريبة من التأخر',
+                `لديك ${upcomingOverdue.length} فاتورة لم يتم سدادها بالكامل منذ 15-30 يوم`,
                 'warning',
                 6000
             );
@@ -13907,7 +14136,9 @@ function loadCustomersToSelect() {
         const supplier = suppliers.find(s => s.id === purchase.supplierId);
         const totalQty = purchase.items.reduce((sum, item) => sum + item.quantity, 0);
 
-        const remaining = purchase.remainingAmount ?? (purchase.total - (purchase.paidAmount || 0));
+        // حساب المدفوع الكلي (من الفاتورة + الدفعات الجديدة)
+        const totalPaid = getTotalPaid(purchase.id, 'purchase');
+        const remaining = purchase.total - totalPaid;
         const remainingClass = remaining > 0.01 ? 'remaining-unpaid' : (remaining < -0.01 ? 'remaining-credit' : 'remaining-paid');
         const remainingText = remaining.toFixed(2);
         
@@ -13922,11 +14153,13 @@ function loadCustomersToSelect() {
             <td>${supplier ? supplier.name : 'غير معروف'}</td>
             <td>${totalQty}</td>
             <td>${purchase.total.toFixed(2)}</td>
-            <td>${(purchase.paidAmount || 0).toFixed(2)}</td>
+            <td>${totalPaid.toFixed(2)}</td>
             <td class="${remainingClass}">${remainingText}</td>
             <td>${attachmentLink}</td>
             <td>
             <div class="action-buttons">
+                <button class="btn-success" onclick="showAddPaymentModal(${purchase.id}, 'purchase')" style="padding: 6px 10px;">💰 دفعة</button>
+                <button class="btn-info" onclick="showPaymentsHistory(${purchase.id}, 'purchase')" style="padding: 6px 10px;">📜 السجل</button>
                 <button class="btn-secondary" onclick="printPurchaseInvoice(${purchase.id})">🖨️ طباعة</button>
                 <button class="btn-warning edit-btn" onclick="editPurchase(${purchase.id})">✏️ تعديل</button>
                 <button class="btn-danger" onclick="deletePurchase(${purchase.id})">حذف</button>
@@ -14763,15 +14996,14 @@ function loadCustomersToSelect() {
         const customer = customers.find(c => c.id === sale.customerId);
         const totalQty = sale.items.reduce((sum, item) => sum + item.quantity, 0);
         
-        // --- 💡 بداية التعديل: منطق الألوان الجديد ---
-        const remaining = sale.remainingAmount ?? (sale.total - (sale.paidAmount || 0));
+        // 💰 حساب المدفوع من نظام الدفعات
+        const totalPaidFromPayments = getTotalPaid(sale.id, 'sale');
+        const totalPaidDisplay = totalPaidFromPayments > 0 ? totalPaidFromPayments : (sale.paidAmount || 0);
+        const remaining = sale.total - totalPaidDisplay;
+        
         // تحديد الكلاس بناءً على قيمة المتبقي
-        // remaining-unpaid: أحمر (عليه فلوس)
-        // remaining-credit: أخضر (له فلوس)
-        // remaining-paid: أسود (الرصيد صفر)
         const remainingClass = remaining > 0.01 ? 'remaining-unpaid' : (remaining < -0.01 ? 'remaining-credit' : 'remaining-paid');
         const remainingText = remaining.toFixed(2);
-        // --- 💡 نهاية التعديل ---
 
         // دالة لعرض طريقة الدفع
         const getPaymentMethodDisplay = (method) => {
@@ -14782,6 +15014,10 @@ function loadCustomersToSelect() {
                 default: return '💰 كاش';
             }
         };
+        
+        // عدد الدفعات
+        const paymentsCount = salePayments.filter(p => p.invoiceId === sale.id).length;
+        const paymentsInfo = paymentsCount > 0 ? ` (${paymentsCount} دفعة)` : '';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -14791,11 +15027,13 @@ function loadCustomersToSelect() {
             <td data-label="الكمية">${totalQty}</td>
             <td data-label="الخصم">${(sale.discount || 0).toFixed(2)}</td>
             <td data-label="الإجمالي">${sale.total.toFixed(2)}</td>
-            <td data-label="المدفوع">${(sale.paidAmount || 0).toFixed(2)}</td>
+            <td data-label="المدفوع">${totalPaidDisplay.toFixed(2)}${paymentsInfo}</td>
             <td data-label="طريقة الدفع">${getPaymentMethodDisplay(sale.paymentMethod)}</td>
             <td data-label="المتبقي" class="${remainingClass}">${remainingText}</td>
             <td data-label="الإجراءات">
                 <div class="action-buttons">
+                    ${remaining > 0.5 ? `<button class="btn-success" onclick="showAddPaymentModal(${sale.id}, 'sale')" title="إضافة دفعة">💰 دفعة</button>` : ''}
+                    ${paymentsCount > 0 ? `<button class="btn-info" onclick="showPaymentsHistory(${sale.id}, 'sale')" title="سجل الدفعات">📜 السجل</button>` : ''}
                     <button class="btn-secondary" onclick="printSaleInvoice(${sale.id})">🖨️ طباعة</button>
                     <button class="email-btn" onclick="emailSaleInvoice(${sale.id})">📧 بريد</button>
                     <button class="btn-whatsapp" onclick="sendWhatsAppInvoice(${sale.id})">💬 واتساب</button>
@@ -15028,6 +15266,331 @@ function loadCustomersToSelect() {
             // تطبيق المؤثر البصري الأخضر
             const customerName = customers.find(c => c.id === sale.customerId)?.name || 'العميل';
             applyEditMode('#sales', 'saleCustomer', '#sales h2', `✏️ تعديل فاتورة المبيعات: ${customerName}`);
+        }
+
+        // ===== 💰 Payment System Functions - نظام الدفعات =====
+        
+        // عرض نافذة إضافة دفعة جديدة
+        function showAddPaymentModal(invoiceId, type = 'sale') {
+            const invoice = type === 'sale' ? sales.find(s => s.id === invoiceId) : purchases.find(p => p.id === invoiceId);
+            if (!invoice) {
+                showNotification('❌ خطأ', 'لم يتم العثور على الفاتورة', 'error');
+                return;
+            }
+            
+            const payments = type === 'sale' ? 
+                salePayments.filter(p => p.invoiceId === invoiceId) : 
+                purchasePayments.filter(p => p.invoiceId === invoiceId);
+            
+            const paymentsTotal = payments.reduce((sum, p) => sum + p.amount, 0);
+            const originalPaid = invoice.paidAmount || 0;
+            const totalPaid = paymentsTotal + originalPaid;
+            const remaining = invoice.total - totalPaid;
+            
+            if (remaining <= 0) {
+                showNotification('ℹ️ تنبيه', 'تم سداد هذه الفاتورة بالكامل', 'info');
+                return;
+            }
+            
+            const entityName = type === 'sale' ? 
+                customers.find(c => c.id === invoice.customerId)?.name || 'غير معروف' :
+                suppliers.find(s => s.id === invoice.supplierId)?.name || 'غير معروف';
+            
+            const invoiceNumber = type === 'sale' ? 
+                `SAL${invoice.number.toString().padStart(3, '0')}` :
+                `PUR${invoice.number.toString().padStart(3, '0')}`;
+            
+            const modalHtml = `
+                <div id="payment-modal" class="modal-overlay" onclick="closePaymentModal(event)">
+                    <div class="modal-content payment-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3>💰 إضافة دفعة جديدة</h3>
+                            <button class="modal-close-btn" onclick="closePaymentModal()">✖</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="payment-info-card">
+                                <p><strong>الفاتورة:</strong> ${invoiceNumber}</p>
+                                <p><strong>${type === 'sale' ? 'العميل' : 'المورد'}:</strong> ${entityName}</p>
+                                <p><strong>إجمالي الفاتورة:</strong> ${invoice.total.toFixed(2)} ر.س</p>
+                                <p><strong>المدفوع سابقاً:</strong> ${totalPaid.toFixed(2)} ر.س</p>
+                                <p class="remaining-amount"><strong>المتبقي:</strong> ${remaining.toFixed(2)} ر.س</p>
+                            </div>
+                            <div class="form-grid grid-2" style="margin-top: 20px;">
+                                <div>
+                                    <label for="paymentAmount">المبلغ المدفوع *</label>
+                                    <input type="number" id="paymentAmount" placeholder="0.00" min="0" max="${remaining}" step="0.01" required>
+                                </div>
+                                <div>
+                                    <label for="paymentMethod">طريقة الدفع *</label>
+                                    <select id="paymentMethod" required>
+                                        <option value="cash">💰 كاش</option>
+                                        <option value="bank">🏦 بنك</option>
+                                        <option value="check">📝 شيك</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="paymentDate">تاريخ الدفع *</label>
+                                    <input type="date" id="paymentDate" required>
+                                </div>
+                                <div>
+                                    <label for="paymentReference">رقم المرجع</label>
+                                    <input type="text" id="paymentReference" placeholder="رقم الشيك/الحوالة (اختياري)">
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <label for="paymentNotes">ملاحظات</label>
+                                <textarea id="paymentNotes" rows="3" placeholder="ملاحظات إضافية (اختياري)"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-primary" onclick="savePayment(${invoiceId}, '${type}')">💾 حفظ الدفعة</button>
+                            <button class="btn-secondary" onclick="closePaymentModal()">❌ إلغاء</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentAmount').focus();
+        }
+        
+        // إغلاق نافذة الدفعة
+        function closePaymentModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('payment-modal');
+            if (modal) modal.remove();
+        }
+        
+        // حفظ دفعة جديدة
+        async function savePayment(invoiceId, type) {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const method = document.getElementById('paymentMethod').value;
+            const date = document.getElementById('paymentDate').value;
+            const reference = document.getElementById('paymentReference').value;
+            const notes = document.getElementById('paymentNotes').value;
+            
+            if (!amount || amount <= 0 || !method || !date) {
+                showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع الحقول المطلوبة', 'warning');
+                return;
+            }
+            
+            const invoice = type === 'sale' ? sales.find(s => s.id === invoiceId) : purchases.find(p => p.id === invoiceId);
+            const payments = type === 'sale' ? 
+                salePayments.filter(p => p.invoiceId === invoiceId) : 
+                purchasePayments.filter(p => p.invoiceId === invoiceId);
+            
+            const paymentsTotal = payments.reduce((sum, p) => sum + p.amount, 0);
+            const originalPaid = invoice.paidAmount || 0;
+            const totalPaid = paymentsTotal + originalPaid;
+            const remaining = invoice.total - totalPaid;
+            
+            if (amount > remaining) {
+                showNotification('⚠️ تحذير', `المبلغ المدخل أكبر من المتبقي (${remaining.toFixed(2)} ر.س)`, 'warning');
+                return;
+            }
+            
+            const payment = {
+                id: Date.now(),
+                invoiceId,
+                invoiceNumber: invoice.number,
+                invoiceType: type,
+                amount,
+                method,
+                date,
+                reference,
+                notes,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (type === 'sale') {
+                salePayments.push(payment);
+                saveToLocalStorage('salePayments', salePayments);
+            } else {
+                purchasePayments.push(payment);
+                saveToLocalStorage('purchasePayments', purchasePayments);
+            }
+            
+            closePaymentModal();
+            
+            const invoiceNumber = type === 'sale' ? 
+                `SAL${invoice.number.toString().padStart(3, '0')}` :
+                `PUR${invoice.number.toString().padStart(3, '0')}`;
+            
+            showNotification('✅ تم الحفظ', `تم إضافة الدفعة بنجاح للفاتورة ${invoiceNumber}`, 'success');
+            
+            // تحديث الواجهة
+            if (type === 'sale') {
+                renderSalesList();
+            } else {
+                renderPurchasesList();
+            }
+            updateDashboard();
+        }
+        
+        // عرض سجل الدفعات
+        function showPaymentsHistory(invoiceId, type = 'sale') {
+            const invoice = type === 'sale' ? sales.find(s => s.id === invoiceId) : purchases.find(p => p.id === invoiceId);
+            if (!invoice) return;
+            
+            const payments = type === 'sale' ? 
+                salePayments.filter(p => p.invoiceId === invoiceId) : 
+                purchasePayments.filter(p => p.invoiceId === invoiceId);
+            
+            const entityName = type === 'sale' ? 
+                customers.find(c => c.id === invoice.customerId)?.name || 'غير معروف' :
+                suppliers.find(s => s.id === invoice.supplierId)?.name || 'غير معروف';
+            
+            const invoiceNumber = type === 'sale' ? 
+                `SAL${invoice.number.toString().padStart(3, '0')}` :
+                `PUR${invoice.number.toString().padStart(3, '0')}`;
+            
+            const paymentsTotal = payments.reduce((sum, p) => sum + p.amount, 0);
+            const originalPaid = invoice.paidAmount || 0;
+            const totalPaid = paymentsTotal + originalPaid;
+            const remaining = invoice.total - totalPaid;
+            
+            const getPaymentMethodDisplay = (method) => {
+                switch(method) {
+                    case 'cash': return '💰 كاش';
+                    case 'bank': return '🏦 بنك';
+                    case 'check': return '📝 شيك';
+                    default: return method;
+                }
+            };
+            
+            let paymentsRows = '';
+            if (payments.length === 0) {
+                paymentsRows = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">لا توجد دفعات مسجلة</td></tr>';
+            } else {
+                payments.sort((a, b) => new Date(a.date) - new Date(b.date));
+                payments.forEach((payment, index) => {
+                    paymentsRows += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${payment.date}</td>
+                            <td>${payment.amount.toFixed(2)}</td>
+                            <td>${getPaymentMethodDisplay(payment.method)}</td>
+                            <td>${payment.reference || '-'}</td>
+                            <td>
+                                <button class="btn-danger" style="padding: 5px 10px; font-size: 0.85em;" onclick="deletePayment(${payment.id}, '${type}')">حذف</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            const modalHtml = `
+                <div id="payments-history-modal" class="modal-overlay" onclick="closePaymentsHistoryModal(event)">
+                    <div class="modal-content payments-history-modal" onclick="event.stopPropagation()" style="max-width: 900px;">
+                        <div class="modal-header">
+                            <h3>📜 سجل دفعات الفاتورة ${invoiceNumber}</h3>
+                            <button class="modal-close-btn" onclick="closePaymentsHistoryModal()">✖</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="payment-summary-card">
+                                <div class="summary-row">
+                                    <span><strong>${type === 'sale' ? 'العميل' : 'المورد'}:</strong></span>
+                                    <span>${entityName}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span><strong>إجمالي الفاتورة:</strong></span>
+                                    <span>${invoice.total.toFixed(2)} ر.س</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span><strong>إجمالي المدفوع:</strong></span>
+                                    <span style="color: var(--success-color); font-weight: bold;">${totalPaid.toFixed(2)} ر.س</span>
+                                </div>
+                                <div class="summary-row" style="border-top: 2px solid #ddd; padding-top: 10px; margin-top: 10px;">
+                                    <span><strong>المتبقي:</strong></span>
+                                    <span style="color: ${remaining > 0 ? 'var(--accent-color)' : 'var(--success-color)'}; font-weight: bold; font-size: 1.2em;">
+                                        ${remaining.toFixed(2)} ر.س ${remaining === 0 ? '✅' : '⚠️'}
+                                    </span>
+                                </div>
+                            </div>
+                            <table style="margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>التاريخ</th>
+                                        <th>المبلغ</th>
+                                        <th>الطريقة</th>
+                                        <th>المرجع</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${paymentsRows}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            ${remaining > 0 ? `<button class="btn-primary" onclick="closePaymentsHistoryModal(); showAddPaymentModal(${invoiceId}, '${type}')">💰 إضافة دفعة جديدة</button>` : ''}
+                            <button class="btn-secondary" onclick="closePaymentsHistoryModal()">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        // إغلاق نافذة سجل الدفعات
+        function closePaymentsHistoryModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('payments-history-modal');
+            if (modal) modal.remove();
+        }
+        
+        // حذف دفعة
+        async function deletePayment(paymentId, type) {
+            const confirmed = await showConfirmDialog(
+                'حذف الدفعة',
+                'هل أنت متأكد من حذف هذه الدفعة؟ لا يمكن التراجع عن هذا الإجراء.',
+                'warning'
+            );
+            
+            if (!confirmed) return;
+            
+            if (type === 'sale') {
+                const index = salePayments.findIndex(p => p.id === paymentId);
+                if (index > -1) {
+                    salePayments.splice(index, 1);
+                    saveToLocalStorage('salePayments', salePayments);
+                }
+            } else {
+                const index = purchasePayments.findIndex(p => p.id === paymentId);
+                if (index > -1) {
+                    purchasePayments.splice(index, 1);
+                    saveToLocalStorage('purchasePayments', purchasePayments);
+                }
+            }
+            
+            closePaymentsHistoryModal();
+            showNotification('✅ تم الحذف', 'تم حذف الدفعة بنجاح', 'success');
+            
+            if (type === 'sale') {
+                renderSalesList();
+            } else {
+                renderPurchasesList();
+            }
+            updateDashboard();
+        }
+        
+        // حساب إجمالي المدفوع لفاتورة (من الدفعات + المدفوع الأصلي)
+        function getTotalPaid(invoiceId, type = 'sale') {
+            const invoice = type === 'sale' ? 
+                sales.find(s => s.id === invoiceId) : 
+                purchases.find(p => p.id === invoiceId);
+            
+            const payments = type === 'sale' ? 
+                salePayments.filter(p => p.invoiceId === invoiceId) : 
+                purchasePayments.filter(p => p.invoiceId === invoiceId);
+            
+            const paymentsTotal = payments.reduce((sum, p) => sum + p.amount, 0);
+            const originalPaid = invoice ? (invoice.paidAmount || 0) : 0;
+            
+            return paymentsTotal + originalPaid;
         }
 
         // ===== Returns Functions =====
@@ -16257,10 +16820,11 @@ function renderPurchaseReturns() {
             
             filteredPurchases.forEach(purchase => {
                 const supplier = suppliers.find(s => s.id === purchase.supplierId);
-                const remaining = purchase.total - (purchase.paidAmount || 0);
+                const totalPaidAmount = getTotalPaid(purchase.id, 'purchase');
+                const remaining = purchase.total - totalPaidAmount;
                 
                 totalPurchases += purchase.total;
-                totalPaid += purchase.paidAmount || 0;
+                totalPaid += totalPaidAmount;
                 totalRemaining += remaining;
                 
                 tableHTML += `
@@ -16269,7 +16833,7 @@ function renderPurchaseReturns() {
                         <td>${supplier ? supplier.name : 'غير معروف'}</td>
                         <td>PUR${purchase.number.toString().padStart(3, '0')}</td>
                         <td>${purchase.total.toFixed(2)}</td>
-                        <td>${(purchase.paidAmount || 0).toFixed(2)}</td>
+                        <td>${totalPaidAmount.toFixed(2)}</td>
                         <td class="${remaining > 0.01 ? 'remaining-unpaid' : 'remaining-paid'}">${remaining.toFixed(2)}</td>
                     </tr>
                 `;
@@ -16321,7 +16885,7 @@ function renderPurchaseReturns() {
             document.getElementById('statementResults').innerHTML = tableHTML;
         }
         
-        // دالة كشف حساب العملاء
+        // دالة كشف حساب العملاء - محدّثة لنظام الدفعات
         function generateCustomersStatement(fromDate, toDate) {
             const specificCustomerId = document.getElementById('specificCustomerFilter').value;
             
@@ -16341,7 +16905,7 @@ function renderPurchaseReturns() {
             let totalRemaining = 0;
             
             let tableHTML = `
-                <h3>👥 كشف حساب العملاء</h3>
+                <h3>👥 كشف حساب العملاء (مع نظام الدفعات المحسّن)</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -16350,6 +16914,7 @@ function renderPurchaseReturns() {
                             <th>رقم الفاتورة</th>
                             <th>إجمالي الفاتورة</th>
                             <th>المدفوع</th>
+                            <th>عدد الدفعات</th>
                             <th>المتبقي</th>
                         </tr>
                     </thead>
@@ -16358,10 +16923,12 @@ function renderPurchaseReturns() {
             
             filteredSales.forEach(sale => {
                 const customer = customers.find(c => c.id === sale.customerId);
-                const remaining = sale.total - (sale.paidAmount || 0);
+                const totalPaidFromPayments = getTotalPaid(sale.id, 'sale');
+                const paymentsCount = salePayments.filter(p => p.invoiceId === sale.id).length;
+                const remaining = sale.total - totalPaidFromPayments;
                 
                 totalSales += sale.total;
-                totalPaid += sale.paidAmount || 0;
+                totalPaid += totalPaidFromPayments;
                 totalRemaining += remaining;
                 
                 tableHTML += `
@@ -16370,7 +16937,8 @@ function renderPurchaseReturns() {
                         <td>${customer ? customer.name : 'غير معروف'}</td>
                         <td>SAL${sale.number.toString().padStart(3, '0')}</td>
                         <td>${sale.total.toFixed(2)}</td>
-                        <td>${(sale.paidAmount || 0).toFixed(2)}</td>
+                        <td>${totalPaidFromPayments.toFixed(2)}</td>
+                        <td>${paymentsCount > 0 ? `${paymentsCount} دفعة` : '-'}</td>
                         <td class="${remaining > 0.01 ? 'remaining-unpaid' : 'remaining-paid'}">${remaining.toFixed(2)}</td>
                     </tr>
                 `;
@@ -16387,32 +16955,32 @@ function renderPurchaseReturns() {
                         <div class="card-value">${totalSales.toFixed(2)}</div>
                         <div class="card-title">إجمالي المبيعات</div>
                         <div class="card-growth">
-                            <span>+12%</span>
-                            <span class="growth-icon">💰</span>
+                            <span>💰</span>
+                            <span class="growth-icon">📈</span>
                         </div>
                     </div>
                     <div class="dashboard-card profit">
                         <div class="card-value">${totalPaid.toFixed(2)}</div>
                         <div class="card-title">إجمالي المدفوع</div>
                         <div class="card-growth">
-                            <span>+8%</span>
-                            <span class="growth-icon">✅</span>
+                            <span>✅</span>
+                            <span class="growth-icon">💵</span>
                         </div>
                     </div>
                     <div class="dashboard-card revenue">
                         <div class="card-value">${totalRemaining.toFixed(2)}</div>
                         <div class="card-title">إجمالي المتبقي</div>
                         <div class="card-growth">
-                            <span>${totalRemaining > 0 ? '-15%' : '+5%'}</span>
-                            <span class="growth-icon">${totalRemaining > 0 ? '⏳' : '🎉'}</span>
+                            <span>${totalRemaining > 0 ? '⏳' : '🎉'}</span>
+                            <span class="growth-icon">${totalRemaining > 0 ? '⚠️' : '✅'}</span>
                         </div>
                     </div>
                     <div class="dashboard-card sales-today">
                         <div class="card-value">${filteredSales.length}</div>
                         <div class="card-title">عدد المبيعات</div>
                         <div class="card-growth">
-                            <span>+10%</span>
-                            <span class="growth-icon">📋</span>
+                            <span>📋</span>
+                            <span class="growth-icon">🔢</span>
                         </div>
                     </div>
                 </div>
@@ -18289,16 +18857,16 @@ if (data.length > 0) {
     }
     setText('totalAssetsHome', totalAssetsValue.toFixed(2));
     
-    // حساب الرصيد النقدي المتاح
-    // النقد الداخل = المبيعات النقدية + تحصيلات العملاء + الإيرادات
-    const cashSales = sales.reduce((sum, sale) => sum + (Number(sale.paidAmount) || 0), 0);
+    // 💰 حساب الرصيد النقدي المتاح - محدّث لنظام الدفعات
+    // النقد الداخل = دفعات المبيعات (من نظام الدفعات) + الإيرادات
+    const cashFromSalePayments = salePayments.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0);
     const cashRevenues = revenues.reduce((sum, rev) => sum + (Number(rev.amount) || 0), 0);
-    const totalCashIn = cashSales + cashRevenues;
+    const totalCashIn = cashFromSalePayments + cashRevenues;
     
-    // النقد الخارج = المشتريات النقدية + المصروفات + سداد الموردين
-    const cashPurchases = purchases.reduce((sum, purchase) => sum + (Number(purchase.paidAmount) || 0), 0);
+    // النقد الخارج = دفعات المشتريات (من نظام الدفعات) + المصروفات
+    const cashFromPurchasePayments = purchasePayments.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0);
     const cashExpenses = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-    const totalCashOut = cashPurchases + cashExpenses;
+    const totalCashOut = cashFromPurchasePayments + cashExpenses;
     
     // الرصيد النقدي = الداخل - الخارج
     const availableCash = totalCashIn - totalCashOut;
