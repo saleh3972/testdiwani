@@ -2,7 +2,7 @@
 <html dir="rtl" lang="ar">
 <!--
     ========================================
-    🎯 الديوان - النظام المحاسبي v23.0
+    ديواني - النظام المحاسبي v23.0
     ========================================
     /آخر إصلاح في هذه النسخة إضافة دالة فارغة لتجنب تحذير عدم وجود دالة
     📋 أحدث التحسينات والميزات المضافة:
@@ -4301,7 +4301,7 @@ textarea.editing-mode {
     </div>
 
     <div id="home" class="section active">
-        <h2>مرحباً بك في نظام الديوان المحاسبي</h2>
+        <h2>مرحباً بك في نظام ديواني المحاسبي</h2>
         <p>نظام متكامل لإدارة عملياتك المحاسبية بكل سهولة واحترافية</p>
        <div class="stats-grid">
     <div class="stat-card">
@@ -7190,7 +7190,7 @@ const GOSI_SALARY_CAP = 45000;
 // ========================================
 async function initializeApp() {
     console.log('🎯 بدء تهيئة التطبيق...');
-    console.log('🚀 مرحباً بك في الديوان - النظام المحاسبي v23.0');
+    console.log('🚀 مرحباً بك في ديواني - النظام المحاسبي v23.0');
     
     // تحميل المستخدمين والأنشطة من Firebase/LocalStorage
     console.log('📋 تحميل البيانات الأساسية...');
@@ -17122,7 +17122,7 @@ if (data.length > 0) {
         function exportActivityData() {
             if (!ensureActivitySelected()) return;
             const activity = activities.find(a => a.id == currentActivityId);
-            const activityData = { items, customers, suppliers, purchases, sales, expenses, revenues, salaries, salesReturns, purchaseReturns, exportDate: new Date().toISOString(), system: 'نظام الديوان المحاسبي', activityName: activity ? activity.name : 'غير معروف' };
+            const activityData = { items, customers, suppliers, purchases, sales, expenses, revenues, salaries, salesReturns, purchaseReturns, exportDate: new Date().toISOString(), system: 'نظام ديواني المحاسبي', activityName: activity ? activity.name : 'غير معروف' };
             const dataStr = JSON.stringify(activityData, null, 2);
             const link = document.createElement('a');
             link.href = URL.createObjectURL(new Blob([dataStr], {type: 'application/json'}));
