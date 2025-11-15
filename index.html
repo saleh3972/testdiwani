@@ -2040,8 +2040,8 @@
     .btn-primary:hover { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4); }
     .btn-add { background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%); color: white; border: none; }
     .btn-add:hover { background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4); }
-    .btn-success { background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%); color: white; border: none; }
-    .btn-success:hover { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4); }
+    .btn-success { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; }
+    .btn-success:hover { background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4); }
     .btn-success.code-generator-btn { background: linear-gradient(135deg, #0277bd 0%, #01579b 100%); color: #ffffff; border: none; box-shadow: 0 2px 6px rgba(1, 87, 155, 0.3); }
     .btn-success.code-generator-btn:hover { background: linear-gradient(135deg, #01579b 0%, #01396a 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(1, 87, 155, 0.4); }
         .btn-danger { background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white; border: none; }
@@ -6089,7 +6089,7 @@ textarea.editing-mode {
             <option value="مسدد">مسدد</option>
             <option value="جزئي">مسدد جزئياً</option>
         </select>
-        <button class="btn-primary btn-add" onclick="addAdvance()">إضافة عهدة/سلفة</button>
+        <button class="btn-success btn-add" onclick="addAdvance()">إضافة عهدة/سلفة</button>
     </div>
 
     <div class="search-container">
@@ -6307,12 +6307,9 @@ textarea.editing-mode {
             </select>
         </div>
         
-        <div class="form-grid grid-1">
-            <textarea id="assetNotes" placeholder="ملاحظات إضافية" rows="2"></textarea>
-        </div>
-        
-        <div class="asset-actions">
-            <button class="btn-primary" onclick="addAsset()">إضافة الأصل</button>
+        <div class="form-grid" style="grid-template-columns: 2fr 1fr; gap: 15px; align-items: stretch;">
+            <textarea id="assetNotes" placeholder="ملاحظات إضافية" rows="1" style="resize: none; height: 45px; padding: 12px;"></textarea>
+            <button class="btn-success" onclick="addAsset()" style="height: 45px; padding: 0 20px; white-space: nowrap;">إضافة الأصل</button>
         </div>
     </div>
 
@@ -22411,7 +22408,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const notes = document.getElementById('assetNotes').value.trim();
 
             if (!name || !type || !purchaseDate || !cost || !lifespan) {
-                showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع الحقول المطلوبة', 'warning');
+                let missingFields = [];
+                if (!name) missingFields.push('اسم الأصل');
+                if (!type) missingFields.push('نوع الأصل');
+                if (!purchaseDate) missingFields.push('تاريخ الشراء');
+                if (!cost) missingFields.push('تكلفة الشراء');
+                if (!lifespan) missingFields.push('العمر الإنتاجي');
+                
+                showNotification('⚠️ بيانات ناقصة', `يرجى تعبئة الحقول التالية: ${missingFields.join('، ')}`, 'warning');
                 return;
             }
 
