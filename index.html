@@ -24020,31 +24020,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // تطبيق النمط على حقل واحد
+        function applyInputStyle(input) {
+            if (isDarkMode) {
+                input.style.backgroundColor = '#2c2d2e';
+                input.style.color = '#e4e6ea';
+                input.style.borderColor = '#3a3b3c';
+            } else {
+                input.style.backgroundColor = '';
+                input.style.color = '';
+                input.style.borderColor = '';
+            }
+        }
+
         // تطبيق الوضع الداكن
         function applyDarkMode() {
             if (isDarkMode) {
                 document.body.classList.add('dark-mode');
-                // فرض اللون الموحد على جميع الحقول
-                forceUniformInputColors();
             } else {
                 document.body.classList.remove('dark-mode');
             }
+            // فرض اللون الموحد على جميع الحقول في الحالتين
+            forceUniformInputColors();
         }
         
         // فرض لون موحد على جميع الحقول
         function forceUniformInputColors() {
             const allInputs = document.querySelectorAll('input, select, textarea');
-            allInputs.forEach(input => {
-                if (isDarkMode) {
-                    input.style.backgroundColor = '#2c2d2e';
-                    input.style.color = '#e4e6ea';
-                    input.style.borderColor = '#3a3b3c';
-                } else {
-                    input.style.backgroundColor = '';
-                    input.style.color = '';
-                    input.style.borderColor = '';
-                }
-            });
+            allInputs.forEach(applyInputStyle);
         }
 
         // تبديل الوضع الداكن
@@ -24099,10 +24102,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // مراقبة الحقول الجديدة المضافة ديناميكياً
+        function observeNewInputs() {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) { // عنصر HTML
+                            // تطبيق الألوان على العنصر نفسه إذا كان حقل إدخال
+                            if (node.matches && node.matches('input, select, textarea')) {
+                                applyInputStyle(node);
+                            }
+                            // تطبيق الألوان على الحقول الفرعية
+                            const inputs = node.querySelectorAll('input, select, textarea');
+                            inputs.forEach(applyInputStyle);
+                        }
+                    });
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+
         // تحميل التفضيل عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 loadDarkModePreference();
+                observeNewInputs(); // بدء مراقبة الحقول الجديدة
             }, 100);
         });
     </script>
