@@ -3909,20 +3909,12 @@ textarea.editing-mode {
                         <code style="display: block; background-color: #f0f0f0; padding: 8px; border-radius: 4px; margin-bottom: 8px; cursor: pointer; user-select: all; font-size: 0.85em;" onclick="navigator.clipboard.writeText(this.innerText); showNotification('✅ تم النسخ', 'تم نسخ Template ID', 'success', 2000);">template_cwep9ok</code>
                         <input type="text" id="emailJsTemplateId" class="login-input" placeholder="أدخل Template ID للفواتير">
                     </div>
-                    
-                    <!-- Reset Template ID -->
-                    <div>
-                        <label for="emailJsResetTemplateId" style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Reset Template ID</label>
-                        <code style="display: block; background-color: #f0f0f0; padding: 8px; border-radius: 4px; margin-bottom: 8px; cursor: pointer; user-select: all; font-size: 0.85em;" onclick="navigator.clipboard.writeText(this.innerText); showNotification('✅ تم النسخ', 'تم نسخ Reset Template ID', 'success', 2000);">template_password_reset</code>
-                        <input type="text" id="emailJsResetTemplateId" class="login-input" placeholder="أدخل Template ID لإعادة كلمة المرور">
-                    </div>
                 </div>
                 
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; color: #555;">
                     <strong>📝 ملاحظات:</strong>
                     <ul style="margin: 10px 0 0 20px; padding: 0;">
                         <li>قالب الفاتورة يجب أن يحتوي على: <code style="background: #e9ecef; padding: 2px 5px; border-radius: 3px;">{{to_name}}, {{to_email}}, {{invoice_number}}, {{invoice_details}}</code></li>
-                        <li>قالب إعادة كلمة المرور يجب أن يحتوي على: <code style="background: #e9ecef; padding: 2px 5px; border-radius: 3px;">{{to_email}}, {{reset_link}}, {{app_name}}</code></li>
                     </ul>
                 </div>
                 
@@ -4192,6 +4184,8 @@ textarea.editing-mode {
 
             <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
             
+            <!-- تخصيص التذييل - خاص بمدير النظام فقط -->
+            <div id="footerCustomizationSection">
             <h4 style="margin: 10px 0; font-size: 0.95em; color: #1a3a5c;">📄 تخصيص التذييل</h4>
             
             <div class="control-group">
@@ -4214,6 +4208,7 @@ textarea.editing-mode {
                     <option value="'Reem Kufi', sans-serif">Reem Kufi</option>
                     <option value="'Arial', sans-serif">Arial</option>
                 </select>
+            </div>
             </div>
 
             <button onclick="resetDesign()" class="btn-primary" style="width: 100%; margin-top: 8px; padding: 8px 12px; font-size: 0.9em;">🔄 إعادة تعيين</button>
@@ -5724,6 +5719,7 @@ textarea.editing-mode {
             <div style="margin-bottom: 25px;">
                 <h4 style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.15), rgba(66, 165, 245, 0.15)); color: #1976d2; margin-bottom: 15px; padding: 12px 20px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2); border: 2px solid rgba(25, 118, 210, 0.3);"> إضافة مستخدم جديد</h4>
                 <form id="newUserForm" onsubmit="return false;">
+                <!-- السطر الأول: الاسم + الصلاحية + البريد -->
                 <div class="form-grid grid-3">
                     <input type="text" id="newUserName" placeholder="اسم المستخدم *" autocomplete="name">
                     <select id="newUserRole">
@@ -5733,17 +5729,18 @@ textarea.editing-mode {
                     </select>
                     <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني *" autocomplete="email">
                 </div>
-                <div class="form-grid grid-4">
+                <!-- السطر الثاني: رقم الجوال + كلمة المرور + النشاط -->
+                <div class="form-grid grid-3" style="margin-top: 15px;">
                     <input type="tel" id="newUserPhone" placeholder="رقم الجوال *" autocomplete="tel">
                     <input type="password" id="newUserPassword" placeholder="كلمة المرور *" autocomplete="new-password">
                     <select id="newUserActivity">
                         <option value="">-- تعيين لنشاط --</option>
                     </select>
                 </div>
-                <!-- سؤال الأمان -->
+                <!-- السطر الثالث: سؤال الأمان + الإجابة + الزر -->
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-right: 3px solid #ffc107;">
                     <h5 style="color: #856404; margin: 0 0 10px 0;">🔐 سؤال الأمان (اختياري - موصى به)</h5>
-                    <div class="form-grid grid-2">
+                    <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 15px; align-items: end;">
                         <select id="newUserSecurityQuestion" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
                             <option value="">-- اختر سؤال أمان --</option>
                             <option value="ما هو اسم والدتك؟">ما هو اسم والدتك؟</option>
@@ -5754,10 +5751,10 @@ textarea.editing-mode {
                             <option value="ما هو رقمك المفضل؟">ما هو رقمك المفضل؟</option>
                         </select>
                         <input type="text" id="newUserSecurityAnswer" placeholder="إجابة سؤال الأمان" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px;">
+                        <button class="btn-primary btn-add" onclick="addUser()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s ease; white-space: nowrap;">✅ إضافة</button>
                     </div>
                     <p style="font-size: 12px; color: #856404; margin: 8px 0 0 0;">💡 سؤال الأمان يساعد المستخدم في استعادة كلمة المرور بشكل آمن</p>
                 </div>
-                <button class="btn-primary btn-add" onclick="addUser()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease; width: 100%;"> إضافة المستخدم</button>
                 </form>
             </div>
             
@@ -5918,10 +5915,10 @@ textarea.editing-mode {
             </p>
             
             <div class="form-grid grid-3" style="gap: 15px;">
-                <button class="btn-primary" onclick="openFooterSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #1976d2, #42a5f5);">
+                <button class="btn-primary" onclick="openFooterSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #1976d2, #42a5f5);" id="footerSettingsBtn">
                     📄 تخصيص بيانات التذييل
                 </button>
-                <button class="btn-info" onclick="openAboutSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #0d47a1, #1565c0);">
+                <button class="btn-info" onclick="openAboutSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #0d47a1, #1565c0);" id="aboutSettingsBtn">
                     ℹ️ تخصيص حول البرنامج
                 </button>
                 <button class="btn-success" onclick="toggleControlPanel()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #7b1fa2, #9c27b0);">
@@ -7495,13 +7492,11 @@ function toggleEmailSettings() {
     // تحميل القيم الحالية (من المتغيرات أو LocalStorage)
     const serviceId = emailJsConfig.serviceID || localStorage.getItem('emailjs_service_id') || '';
     const templateId = emailJsConfig.templateID || localStorage.getItem('emailjs_template_id') || '';
-    const resetTemplateId = emailJsConfig.resetTemplateID || localStorage.getItem('emailjs_reset_template_id') || '';
     const publicKey = emailJsConfig.publicKey || localStorage.getItem('emailjs_public_key') || '';
     
     // تعبئة الحقول
     document.getElementById('emailJsServiceId').value = serviceId;
     document.getElementById('emailJsTemplateId').value = templateId;
-    document.getElementById('emailJsResetTemplateId').value = resetTemplateId;
     document.getElementById('emailJsPublicKey').value = publicKey;
     
     // فتح النافذة
@@ -7528,14 +7523,12 @@ async function saveEmailJsSettings() {
     
     const serviceId = document.getElementById('emailJsServiceId').value.trim();
     const templateId = document.getElementById('emailJsTemplateId').value.trim();
-    const resetTemplateId = document.getElementById('emailJsResetTemplateId').value.trim();
     const publicKey = document.getElementById('emailJsPublicKey').value.trim();
     
     // تحديث المتغير العالمي
     emailJsConfig = {
         serviceID: serviceId,
         templateID: templateId,
-        resetTemplateID: resetTemplateId,
         publicKey: publicKey
     };
     
@@ -7546,7 +7539,6 @@ async function saveEmailJsSettings() {
         // حفظ القيم منفصلة أيضاً للتوافق مع النظام القديم
         localStorage.setItem('emailjs_service_id', serviceId);
         localStorage.setItem('emailjs_template_id', templateId);
-        localStorage.setItem('emailjs_reset_template_id', resetTemplateId);
         localStorage.setItem('emailjs_public_key', publicKey);
         
         console.log('✅ تم حفظ إعدادات البريد بنجاح');
@@ -7674,7 +7666,6 @@ const EMAILJS_FIXED = false; // true = استخدام الإعدادات الث�
 const EMAILJS_DEFAULTS = {
     serviceID: 'service_hu6ucxi',
     templateID: 'template_cwep9ok',
-    resetTemplateID: 'template_aqp69jt',
     publicKey: '-FKicwCTdzG90IoY6'
 };
 let emailJsConfig = { ...EMAILJS_DEFAULTS };
@@ -10537,6 +10528,30 @@ loadSavedEmailSettings();
             }
 
             updateAccountInfoSection(user);
+        }
+
+        // دالة لإخفاء عناصر التخصيص عن مدير النشاط
+        function hideCustomizationForManagers(userRole) {
+            if (userRole === 'manager') {
+                // إخفاء أزرار التخصيص
+                const footerBtn = document.getElementById('footerSettingsBtn');
+                const aboutBtn = document.getElementById('aboutSettingsBtn');
+                if (footerBtn) footerBtn.style.display = 'none';
+                if (aboutBtn) aboutBtn.style.display = 'none';
+                
+                // إخفاء قسم تخصيص التذييل من لوحة التحكم
+                const footerSection = document.getElementById('footerCustomizationSection');
+                if (footerSection) footerSection.style.display = 'none';
+            } else {
+                // إظهار العناصر للمدير
+                const footerBtn = document.getElementById('footerSettingsBtn');
+                const aboutBtn = document.getElementById('aboutSettingsBtn');
+                if (footerBtn) footerBtn.style.display = '';
+                if (aboutBtn) aboutBtn.style.display = '';
+                
+                const footerSection = document.getElementById('footerCustomizationSection');
+                if (footerSection) footerSection.style.display = '';
+            }
         }
 
 function updatePerformanceIndicators() {
@@ -18606,6 +18621,9 @@ function updateAllCharts() {
         updateLoggedInUserDisplay(user);
         document.getElementById('login-overlay').style.display = 'none';
         document.querySelector('.app-container').style.display = 'flex';
+        
+        // إخفاء عناصر التخصيص عن مدير النشاط
+        hideCustomizationForManagers(user.role);
         
         // إظهار التذييل بعد تسجيل الدخول
         const footer = document.getElementById('appFooter');
