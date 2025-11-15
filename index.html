@@ -687,6 +687,21 @@
             --sidebar-bg: #1a3a5c;
             --sidebar-text: #ffffff;
             --header-bg: linear-gradient(135deg, #1a3a5c 0%, #0d2742 100%);
+            
+            /* متغيرات الوضع الداكن */
+            --dark-bg: #1a1a2e;
+            --dark-bg-secondary: #16213e;
+            --dark-bg-tertiary: #0f3460;
+            --dark-text: #e4e6ea;
+            --dark-text-secondary: #b0b3b8;
+            --dark-border: #3a3b3c;
+            --dark-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            --dark-input-bg: #242526;
+            --dark-card-bg: #242526;
+            --dark-table-bg: #18191a;
+            --dark-table-row: #242526;
+            --dark-sidebar-bg: #18191a;
+            --dark-header-bg: linear-gradient(135deg, #1c1e21 0%, #0f1013 100%);
         }
     
 
@@ -3753,6 +3768,725 @@ textarea.editing-mode {
 
 /* ===== نهاية أنماط قسم الأصول ===== */
 
+/* ==== أنماط الوضع الداكن ==== */
+        
+        /* زر الوضع الداكن */
+        .dark-mode-toggle { 
+            position: fixed; 
+            top: 20px; 
+            left: 80px; 
+            background: linear-gradient(135deg, #2c5aa0, #1a3a5c); 
+            color: white; 
+            border: none; 
+            border-radius: 50%; 
+            width: 50px; 
+            height: 50px; 
+            cursor: pointer; 
+            font-size: 20px; 
+            box-shadow: var(--shadow); 
+            transition: all 0.3s ease; 
+            z-index: 102; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-mode-toggle:hover { 
+            transform: scale(1.1); 
+            background: linear-gradient(135deg, #1a3a5c, #0d2742); 
+            box-shadow: 0 6px 15px rgba(44, 90, 160, 0.4);
+        }
+        
+        body.dark-mode {
+            background: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .section,
+        body.dark-mode .chart-card,
+        body.dark-mode .analytics-card,
+        body.dark-mode .stat-card,
+        body.dark-mode #login-box,
+        body.dark-mode .control-panel,
+        body.dark-mode .settings-card {
+            background: var(--dark-card-bg) !important;
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+            box-shadow: var(--dark-shadow) !important;
+        }
+        
+        /* تأكيد إصلاح بطاقات لوحة التحكم */
+        body.dark-mode .stat-card {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        body.dark-mode .stat-number {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .stat-label {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح ألوان الأزرار في الوضع الداكن */
+        body.dark-mode button,
+        body.dark-mode .btn,
+        body.dark-mode .btn-primary,
+        body.dark-mode .btn-success,
+        body.dark-mode .btn-danger,
+        body.dark-mode .btn-warning,
+        body.dark-mode .btn-info,
+        body.dark-mode .btn-secondary,
+        body.dark-mode .btn-add {
+            color: white !important;
+        }
+        
+        /* إصلاح أزرار القائمة الجانبية */
+        body.dark-mode .sidebar-nav button {
+            color: var(--sidebar-text) !important;
+        }
+        
+        body.dark-mode .sidebar-nav button.active {
+            color: white !important;
+        }
+        
+        /* إصلاح نصوص الأزرار العادية */
+        body.dark-mode button:not(.sidebar-nav button) {
+            color: white !important;
+        }
+        
+        /* إصلاح نصوص الرسوم البيانية */
+        body.dark-mode .chart-card canvas {
+            filter: brightness(1.1);
+        }
+        
+        /* إصلاح legend في الرسوم البيانية */
+        body.dark-mode canvas {
+            color-scheme: dark;
+        }
+        
+        /* إصلاح نصوص Chart.js */
+        body.dark-mode .chart-card {
+            --chart-text-color: #e4e6ea;
+        }
+        
+        body.dark-mode .sidebar {
+            background: var(--dark-sidebar-bg);
+        }
+        
+        body.dark-mode .header {
+            background: var(--dark-header-bg);
+        }
+        
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea,
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="number"],
+        body.dark-mode input[type="date"],
+        body.dark-mode input[type="tel"],
+        body.dark-mode input[type="email"],
+        body.dark-mode input[type="password"] {
+            background: #2c2d2e !important;
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        body.dark-mode input:focus,
+        body.dark-mode select:focus,
+        body.dark-mode textarea:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.3) !important;
+            background: #2c2d2e !important;
+        }
+        
+        body.dark-mode table {
+            background: var(--dark-table-bg);
+        }
+        
+        body.dark-mode th {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        body.dark-mode td {
+            background: var(--dark-table-row);
+            color: var(--dark-text);
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        body.dark-mode tr:hover td {
+            background: var(--dark-bg-secondary);
+        }
+        
+        /* إصلاح صفحة الإعدادات في الوضع الداكن */
+        body.dark-mode .user-management,
+        body.dark-mode .activities-management,
+        body.dark-mode .branches-management,
+        body.dark-mode .backup-settings,
+        body.dark-mode .logo-settings,
+        body.dark-mode .activity-logo-settings {
+            background: var(--dark-card-bg) !important;
+            color: var(--dark-text);
+            border-color: var(--dark-border) !important;
+        }
+        
+        /* إصلاح الخلفية البيضاء في قسم المستخدمين */
+        body.dark-mode .user-selector,
+        body.dark-mode .activity-selector {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        /* إصلاح خلفية user-management بالكامل */
+        body.dark-mode #userManagementSection,
+        body.dark-mode #activityManagementSection,
+        body.dark-mode #branchManagementSection {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        /* إصلاح الأقسام الداخلية */
+        body.dark-mode .user-selector > *,
+        body.dark-mode .activity-selector > * {
+            background: transparent !important;
+        }
+        
+        body.dark-mode .current-user-info {
+            background: var(--dark-bg-secondary) !important;
+            border-right-color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .user-management h3,
+        body.dark-mode .user-management h4,
+        body.dark-mode .activities-management h3,
+        body.dark-mode .settings-card h3,
+        body.dark-mode .settings-card h4 {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .current-user-info strong,
+        body.dark-mode .settings-card p {
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .current-user-info span {
+            color: var(--dark-text-secondary);
+        }
+        
+        body.dark-mode #currentActivityDisplay {
+            background: var(--dark-input-bg) !important;
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .tips-container {
+            background: var(--dark-bg-secondary) !important;
+            border-color: rgba(44, 90, 160, 0.3) !important;
+        }
+        
+        body.dark-mode .tips-container p,
+        body.dark-mode .tips-container li {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode .tips-container strong {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .user-selector label,
+        body.dark-mode .activity-selector label,
+        body.dark-mode .selected-user-field label,
+        body.dark-mode .selected-activity-field label {
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .logo-preview-container img {
+            background: var(--dark-input-bg);
+            border-color: var(--dark-border);
+        }
+        
+        body.dark-mode #noLogoText,
+        body.dark-mode #noActivityLogoText {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* تحسين العناوين الملونة في الإعدادات */
+        body.dark-mode h4[style*="background: linear-gradient"],
+        body.dark-mode .current-user-info h4 {
+            background: var(--dark-bg-tertiary) !important;
+            border: 2px solid var(--primary-color) !important;
+            color: var(--primary-color) !important;
+        }
+        
+        /* تحسين قسم معلومات النظام */
+        body.dark-mode div[style*="background: linear-gradient(135deg, #e3f2fd"] {
+            background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode div[style*="background: linear-gradient(135deg, #e3f2fd"] strong {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode div[style*="background: linear-gradient(135deg, #e3f2fd"] div {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح قسم النسخ الاحتياطي */
+        body.dark-mode .backup-settings {
+            background: var(--dark-bg-secondary) !important;
+            color: var(--dark-text) !important;
+            border-color: rgba(44, 90, 160, 0.5) !important;
+        }
+        
+        body.dark-mode .backup-settings h3,
+        body.dark-mode .backup-settings h4 {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode .backup-settings p,
+        body.dark-mode .backup-settings li {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode .backup-settings > div {
+            background: var(--dark-bg-tertiary) !important;
+            border-color: rgba(44, 90, 160, 0.3) !important;
+        }
+        
+        /* إصلاح باقي العناصر */
+        body.dark-mode .filters-container {
+            background: var(--dark-bg-secondary);
+            border-color: var(--dark-border);
+        }
+        
+        body.dark-mode .notification {
+            background: var(--dark-card-bg);
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .confirm-dialog {
+            background: var(--dark-card-bg);
+        }
+        
+        body.dark-mode .trash-content,
+        body.dark-mode .modal-content {
+            background: var(--dark-card-bg);
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .current-user {
+            background: var(--dark-bg-tertiary);
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5 {
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode .sidebar-header h1 {
+            color: white;
+        }
+        
+        body.dark-mode .stat-number {
+            color: var(--primary-color);
+        }
+        
+        body.dark-mode .stat-label {
+            color: var(--dark-text-secondary);
+        }
+        
+        body.dark-mode .chart-card h3,
+        body.dark-mode .analytics-card h3,
+        body.dark-mode .section h2 {
+            color: var(--primary-color);
+        }
+        
+        body.dark-mode #appFooter {
+            background: linear-gradient(135deg, var(--dark-bg-tertiary) 0%, var(--dark-bg-secondary) 100%);
+            border-top-color: var(--dark-border);
+        }
+        
+        /* إصلاح صندوق سؤال الأمان */
+        body.dark-mode div[style*="background: #f8f9fa"][style*="border-right: 3px solid #ffc107"] {
+            background: var(--dark-bg-secondary) !important;
+            border-right-color: #ffc107 !important;
+        }
+        
+        body.dark-mode div[style*="background: #f8f9fa"][style*="border-right: 3px solid #ffc107"] h5 {
+            color: #ffc107 !important;
+        }
+        
+        body.dark-mode div[style*="background: #f8f9fa"][style*="border-right: 3px solid #ffc107"] p {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح العناوين مع الخلفية المدرجة الزرقاء */
+        body.dark-mode h4[style*="background: linear-gradient(135deg, rgba(25, 118, 210"] {
+            background: linear-gradient(135deg, var(--dark-bg-tertiary), var(--dark-bg-secondary)) !important;
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        /* إصلاح قسم المستخدم الحالي */
+        body.dark-mode div[style*="background: #f0f7ff"] {
+            background: var(--dark-bg-secondary) !important;
+            border-right-color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode div[style*="background: #f0f7ff"] strong {
+            color: var(--dark-text);
+        }
+        
+        body.dark-mode div[style*="background: #f0f7ff"] span {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* إصلاح العناصر ذات الخلفية البيضاء في الإعدادات */
+        body.dark-mode #currentActivityDisplay[style*="background: white"] {
+            background: var(--dark-input-bg) !important;
+        }
+        
+        /* إصلاح أقسام النظام الهجين */
+        body.dark-mode .settings-card div[style*="background: rgba(25, 118, 210, 0.1)"] {
+            background: var(--dark-bg-tertiary) !important;
+            border-color: rgba(44, 90, 160, 0.5) !important;
+        }
+        
+        body.dark-mode .settings-card div[style*="background: rgba(25, 118, 210, 0.08)"] {
+            background: var(--dark-bg-tertiary) !important;
+            border-color: rgba(44, 90, 160, 0.3) !important;
+        }
+        
+        body.dark-mode .settings-card div[style*="background: rgba(25, 118, 210, 0.08)"] ul {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح حقول الإدخال داخل سؤال الأمان */
+        body.dark-mode select[id*="SecurityQuestion"],
+        body.dark-mode input[id*="SecurityAnswer"] {
+            background: var(--dark-input-bg) !important;
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        /* إصلاح Labels في صفحة الإعدادات */
+        body.dark-mode .user-selector-label,
+        body.dark-mode .activity-selector-label {
+            color: var(--dark-text);
+        }
+        
+        /* إصلاح قائمة الأنشطة في الإعدادات */
+        body.dark-mode #activitiesDropdown,
+        body.dark-mode #usersDropdown,
+        body.dark-mode #newUserActivity {
+            background: var(--dark-input-bg);
+            color: var(--dark-text);
+            border-color: var(--dark-border);
+        }
+        
+        /* إصلاح الملاحظات في صفحة الإعدادات */
+        body.dark-mode p[style*="font-size: 0.8em"][style*="color: #666"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode p[style*="font-size: 0.9em"][style*="color: #666"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح Label "قائمة المستخدمين" */
+        body.dark-mode label[for="usersDropdown"],
+        body.dark-mode label[for="activitiesDropdown"] {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح جميع الـ labels في صفحة الإعدادات */
+        body.dark-mode #settings label,
+        body.dark-mode .settings-card label {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح النصوص الباهتة */
+        body.dark-mode .settings-card p[style*="color: #999"],
+        body.dark-mode p[style*="font-style: italic"][style*="color: #999"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح أي div بخلفية بيضاء في الإعدادات */
+        body.dark-mode #settings div[style*="background: white"],
+        body.dark-mode .settings-card div[style*="background: white"] {
+            background: var(--dark-input-bg) !important;
+        }
+        
+        /* إصلاح الـ placeholders */
+        body.dark-mode input::placeholder,
+        body.dark-mode textarea::placeholder {
+            color: var(--dark-text-secondary);
+            opacity: 0.6;
+        }
+        
+        /* إصلاح readonly inputs */
+        body.dark-mode input[readonly],
+        body.dark-mode textarea[readonly] {
+            background: #2c2d2e !important;
+            color: var(--dark-text) !important;
+            opacity: 1 !important;
+        }
+        
+        /* إصلاح شامل لجميع عناصر الإعدادات */
+        body.dark-mode #settings *[style*="color: #666"],
+        body.dark-mode .settings-card *[style*="color: #666"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode #settings *[style*="color: #999"],
+        body.dark-mode .settings-card *[style*="color: #999"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح نص "قائمة المستخدمين:" الواضح */
+        body.dark-mode .user-selector > label,
+        body.dark-mode .activity-selector > label {
+            color: var(--dark-text) !important;
+            font-weight: 600;
+        }
+        
+        /* إصلاح إضافي للنصوص الباهتة جداً */
+        body.dark-mode .user-selector *,
+        body.dark-mode .activity-selector * {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح شامل لأي نص باهت في الإعدادات */
+        body.dark-mode #settings h4,
+        body.dark-mode #settings h5,
+        body.dark-mode #settings p,
+        body.dark-mode #settings label,
+        body.dark-mode #settings span {
+            opacity: 1 !important;
+        }
+        
+        /* إصلاح النصوص ذات opacity منخفض */
+        body.dark-mode .settings-card * {
+            opacity: 1 !important;
+        }
+        
+        body.dark-mode .settings-card p[style*="opacity"],
+        body.dark-mode .settings-card span[style*="opacity"] {
+            opacity: 0.9 !important;
+        }
+        
+        /* إصلاح قوي جداً للـ label "قائمة المستخدمين:" */
+        body.dark-mode .user-selector-label,
+        body.dark-mode .activity-selector-label,
+        body.dark-mode label.user-selector-label,
+        body.dark-mode label.activity-selector-label {
+            color: #e4e6ea !important;
+            opacity: 1 !important;
+            font-weight: 600 !important;
+        }
+        
+        /* إصلاح كل label في قسم المستخدمين */
+        body.dark-mode .user-selector label,
+        body.dark-mode .activity-selector label {
+            color: #e4e6ea !important;
+            opacity: 1 !important;
+        }
+        
+        /* إصلاح شامل لجميع labels في الإعدادات */
+        body.dark-mode #usersTabContent label,
+        body.dark-mode #activitiesTabContent label,
+        body.dark-mode #generalTabContent label,
+        body.dark-mode #backupTabContent label {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح خلفية invoice-totals */
+        body.dark-mode .invoice-totals,
+        body.dark-mode .invoice-totals-print {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        /* إصلاح حقول الإدخال في invoice-totals */
+        body.dark-mode .invoice-totals input[type="number"],
+        body.dark-mode .invoice-totals select {
+            background: #2c2d2e !important;
+            color: var(--dark-text) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        /* إصلاح بطاقات الرواتب */
+        body.dark-mode .salary-card,
+        body.dark-mode .salary-summary {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        body.dark-mode .dashboard-card[style*="background: white"] {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        body.dark-mode .dashboard-card .card-value,
+        body.dark-mode .dashboard-card .card-title,
+        body.dark-mode .dashboard-card .card-growth span {
+            color: inherit !important;
+        }
+        
+        /* إصلاح بطاقات الأصول */
+        body.dark-mode .asset-card,
+        body.dark-mode .assets-summary {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        /* إصلاح dashboard cards */
+        body.dark-mode .dashboard-card.customers,
+        body.dark-mode .dashboard-card.profit,
+        body.dark-mode .dashboard-card.revenue,
+        body.dark-mode .dashboard-card.sales-today {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        body.dark-mode .dashboard-card .card-value,
+        body.dark-mode .dashboard-card .card-title,
+        body.dark-mode .dashboard-card .card-growth {
+            color: var(--dark-text) !important;
+        }
+        
+        body.dark-mode .dashboard-card.customers .card-value,
+        body.dark-mode .dashboard-card.customers .card-title,
+        body.dark-mode .dashboard-card.customers .card-growth,
+        body.dark-mode .dashboard-card.profit .card-value,
+        body.dark-mode .dashboard-card.profit .card-title,
+        body.dark-mode .dashboard-card.profit .card-growth,
+        body.dark-mode .dashboard-card.revenue .card-value,
+        body.dark-mode .dashboard-card.revenue .card-title,
+        body.dark-mode .dashboard-card.revenue .card-growth,
+        body.dark-mode .dashboard-card.sales-today .card-value,
+        body.dark-mode .dashboard-card.sales-today .card-title,
+        body.dark-mode .dashboard-card.sales-today .card-growth {
+            color: var(--dark-text) !important;
+        }
+            opacity: 1 !important;
+        }
+        
+        /* إصلاح صفحة "حول البرنامج" */
+        body.dark-mode #about .settings-card {
+            background: var(--dark-card-bg) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        body.dark-mode #about .settings-card[style*="background: white"] {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        body.dark-mode #about div[style*="background: #f8f9fa"],
+        body.dark-mode #about div[style*="background: white"] {
+            background: var(--dark-bg-secondary) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        body.dark-mode #about div[style*="background: rgba(25, 118, 210, 0.05)"],
+        body.dark-mode #about div[style*="background: rgba(25, 118, 210, 0.1)"] {
+            background: var(--dark-bg-tertiary) !important;
+            border-color: rgba(44, 90, 160, 0.5) !important;
+        }
+        
+        body.dark-mode #about div[style*="background: rgba(25, 118, 210, 0.08)"] {
+            background: var(--dark-bg-secondary) !important;
+            border-color: rgba(44, 90, 160, 0.3) !important;
+        }
+        
+        body.dark-mode #about h1,
+        body.dark-mode #about h3,
+        body.dark-mode #about strong {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode #about p,
+        body.dark-mode #about div[style*="color: #666"],
+        body.dark-mode #about div[style*="color: #555"],
+        body.dark-mode #about div[style*="color: #333"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode #about div[style*="color: #999"] {
+            color: var(--dark-text-secondary) !important;
+            opacity: 0.7;
+        }
+        
+        body.dark-mode #aboutProgramName {
+            color: var(--primary-color) !important;
+        }
+        
+        body.dark-mode #aboutVersion,
+        body.dark-mode #aboutDescription {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        body.dark-mode #aboutDeveloper,
+        body.dark-mode #aboutYear {
+            color: var(--dark-text) !important;
+        }
+        
+        /* إصلاح بطاقات المميزات */
+        body.dark-mode #about div[style*="background: white"][style*="border-right"] {
+            background: var(--dark-bg-secondary) !important;
+        }
+        
+        body.dark-mode #about div[style*="background: white"][style*="border-right"] p {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح البطاقة السفلية في حول البرنامج */
+        body.dark-mode #about > div > div:last-child {
+            background: var(--dark-card-bg) !important;
+        }
+        
+        /* إصلاح جميع الأقسام داخل صفحة about */
+        body.dark-mode #about > div {
+            background: transparent !important;
+        }
+        
+        body.dark-mode #about > div > div {
+            background: var(--dark-card-bg) !important;
+            border-color: var(--dark-border) !important;
+        }
+        
+        /* إصلاح النصوص الصغيرة */
+        body.dark-mode #about div[style*="font-size: 0.9em"],
+        body.dark-mode #about div[style*="font-size: 0.85em"],
+        body.dark-mode #about div[style*="font-size: 0.95em"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح العناوين الصغيرة فوق البيانات */
+        body.dark-mode #about div[style*="font-size: 0.9em"][style*="color: #666"] {
+            color: var(--dark-text-secondary) !important;
+        }
+        
+        /* إصلاح القيم الكبيرة */
+        body.dark-mode #about div[style*="font-size: 1.1em"][style*="font-weight: 600"] {
+            color: var(--dark-text) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .dark-mode-toggle { 
+                top: 20px; 
+                left: 20px; 
+                z-index: 103; 
+            }
+        }
+        
+        /* الانتقالات السلسة */
+        body,
+        .section,
+        .settings-card,
+        input,
+        select,
+        textarea {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
 
  </style>
 
@@ -4116,6 +4850,7 @@ textarea.editing-mode {
 
     <div class="app-container" style="display: none;">
         <button class="sidebar-toggle" onclick="toggleSidebar()">☰ القائمة</button>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()" id="darkModeToggle" title="تبديل الوضع الداكن">🌙</button>
 
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -17822,12 +18557,32 @@ function updateSalesVsPurchasesChart() {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        color: document.body.classList.contains('dark-mode') ? '#e4e6ea' : '#666',
+                        font: {
+                            family: "'Tajawal', sans-serif"
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#b0b3b8' : '#666'
+                    },
+                    grid: {
+                        color: document.body.classList.contains('dark-mode') ? '#3a3b3c' : 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#b0b3b8' : '#666'
+                    },
+                    grid: {
+                        color: document.body.classList.contains('dark-mode') ? '#3a3b3c' : 'rgba(0, 0, 0, 0.1)'
+                    }
                 }
             }
         }
@@ -18011,12 +18766,32 @@ function updateCashFlowChart() {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        color: document.body.classList.contains('dark-mode') ? '#e4e6ea' : '#666',
+                        font: {
+                            family: "'Tajawal', sans-serif"
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#b0b3b8' : '#666'
+                    },
+                    grid: {
+                        color: document.body.classList.contains('dark-mode') ? '#3a3b3c' : 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: document.body.classList.contains('dark-mode') ? '#b0b3b8' : '#666'
+                    },
+                    grid: {
+                        color: document.body.classList.contains('dark-mode') ? '#3a3b3c' : 'rgba(0, 0, 0, 0.1)'
+                    }
                 }
             }
         }
@@ -23228,6 +24003,109 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })();
             </script>
+
+    <!-- سكريبت إدارة الوضع الداكن -->
+    <script>
+        // إدارة الوضع الداكن
+        let isDarkMode = false;
+
+        // تحميل حالة الوضع الداكن من localStorage
+        function loadDarkModePreference() {
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'enabled') {
+                isDarkMode = true;
+                applyDarkMode();
+                updateDarkModeToggleButton();
+                console.log('🌙 تم تفعيل الوضع الداكن المحفوظ');
+            }
+        }
+
+        // تطبيق الوضع الداكن
+        function applyDarkMode() {
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                // فرض اللون الموحد على جميع الحقول
+                forceUniformInputColors();
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        
+        // فرض لون موحد على جميع الحقول
+        function forceUniformInputColors() {
+            const allInputs = document.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
+                if (isDarkMode) {
+                    input.style.backgroundColor = '#2c2d2e';
+                    input.style.color = '#e4e6ea';
+                    input.style.borderColor = '#3a3b3c';
+                } else {
+                    input.style.backgroundColor = '';
+                    input.style.color = '';
+                    input.style.borderColor = '';
+                }
+            });
+        }
+
+        // تبديل الوضع الداكن
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            applyDarkMode();
+            updateDarkModeToggleButton();
+            
+            // حفظ التفضيل
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            
+            // تحديث ألوان الرسوم البيانية
+            updateChartsForDarkMode();
+            
+            if (typeof showNotification === 'function') {
+                showNotification(
+                    isDarkMode ? '🌙 تم التفعيل' : '☀️ تم الإلغاء',
+                    isDarkMode ? 'تم تفعيل الوضع الداكن' : 'تم إلغاء الوضع الداكن',
+                    'success'
+                );
+            }
+            
+            console.log(isDarkMode ? '🌙 تم تفعيل الوضع الداكن' : '☀️ تم إلغاء الوضع الداكن');
+        }
+        
+        // تحديث ألوان الرسوم البيانية
+        function updateChartsForDarkMode() {
+            if (typeof Chart !== 'undefined' && Chart.defaults) {
+                if (isDarkMode) {
+                    Chart.defaults.color = '#e4e6ea';
+                    Chart.defaults.borderColor = '#3a3b3c';
+                    Chart.defaults.backgroundColor = 'rgba(228, 230, 234, 0.1)';
+                } else {
+                    Chart.defaults.color = '#666';
+                    Chart.defaults.borderColor = '#ddd';
+                    Chart.defaults.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }
+                
+                // إعادة رسم جميع الرسوم البيانية
+                if (typeof updateDashboardCharts === 'function') {
+                    updateDashboardCharts();
+                }
+            }
+        }
+
+        // تحديث أيقونة زر التبديل
+        function updateDarkModeToggleButton() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            if (toggleBtn) {
+                toggleBtn.innerHTML = isDarkMode ? '☀️' : '🌙';
+                toggleBtn.title = isDarkMode ? 'تبديل إلى الوضع الفاتح' : 'تبديل إلى الوضع الداكن';
+            }
+        }
+
+        // تحميل التفضيل عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                loadDarkModePreference();
+            }, 100);
+        });
+    </script>
 
 </body>
 </html>
