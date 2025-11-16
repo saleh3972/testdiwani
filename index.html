@@ -4677,6 +4677,12 @@ textarea.editing-mode {
        
             <button class="btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
             </form>
+            
+            <!-- زر إنشاء مدير النظام الأول - يظهر فقط عند عدم وجود مستخدمين -->
+            <button id="firstSetupBtn" class="btn-secondary" onclick="showFirstSetup()" style="width: 100%; margin-top: 10px; background: #6c757d; border-color: #6c757d; padding: 12px; display: none;">
+                🚀 إنشاء مدير النظام الأول
+            </button>
+            
             <a class="back-to-roles" onclick="openForgotPasswordModal()">نسيت كلمة المرور؟</a>
             <p id="login-error">بيانات الدخول غير صحيحة أو غير مصرح لك بالدخول.</p>
         </div>
@@ -4710,8 +4716,12 @@ textarea.editing-mode {
                        style="background: rgba(255,255,255,0.9); border: none; margin-bottom: 20px;"
                        onkeypress="if(event.key==='Enter')createFirstAdmin()" autocomplete="off" required>
                 
-                <button class="btn-success" onclick="createFirstAdmin()" style="width: 100%; padding: 15px; font-size: 1.1em; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 10px; transition: all 0.3s;">
+                <button class="btn-success" onclick="createFirstAdmin()" style="width: 100%; padding: 15px; font-size: 1.1em; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 10px; transition: all 0.3s; margin-bottom: 10px;">
                     🎯 إنشاء حساب المدير وبدء الاستخدام
+                </button>
+                
+                <button class="btn-secondary" onclick="cancelFirstSetup()" style="width: 100%; padding: 12px; font-size: 1em; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; border-radius: 10px; transition: all 0.3s;">
+                    ← العودة لتسجيل الدخول
                 </button>
             </form>
             
@@ -6591,22 +6601,22 @@ textarea.editing-mode {
 
     <!-- التبويبات -->
     <div class="settings-tabs">
-        <button class="settings-tab active" onclick="switchSettingsTab('users')">
-            👥 المستخدمين
-        </button>
-        <button class="settings-tab" onclick="switchSettingsTab('activities')">
+        <button class="settings-tab active" onclick="switchSettingsTab('activities')">
             🏢 الأنشطة والفروع
+        </button>
+        <button class="settings-tab" onclick="switchSettingsTab('users')">
+            👥 المستخدمين
         </button>
         <button class="settings-tab" onclick="switchSettingsTab('general')">
             ⚙️ الإعدادات العامة
         </button>
         <button class="settings-tab" onclick="switchSettingsTab('backup')">
-            💾 النسخ والمزامنة
+            💾 النسخ الاحتياطي
         </button>
     </div>
 
-    <!-- محتوى التبويبة الأولى: المستخدمين -->
-    <div id="usersTabContent" class="settings-tab-content active">
+    <!-- محتوى التبويبة الثانية: المستخدمين -->
+    <div id="usersTabContent" class="settings-tab-content">
         <div id="userManagementSection" class="user-management settings-card">
             <h3>👥 إدارة المستخدمين</h3>
             
@@ -6721,8 +6731,8 @@ textarea.editing-mode {
         </div>
     </div>
 
-    <!-- محتوى التبويبة الثانية: الأنشطة والفروع -->
-    <div id="activitiesTabContent" class="settings-tab-content">
+    <!-- محتوى التبويبة الأولى: الأنشطة والفروع -->
+    <div id="activitiesTabContent" class="settings-tab-content active">
         <div id="activityManagementSection" class="activities-management settings-card">
             <h3>🏢 إدارة الأنشطة التجارية</h3>
             
@@ -6739,24 +6749,6 @@ textarea.editing-mode {
                         <button class="btn-warning edit-btn" id="editSelectedActivityBtn" onclick="handleEditSelectedActivity()" disabled style="flex: 1; height: 48px; padding: 0; font-size: 1em; display: flex; align-items: center; justify-content: center; line-height: 1;">✏️ تعديل</button>
                         <button class="btn-danger" id="deleteSelectedActivityBtn" onclick="handleDeleteSelectedActivity()" disabled style="flex: 1; height: 48px; padding: 0; font-size: 1em; display: flex; align-items: center; justify-content: center; line-height: 1;">🗑️ حذف</button>
                     </div>
-                </div>
-                
-                <div class="form-grid grid-2" style="margin-top: 15px;">
-                    <button class="btn-secondary" onclick="migrateActivitiesToFirebase()" style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">
-                        🔄 مزامنة الأنشطة القديمة لـ Firebase
-                    </button>
-                    <button class="btn-secondary" onclick="migrateActivityDataToFirebase()" style="background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">
-                        📤 مزامنة بيانات النشاط القديمة
-                    </button>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                    <p style="font-size: 0.8em; color: #666; margin: 0; font-style: italic;">
-                        💡 ملاحظة: الأنشطة الجديدة تحفظ تلقائياً في Firebase
-                    </p>
-                    <p style="font-size: 0.8em; color: #666; margin: 0; font-style: italic;">
-                        💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase
-                    </p>
                 </div>
             </div>
             
@@ -6809,7 +6801,7 @@ textarea.editing-mode {
                 تخصيص إعدادات التذييل والواجهة والبرنامج
             </p>
             
-            <div class="form-grid grid-3" style="gap: 15px;">
+            <div class="form-grid grid-4" style="gap: 15px;">
                 <button class="btn-primary" onclick="openFooterSettingsModal()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #1976d2, #42a5f5);" id="footerSettingsBtn">
                     📄 تخصيص بيانات التذييل
                 </button>
@@ -6818,6 +6810,9 @@ textarea.editing-mode {
                 </button>
                 <button class="btn-success" onclick="toggleControlPanel()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #7b1fa2, #9c27b0);">
                     🎨 تخصيص الواجهة
+                </button>
+                <button id="toggleEmailSettingsBtn" class="btn-success" onclick="toggleEmailSettings()" style="padding: 15px 30px; font-size: 1.1em; background: linear-gradient(135deg, #16a34a, #22c55e);">
+                    📧 إعدادات البريد الإلكتروني
                 </button>
             </div>
             
@@ -6891,30 +6886,24 @@ textarea.editing-mode {
         </div>
     </div>
 
-    <!-- محتوى التبويبة الرابعة: النسخ والمزامنة -->
+    <!-- محتوى التبويبة الرابعة: النسخ الاحتياطي -->
     <div id="backupTabContent" class="settings-tab-content">
         <div class="backup-settings settings-card" style="background: rgba(25, 118, 210, 0.1); color: #1976d2; border: 2px solid rgba(25, 118, 210, 0.3);">
             <h3 style="color: #1976d2;">💾 النسخ الاحتياطي والاستعادة</h3>
             <p style="opacity: 0.85; margin-bottom: 20px;">إدارة النسخ الاحتياطية وحفظها محلياً على جهازك</p>
             
             <div class="data-actions-grid" style="gap: 15px;">
-                <button class="btn-success" onclick="createBackup()" style="background: #10b981;">
-                    💾 إنشاء نسخة احتياطية الآن
-                </button>
-                <button class="btn-secondary" onclick="downloadAutoBackup()" style="background: #6366f1;">
-                    📥 تنزيل النسخة كملف
+                <button id="fullBackupBtn" class="btn-secondary" onclick="downloadAutoBackup()" style="background: #6366f1; display: none;">
+                    📥 نسخة احتياطية لجميع البيانات
                 </button>
                 <button class="btn-success" onclick="exportActivityData()" style="background: #059669;">
-                    📥 تصدير بيانات النشاط
+                    📥 نسخة احتياطية للنشاط
                 </button>
                 <button class="btn-info" onclick="exportActivityDataExcel()" style="background: #0284c7;">
-                    📊 تصدير بيانات Excel
+                    📊 تصدير بيانات النشاط Excel
                 </button>
                 <button class="btn-primary" onclick="importData()" style="background: #7c3aed;">
                     📤 استيراد بيانات للنشاط
-                </button>
-                <button class="btn-secondary" onclick="importSampleData()" style="background: #64748b;">
-                    🧪 بيانات تجريبية للنشاط
                 </button>
                 <button class="btn-danger" onclick="showTrashModal()">
                     🗑️ سلة المحذوفات
@@ -6922,9 +6911,6 @@ textarea.editing-mode {
                 </button>
                 <button class="btn-danger" onclick="clearActivityData()" style="background: #dc2626;">
                     🗑️ مسح بيانات النشاط
-                </button>
-                <button id="toggleEmailSettingsBtn" class="btn-success" onclick="toggleEmailSettings()" style="background: #16a34a;">
-                    📧 إعدادات البريد الإلكتروني
                 </button>
             </div>
             
@@ -6939,43 +6925,6 @@ textarea.editing-mode {
             </div>
             
             <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleFileImport(this.files)">
-        </div>
-
-        <!-- أدوات المزامنة مع Firebase -->
-        <div class="settings-card" style="margin-top: 20px; background: rgba(25, 118, 210, 0.1); border: 2px solid rgba(25, 118, 210, 0.3);">
-            <h3 style="color: #1976d2;">🔥 أدوات المزامنة مع Firebase</h3>
-            
-            <div class="form-grid grid-4">
-                <button class="btn-secondary" onclick="migrateUsersToFirebase()">
-                    👥 مزامنة المستخدمين القدامى
-                </button>
-                <button class="btn-secondary" onclick="fixFirebaseUserData()">
-                    🔧 إصلاح بيانات Firebase
-                </button>
-                <button class="btn-secondary" onclick="migrateActivitiesToFirebase()">
-                    🏢 مزامنة الأنشطة القديمة
-                </button>
-                <button class="btn-secondary" onclick="migrateActivityDataToFirebase()">
-                    📊 مزامنة بيانات النشاط القديمة
-                </button>
-            </div>
-            
-            <!-- معلومات حالة النظام -->
-            <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border: 2px solid #1976d2; border-radius: 12px; padding: 20px; margin-top: 20px;">
-                <h4 style="margin: 0 0 15px 0; color: #0d47a1; font-size: 1.1em; display: flex; align-items: center; gap: 8px;">
-                    🔥 حالة النظام الهجين
-                </h4>
-                <div style="font-size: 0.95em; color: #1565c0; line-height: 1.6;">
-                    ✅ <strong>المستخدمين الجدد:</strong> يحفظون تلقائياً في Firebase + LocalStorage<br>
-                    ✅ <strong>الأنشطة الجديدة:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
-                    ✅ <strong>بيانات النشاط:</strong> تحفظ تلقائياً في Firebase + LocalStorage<br>
-                    💡 <strong>الأزرار أعلاه:</strong> فقط لمزامنة البيانات القديمة أو إعادة المزامنة
-                </div>
-            </div>
-            
-            <p style="font-size: 0.9em; color: #666; margin: 15px 0; font-style: italic; text-align: center;">
-                💡 ملاحظة: البيانات الجديدة تحفظ تلقائياً في Firebase + LocalStorage
-            </p>
         </div>
     </div>
 </div>
@@ -11876,8 +11825,18 @@ function formatDate(dateString) {
         renderActivitiesInSettings();
         renderUsersInSettings();
         
-        // فتح التبويبة الافتراضية (المستخدمين)
-        switchSettingsTab('users');
+        // إظهار زر النسخة الاحتياطية الكاملة لمدير النظام فقط
+        const fullBackupBtn = document.getElementById('fullBackupBtn');
+        if (fullBackupBtn) {
+            if (loggedInUser && loggedInUser.role === 'admin') {
+                fullBackupBtn.style.display = 'block';
+            } else {
+                fullBackupBtn.style.display = 'none';
+            }
+        }
+        
+        // فتح التبويبة الافتراضية (الأنشطة والفروع)
+        switchSettingsTab('activities');
         
         // التمرير للأعلى عند فتح صفحة الإعدادات
         setTimeout(() => {
@@ -19602,7 +19561,7 @@ function updateAllCharts() {
             } catch (error) {
                 console.error('❌ خطأ في إنشاء مدير النظام:', error);
                 if (error.code === 'auth/email-already-in-use') {
-                    return { error: 'البريد الإلكتروني مستخدم بالفعل' };
+                    return { error: 'البريد الإلكتروني مستخدم بالفعل. إذا كنت قد حذفت البيانات سابقاً، حاول تسجيل الدخول بكلمة المرور السابقة أو استخدم بريد إلكتروني آخر.' };
                 } else if (error.code === 'auth/weak-password') {
                     return { error: 'كلمة المرور ضعيفة جداً' };
                 } else if (error.code === 'auth/invalid-email') {
@@ -20006,6 +19965,43 @@ function updateAllCharts() {
         // ===== First Setup System Functions =====
         
         /**
+         * إظهار نافذة إنشاء مدير النظام الأول يدوياً
+         */
+        function showFirstSetup() {
+            console.log('🚀 إظهار نافذة إنشاء مدير النظام الأول يدوياً');
+            
+            // إخفاء شاشة تسجيل الدخول
+            document.getElementById('login-overlay').style.display = 'none';
+            
+            // إظهار نافذة الإعداد الأولي
+            document.getElementById('first-setup-overlay').style.display = 'flex';
+            
+            // مسح الحقول إذا كان بها بيانات سابقة
+            document.getElementById('adminName').value = '';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminPhone').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPasswordConfirm').value = '';
+            
+            // إخفاء رسالة الخطأ
+            const errorMsg = document.getElementById('setup-error');
+            errorMsg.style.display = 'none';
+        }
+        
+        /**
+         * إلغاء الإعداد الأولي والعودة لشاشة تسجيل الدخول
+         */
+        function cancelFirstSetup() {
+            console.log('↩️ إلغاء الإعداد الأولي والعودة لشاشة تسجيل الدخول');
+            
+            // إخفاء نافذة الإعداد الأولي
+            document.getElementById('first-setup-overlay').style.display = 'none';
+            
+            // إظهار شاشة تسجيل الدخول
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+        
+        /**
          * إنشاء مدير النظام الأول
          */
         async function createFirstAdmin() {
@@ -20100,8 +20096,15 @@ function updateAllCharts() {
                     console.log('🚀 إظهار نموذج إنشاء مدير النظام الأول');
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('first-setup-overlay').style.display = 'flex';
+                    // إخفاء زر الإنشاء من شاشة تسجيل الدخول
+                    const firstSetupBtn = document.getElementById('firstSetupBtn');
+                    if (firstSetupBtn) firstSetupBtn.style.display = 'none';
                 } else {
-                    console.log('✅ النظام معد بالفعل');
+                    console.log('✅ النظام معد بالفعل - إخفاء زر إنشاء المدير');
+                    
+                    // إخفاء زر إنشاء المدير لأن النظام معد بالفعل
+                    const firstSetupBtn = document.getElementById('firstSetupBtn');
+                    if (firstSetupBtn) firstSetupBtn.style.display = 'none';
                     
                     // التحقق من حالة "تذكرني" قبل إظهار شاشة تسجيل الدخول
                     const rememberedUser = localStorage.getItem('rememberedUser');
@@ -20127,8 +20130,10 @@ function updateAllCharts() {
                 }
             } catch (error) {
                 console.error('❌ خطأ في فحص الإعداد الأولي:', error);
-                // في حالة الخطأ، أظهر شاشة تسجيل الدخول العادية
+                // في حالة الخطأ، أظهر شاشة تسجيل الدخول العادية وأخفِ زر الإنشاء
                 document.getElementById('login-overlay').style.display = 'flex';
+                const firstSetupBtn = document.getElementById('firstSetupBtn');
+                if (firstSetupBtn) firstSetupBtn.style.display = 'none';
             }
         }
 
