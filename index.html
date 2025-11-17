@@ -2020,7 +2020,7 @@
             font-weight: 600;
         }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: calc(var(--font-size) * 0.95); }
-        th { background: var(--primary-color); color: white; padding: 15px; text-align: right; font-weight: 600; }
+        th { background: rgba(33, 150, 243, 0.1); color: #1565c0; padding: 15px; text-align: right; font-weight: 600; border: 1px solid rgba(33, 150, 243, 0.2); }
         td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: right; }
         tr:hover { background: #f8f9fa; }
     .form-grid { display: grid; gap: 20px; margin-bottom: 30px; }
@@ -6950,10 +6950,10 @@ textarea.editing-mode {
                     </select>
                     <input type="number" class="debit-input" data-index="0" placeholder="المدين" min="0" step="0.01">
                     <input type="number" class="credit-input" data-index="0" placeholder="الدائن" min="0" step="0.01">
-                    <button type="button" class="btn-danger btn-small" onclick="removeJournalRow(0)" style="padding: 8px;">🗑️ حذف</button>
+                    <button type="button" class="btn-danger btn-small" onclick="removeJournalRow(0)" style="padding: 2px 6px; font-size: 0.75em; min-width: 35px;">🗑️</button>
                 </div>
             </div>
-            <button type="button" class="btn-secondary" onclick="addJournalRow()" style="margin-top: 10px;">➕ إضافة حركة</button>
+            <button type="button" class="btn-secondary" onclick="addJournalRow()" style="margin-top: 10px;"> إضافة حركة</button>
         </div>
         
         <div style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px;">
@@ -6973,9 +6973,10 @@ textarea.editing-mode {
             </div>
         </div>
         
-        <textarea id="journalNotes" placeholder="ملاحظات (اختياري)" rows="2" style="margin-top: 10px; width: 100%;"></textarea>
-        
-        <button class="btn-primary" onclick="saveJournalEntry()" style="margin-top: 15px; width: 100%;">💾 حفظ القيد</button>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+            <textarea id="journalNotes" placeholder="ملاحظات (اختياري)" rows="2" style="flex: 1; min-width: 0; resize: vertical;"></textarea>
+            <button class="btn-primary" onclick="saveJournalEntry()" style="flex-shrink: 0; height: fit-content; padding: 12px 30px; white-space: nowrap;">💾 حفظ القيد</button>
+        </div>
     </div>
     
     <div class="settings-card">
@@ -8242,7 +8243,7 @@ function addJournalRow() {
         </select>
         <input type="number" class="debit-input" data-index="${journalRowIndex}" placeholder="المدين" min="0" step="0.01" oninput="updateJournalTotals()">
         <input type="number" class="credit-input" data-index="${journalRowIndex}" placeholder="الدائن" min="0" step="0.01" oninput="updateJournalTotals()">
-        <button type="button" class="btn-danger btn-small" onclick="removeJournalRow(${journalRowIndex})" style="padding: 8px;">🗑️ حذف</button>
+        <button type="button" class="btn-danger btn-small" onclick="removeJournalRow(${journalRowIndex})" style="padding: 2px 6px; font-size: 0.75em; min-width: 35px;">🗑️</button>
     `;
     
     container.appendChild(newRow);
@@ -8428,7 +8429,7 @@ function renderJournalList() {
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background: #f5f5f5;">
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">الحساب</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: right; color: #333;">الحساب</th>
                             <th style="border: 1px solid #ddd; padding: 8px; text-align: center; color: #c62828;">المدين</th>
                             <th style="border: 1px solid #ddd; padding: 8px; text-align: center; color: #2e7d32;">الدائن</th>
                         </tr>
@@ -8441,7 +8442,7 @@ function renderJournalList() {
                                 <td style="border: 1px solid #ddd; padding: 8px; text-align: center; color: ${e.credit > 0 ? '#2e7d32' : '#999'};">${e.credit > 0 ? e.credit.toFixed(2) : '-'}</td>
                             </tr>
                         `).join('')}
-                        <tr style="background: #e3f2fd; font-weight: bold;">
+                        <tr style="background: #f5f5f5; font-weight: bold;">
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">الإجمالي</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center; color: #c62828;">${entry.entries.reduce((sum, e) => sum + e.debit, 0).toFixed(2)}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center; color: #2e7d32;">${entry.entries.reduce((sum, e) => sum + e.credit, 0).toFixed(2)}</td>
