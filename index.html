@@ -1259,7 +1259,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 10000;
+    z-index: 20000;
     backdrop-filter: blur(3px);
     animation: fadeIn 0.3s ease;
 }
@@ -5039,6 +5039,7 @@ textarea.editing-mode {
 
             <div class="user-section">
                 <div class="current-user" id="currentUserDisplay"></div>
+                <button class="btn-secondary" onclick="showActivityModal()" style="width: 100%; margin-top: 10px;">🔄 تغيير النشاط</button>
                 <button class="btn-danger" onclick="logout()" style="width: 100%; margin-top: 10px;">تسجيل الخروج</button>
             </div>
         </div>
@@ -5380,12 +5381,47 @@ textarea.editing-mode {
     <div class="form-grid grid-3">
         <input type="text" id="itemCode" placeholder="كود الصنف">
         <input type="text" id="itemName" placeholder="اسم الصنف *" required>
-        <input type="number" id="itemCost" placeholder="سعر الشراء">
+        <select id="itemCategory" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <option value="">اختر الفئة *</option>
+            <option value="food">🍔 مواد غذائية</option>
+            <option value="beverages">🥤 مشروبات</option>
+            <option value="cleaning">🧹 منظفات</option>
+            <option value="stationery">📝 قرطاسية</option>
+            <option value="electronics">⚡ إلكترونيات</option>
+            <option value="clothing">👕 ملابس</option>
+            <option value="cosmetics">💄 مستحضرات تجميل</option>
+            <option value="medical">💊 أدوية ومستلزمات طبية</option>
+            <option value="building">🔨 مواد بناء</option>
+            <option value="spare_parts">🔧 قطع غيار</option>
+            <option value="other">📦 أخرى</option>
+        </select>
     </div>
     
     <div class="form-grid grid-3">
-        <input type="number" id="itemPrice" placeholder="سعر البيع">
-        <input type="number" id="itemStock" placeholder="الرصيد الأولي">
+        <input type="number" id="itemCost" placeholder="سعر الشراء *" required>
+        <input type="number" id="itemPrice" placeholder="سعر البيع *" required>
+        <select id="itemUnit" style="padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+            <option value="">وحدة القياس *</option>
+            <option value="piece">قطعة</option>
+            <option value="box">علبة</option>
+            <option value="carton">كرتون</option>
+            <option value="kg">كيلوجرام</option>
+            <option value="gram">جرام</option>
+            <option value="liter">لتر</option>
+            <option value="meter">متر</option>
+            <option value="pack">حزمة</option>
+            <option value="bottle">زجاجة</option>
+            <option value="can">علبة معدنية</option>
+            <option value="bag">كيس</option>
+            <option value="dozen">دستة (12)</option>
+            <option value="set">طقم</option>
+            <option value="roll">لفة</option>
+        </select>
+    </div>
+    
+    <div class="form-grid grid-3">
+        <input type="number" id="itemStock" placeholder="الرصيد الأولي *" required>
+        <input type="number" id="itemMinStock" placeholder="الحد الأدنى للمخزون" min="0">
         <button class="btn-primary btn-add" onclick="addItem()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">إضافة صنف</button>
     </div>
 
@@ -5437,6 +5473,8 @@ textarea.editing-mode {
     <tr>
         <th class="sortable" data-column="code">الكود</th>
         <th class="sortable" data-column="name">الاسم</th>
+        <th class="sortable" data-column="category">الفئة</th>
+        <th class="sortable" data-column="unit">الوحدة</th>
         <th class="sortable" data-column="cost">سعر الشراء</th>
         <th class="sortable" data-column="price">سعر البيع</th>
         <th class="sortable" data-column="stock">الرصيد</th>
@@ -5565,13 +5603,26 @@ textarea.editing-mode {
     </div>
     
     <div class="form-grid grid-4">
-        <select id="purchaseItem">
+        <select id="purchaseItem" onchange="updatePurchaseItemFields()">
             <option value="">اختر الصنف</option>
         </select>
         <input type="number" id="purchaseQuantity" placeholder="الكمية" min="1" value="1">
         <select id="purchaseUnit">
-            <option value="قطعة">قطعة</option>
-            <option value="درزن">درزن</option>
+            <option value="">-- اختر الوحدة --</option>
+            <option value="piece">قطعة</option>
+            <option value="box">علبة</option>
+            <option value="carton">كرتون</option>
+            <option value="kg">كجم</option>
+            <option value="gram">جرام</option>
+            <option value="liter">لتر</option>
+            <option value="meter">متر</option>
+            <option value="pack">حزمة</option>
+            <option value="bottle">زجاجة</option>
+            <option value="can">علبة معدنية</option>
+            <option value="bag">كيس</option>
+            <option value="dozen">دستة</option>
+            <option value="set">طقم</option>
+            <option value="roll">لفة</option>
         </select>
         <input type="number" id="purchasePrice" placeholder="سعر الشراء">
     </div>
@@ -5586,6 +5637,7 @@ textarea.editing-mode {
             <thead>
                 <tr>
                     <th>الصنف</th>
+                    <th>الفئة</th>
                     <th>الكمية</th>
                     <th>الوحدة</th>
                     <th>سعر الشراء</th>
@@ -6995,6 +7047,12 @@ textarea.editing-mode {
             <input type="date" id="journalFilterTo" placeholder="إلى تاريخ">
             <input type="text" id="journalSearchText" placeholder="بحث في الوصف أو المرجع">
             <button class="btn-secondary" onclick="renderJournalList()">🔍 بحث</button>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <button class="btn-primary" onclick="exportJournalToExcel()" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                📊 تصدير دفتر اليومية إلى Excel
+            </button>
         </div>
         
         <div id="journalList" style="max-height: 500px; overflow-y: auto;"></div>
@@ -8471,9 +8529,17 @@ function renderJournalList() {
  * حذف قيد محاسبي من الواجهة
  */
 async function deleteJournalEntryUI(entryId) {
-    if (!confirm('هل أنت متأكد من حذف هذا القيد؟ سيتم عكس جميع الحركات المحاسبية.')) {
-        return;
-    }
+    const confirmed = await showConfirmDialog({
+        title: '⚠️ حذف القيد المحاسبي',
+        message: 'هل أنت متأكد من حذف هذا القيد؟\n\nسيتم عكس جميع الحركات المحاسبية المرتبطة به.\nلا يمكن التراجع عن هذا الإجراء.',
+        type: 'danger',
+        icon: '🗑️',
+        confirmText: 'نعم، حذف القيد',
+        cancelText: 'إلغاء',
+        confirmButtonClass: 'danger'
+    });
+    
+    if (!confirmed) return;
     
     const success = await deleteJournalEntry(entryId);
     if (success) {
@@ -8798,7 +8864,16 @@ function renderJournalList() {
  * حذف قيد من الواجهة
  */
 async function deleteJournalEntryUI(entryId) {
-    const confirmed = confirm('هل أنت متأكد من حذف هذا القيد؟\nسيتم عكس جميع الحركات المحاسبية.');
+    const confirmed = await showConfirmDialog({
+        title: '⚠️ حذف القيد المحاسبي',
+        message: 'هل أنت متأكد من حذف هذا القيد؟\n\nسيتم عكس جميع الحركات المحاسبية المرتبطة به.\nلا يمكن التراجع عن هذا الإجراء.',
+        type: 'danger',
+        icon: '🗑️',
+        confirmText: 'نعم، حذف القيد',
+        cancelText: 'إلغاء',
+        confirmButtonClass: 'danger'
+    });
+    
     if (!confirmed) return;
     
     const success = await deleteJournalEntry(entryId);
@@ -8808,6 +8883,94 @@ async function deleteJournalEntryUI(entryId) {
         renderChartOfAccounts();
     } else {
         showNotification('❌ خطأ', 'فشل حذف القيد', 'error');
+    }
+}
+
+function exportJournalToExcel() {
+    try {
+        const filterFrom = document.getElementById('journalFilterFrom')?.value;
+        const filterTo = document.getElementById('journalFilterTo')?.value;
+        const searchText = document.getElementById('journalSearchText')?.value.toLowerCase();
+        
+        let filtered = [...journalEntries];
+        
+        if (filterFrom) {
+            filtered = filtered.filter(e => e.date >= filterFrom);
+        }
+        
+        if (filterTo) {
+            filtered = filtered.filter(e => e.date <= filterTo);
+        }
+        
+        if (searchText) {
+            filtered = filtered.filter(e => 
+                e.description.toLowerCase().includes(searchText) ||
+                (e.reference && e.reference.toLowerCase().includes(searchText))
+            );
+        }
+        
+        if (filtered.length === 0) {
+            showNotification('⚠️ تنبيه', 'لا توجد قيود للتصدير', 'warning');
+            return;
+        }
+        
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        const activityName = activities.find(a => a.id === currentActivityId)?.name || 'النشاط';
+        
+        let csv = '\uFEFF';
+        csv += 'دفتر اليومية - ' + activityName + '\n';
+        csv += 'تاريخ التصدير: ' + new Date().toLocaleDateString('ar-SA') + '\n';
+        if (filterFrom || filterTo) {
+            csv += 'الفترة: من ' + (filterFrom || 'البداية') + ' إلى ' + (filterTo || 'النهاية') + '\n';
+        }
+        csv += '\n';
+        csv += 'التاريخ,البيان,رقم الحساب,اسم الحساب,المدين,الدائن,المرجع\n';
+        
+        let totalDebit = 0;
+        let totalCredit = 0;
+        
+        filtered.forEach(entry => {
+            entry.entries.forEach((row, index) => {
+                if (index === 0) {
+                    csv += entry.date + ',';
+                    csv += '"' + entry.description + '",';
+                } else {
+                    csv += ',,';
+                }
+                csv += row.accountCode + ',';
+                csv += '"' + row.accountName + '",';
+                csv += row.debit.toFixed(2) + ',';
+                csv += row.credit.toFixed(2) + ',';
+                if (index === 0) {
+                    csv += (entry.reference || '') + '\n';
+                } else {
+                    csv += '\n';
+                }
+                
+                totalDebit += row.debit;
+                totalCredit += row.credit;
+            });
+        });
+        
+        csv += '\n';
+        csv += ',,,الإجماليات,' + totalDebit.toFixed(2) + ',' + totalCredit.toFixed(2) + '\n';
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'دفتر_اليومية_' + new Date().toISOString().split('T')[0] + '.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification('✅ نجاح', 'تم تصدير ' + filtered.length + ' قيد بنجاح', 'success');
+        
+    } catch (error) {
+        console.error('خطأ في التصدير:', error);
+        showNotification('❌ خطأ', 'فشل تصدير البيانات', 'error');
     }
 }
 
@@ -8985,11 +9148,7 @@ async function initializeApp() {
         const firebasePurchasePayments = await firebaseGetActivityData(currentActivityId, 'purchasePayments') || [];
         console.log(`💳 تم تحميل ${firebasePurchasePayments.length} دفعة مشتريات من Firebase`);
         
-        // 🔄 Fallback: تحميل من LocalStorage إذا كانت Firebase فارغة
-        console.log('🔄 تطبيق نظام Fallback الذكي...');
-        
         // تعيين البيانات من Firebase مباشرة
-        // Firebase هو مصدر الحقيقة - نحمّل منه مباشرة بدون شروط
         items = firebaseItems || [];
         customers = firebaseCustomers || [];
         suppliers = firebaseSuppliers || [];
@@ -9025,7 +9184,6 @@ async function initializeApp() {
         console.log(`  - journalEntries: ${journalEntries.length}`);
         console.log(`  - chartOfAccounts: ${chartOfAccounts.length}`);
         
-        debugLog('✅ تم تحميل البيانات من Firebase مع Fallback إلى LocalStorage');
     } else {
         debugLog('📦 تحميل البيانات من LocalStorage...');
         
@@ -9934,8 +10092,16 @@ loadSavedEmailSettings();
     }
 
     function checkUnpaidDebts() {
-        const unpaidSales = sales.filter(s => s.remainingAmount > 0);
-        const totalDebt = unpaidSales.reduce((sum, s) => sum + s.remainingAmount, 0);
+        const unpaidSales = sales.filter(s => {
+            const totalPaid = getTotalPaid(s.id, 'sale');
+            const remaining = s.total - totalPaid;
+            return remaining > 0.5; // فقط إذا كان الباقي أكثر من 0.5
+        });
+        
+        const totalDebt = unpaidSales.reduce((sum, s) => {
+            const totalPaid = getTotalPaid(s.id, 'sale');
+            return sum + (s.total - totalPaid);
+        }, 0);
         
         if (unpaidSales.length > 0) {
             showNotification(
@@ -14352,6 +14518,12 @@ function searchCustomers() {
                     { validator: (v) => ValidationHelper.minLength(v, 2, 'اسم الصنف') },
                     { validator: (v) => ValidationHelper.isUnique(v, items, 'name', 'اسم الصنف') }
                 ],
+                itemCategory: [
+                    { validator: (v) => ValidationHelper.required(v, 'الفئة') }
+                ],
+                itemUnit: [
+                    { validator: (v) => ValidationHelper.required(v, 'وحدة القياس') }
+                ],
                 itemCost: [
                     { validator: (v) => ValidationHelper.isNumber(v, 'سعر الشراء') },
                     { validator: (v) => ValidationHelper.isPositive(v, 'سعر الشراء') }
@@ -14374,9 +14546,12 @@ function searchCustomers() {
             
             const code = document.getElementById('itemCode').value;
             const name = document.getElementById('itemName').value.trim();
+            const category = document.getElementById('itemCategory').value;
+            const unit = document.getElementById('itemUnit').value;
             const cost = document.getElementById('itemCost').value;
             const price = document.getElementById('itemPrice').value;
             const stock = document.getElementById('itemStock').value;
+            const minStock = document.getElementById('itemMinStock').value;
 
             showLoading('جاري إضافة الصنف...');
 
@@ -14385,13 +14560,16 @@ function searchCustomers() {
                     id: Date.now(),
                     code: code || 'IT' + (items.length + 1).toString().padStart(3, '0'),
                     name: name,
+                    category: category,
+                    unit: unit,
                     cost: parseFloat(cost) || 0,
                     price: parseFloat(price) || 0,
-                    stock: parseInt(stock) || 0
+                    stock: parseInt(stock) || 0,
+                    minStock: parseInt(minStock) || 0
                 };
 
                 items.push(item);
-                const success = saveToLocalStorage('items', items);
+                const success = await saveToLocalStorage('items', items);
                 
                 hideLoading();
                 
@@ -14493,22 +14671,53 @@ function loadCustomersToSelect() {
             }
             
             if (filteredItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا توجد نتائج</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد نتائج</td></tr>';
                 return;
             }
             
+            // أسماء الفئات بالعربية
+            const categoryNames = {
+                'food': '🍔 مواد غذائية',
+                'beverages': '🥤 مشروبات',
+                'cleaning': '🧹 منظفات',
+                'stationery': '📝 قرطاسية',
+                'electronics': '⚡ إلكترونيات',
+                'clothing': '👕 ملابس',
+                'cosmetics': '💄 مستحضرات تجميل',
+                'medical': '💊 أدوية ومستلزمات طبية',
+                'building': '🔨 مواد بناء',
+                'spare_parts': '🔧 قطع غيار',
+                'other': '📦 أخرى'
+            };
+            
+            // أسماء وحدات القياس بالعربية
+            const unitNames = {
+                'piece': 'قطعة', 'box': 'علبة', 'carton': 'كرتون', 'kg': 'كجم', 'gram': 'جرام',
+                'liter': 'لتر', 'meter': 'متر', 'pack': 'حزمة', 'bottle': 'زجاجة',
+                'can': 'علبة معدنية', 'bag': 'كيس', 'dozen': 'دستة', 'set': 'طقم', 'roll': 'لفة'
+            };
+            
             filteredItems.forEach(item => {
                 const tr = document.createElement('tr');
+                
+                // تحذير إذا كان المخزون أقل من الحد الأدنى
+                const lowStock = item.minStock && item.stock <= item.minStock;
+                const stockStyle = lowStock ? 'color: red; font-weight: bold;' : '';
+                const stockWarning = lowStock ? ' ⚠️' : '';
+                
                 tr.innerHTML = `
                     <td>${item.code}</td>
                     <td>${item.name}</td>
-                    <td>${item.cost}</td>
-                    <td>${item.price}</td>
-                    <td>${item.stock}</td>
+                    <td>${categoryNames[item.category] || item.category || '-'}</td>
+                    <td>${unitNames[item.unit] || item.unit || '-'}</td>
+                    <td>${item.cost.toFixed(2)}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td style="${stockStyle}">${item.stock}${stockWarning}</td>
                     <td>
                     <div class="action-buttons">
                         <button class="btn-warning edit-btn" onclick="editItem(${item.id})">✏️ تعديل</button>
                         <button class="btn-danger" onclick="deleteItem(${item.id})">حذف</button>
+                    </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -14536,9 +14745,12 @@ function loadCustomersToSelect() {
             
             document.getElementById('itemCode').value = item.code;
             document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category || '';
+            document.getElementById('itemUnit').value = item.unit || '';
             document.getElementById('itemCost').value = item.cost;
             document.getElementById('itemPrice').value = item.price;
             document.getElementById('itemStock').value = item.stock;
+            document.getElementById('itemMinStock').value = item.minStock || '';
             const addButton = document.querySelector('#items .btn-primary');
             addButton.textContent = '💾 تحديث الصنف';
             addButton.onclick = function() { updateItem(id); };
@@ -14557,6 +14769,12 @@ function loadCustomersToSelect() {
                     { validator: (v) => ValidationHelper.required(v, 'اسم الصنف') },
                     { validator: (v) => ValidationHelper.minLength(v, 2, 'اسم الصنف') },
                     { validator: (v) => ValidationHelper.isUnique(v, items, 'name', 'اسم الصنف', id) }
+                ],
+                itemCategory: [
+                    { validator: (v) => ValidationHelper.required(v, 'الفئة') }
+                ],
+                itemUnit: [
+                    { validator: (v) => ValidationHelper.required(v, 'الوحدة') }
                 ],
                 itemCost: [
                     { validator: (v) => ValidationHelper.isNumber(v, 'سعر الشراء') },
@@ -14592,9 +14810,12 @@ function loadCustomersToSelect() {
                         id: id,
                         code: document.getElementById('itemCode').value,
                         name: name,
+                        category: document.getElementById('itemCategory').value,
+                        unit: document.getElementById('itemUnit').value,
                         cost: parseFloat(document.getElementById('itemCost').value) || 0,
                         price: parseFloat(document.getElementById('itemPrice').value) || 0,
-                        stock: parseInt(document.getElementById('itemStock').value) || 0
+                        stock: parseInt(document.getElementById('itemStock').value) || 0,
+                        minStock: parseInt(document.getElementById('itemMinStock').value) || 0
                     };
                     
                     // تحديث اسم الصنف في جميع فواتير المبيعات
@@ -14711,9 +14932,12 @@ function loadCustomersToSelect() {
 
         function clearItemForm() {
             document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('itemUnit').value = '';
             document.getElementById('itemCost').value = '';
             document.getElementById('itemPrice').value = '';
             document.getElementById('itemStock').value = '';
+            document.getElementById('itemMinStock').value = '';
             const addButton = document.querySelector('#items .btn-primary');
             addButton.textContent = ' إضافة صنف';
             addButton.onclick = addItem;
@@ -15274,6 +15498,7 @@ function loadCustomersToSelect() {
                 currentPurchaseItems.push({
                     id: itemId,
                     name: item.name,
+                    category: item.category || 'other',
                     quantity: quantity,
                     unit: unit,
                     price: price,
@@ -15286,6 +15511,7 @@ function loadCustomersToSelect() {
             
             document.getElementById('purchaseItem').value = '';
             document.getElementById('purchaseQuantity').value = '1';
+            document.getElementById('purchaseUnit').value = '';
             document.getElementById('purchasePrice').value = '';
         }
         
@@ -15294,16 +15520,39 @@ function loadCustomersToSelect() {
             tbody.innerHTML = '';
             
             if (currentPurchaseItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا توجد أصناف</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد أصناف</td></tr>';
                 return;
             }
+            
+            // أسماء الفئات بالعربية
+            const categoryNames = {
+                'food': '🍔 مواد غذائية',
+                'beverages': '🥤 مشروبات',
+                'cleaning': '🧹 منظفات',
+                'stationery': '📝 قرطاسية',
+                'electronics': '⚡ إلكترونيات',
+                'clothing': '👕 ملابس',
+                'cosmetics': '💄 مستحضرات تجميل',
+                'medical': '💊 أدوية ومستلزمات طبية',
+                'building': '🔨 مواد بناء',
+                'spare_parts': '🔧 قطع غيار',
+                'other': '📦 أخرى'
+            };
+            
+            // أسماء وحدات القياس بالعربية
+            const unitNames = {
+                'piece': 'قطعة', 'box': 'علبة', 'carton': 'كرتون', 'kg': 'كجم', 'gram': 'جرام',
+                'liter': 'لتر', 'meter': 'متر', 'pack': 'حزمة', 'bottle': 'زجاجة',
+                'can': 'علبة معدنية', 'bag': 'كيس', 'dozen': 'دستة', 'set': 'طقم', 'roll': 'لفة'
+            };
             
             currentPurchaseItems.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.name}</td>
+                    <td>${categoryNames[item.category] || item.category || '-'}</td>
                     <td>${item.quantity}</td>
-                    <td>${item.unit || 'قطعة'}</td>
+                    <td>${unitNames[item.unit] || item.unit || 'قطعة'}</td>
                     <td>${item.price.toFixed(2)}</td>
                     <td>${item.total.toFixed(2)}</td>
                     <td>
@@ -16152,6 +16401,21 @@ function loadCustomersToSelect() {
             }
         }
         
+        function updatePurchaseItemFields() {
+            const itemId = parseInt(document.getElementById('purchaseItem').value);
+            const item = items.find(i => i.id === itemId);
+            
+            if (item) {
+                // ملء الوحدة تلقائياً من بيانات الصنف
+                document.getElementById('purchaseUnit').value = item.unit || '';
+                // ملء سعر الشراء (التكلفة) من بيانات الصنف
+                document.getElementById('purchasePrice').value = item.cost || '';
+            } else {
+                document.getElementById('purchaseUnit').value = '';
+                document.getElementById('purchasePrice').value = '';
+            }
+        }
+        
         function addSaleItem() {
             const itemId = parseInt(document.getElementById('saleItem').value);
             const quantity = parseInt(document.getElementById('saleQuantity').value);
@@ -16773,6 +17037,67 @@ function loadCustomersToSelect() {
             if (modal) modal.remove();
         }
         
+        // إنشاء قيد محاسبي للدفعة
+        function createPaymentJournalEntry(payment, invoice, type) {
+            const accountCode = payment.method === 'cash' ? '1010' : '1020';
+            const accountName = payment.method === 'cash' ? 'الصندوق' : 'البنك';
+            
+            if (type === 'sale') {
+                // قيد دفعة مبيعات: من ح/الصندوق أو البنك إلى ح/المدينون
+                const entry = {
+                    id: Date.now(),
+                    date: payment.date,
+                    description: `دفعة من ${invoice.customerName || 'عميل'} - فاتورة رقم SAL${invoice.number.toString().padStart(3, '0')}`,
+                    reference: `PAY-${payment.id}`,
+                    referenceType: 'salePayment',
+                    referenceId: payment.id,
+                    entries: [
+                        {
+                            accountCode: accountCode,
+                            accountName: accountName,
+                            debit: payment.amount,
+                            credit: 0
+                        },
+                        {
+                            accountCode: '1030',
+                            accountName: 'المدينون (العملاء)',
+                            debit: 0,
+                            credit: payment.amount
+                        }
+                    ]
+                };
+                journalEntries.push(entry);
+            } else {
+                // قيد دفعة مشتريات: من ح/الدائنون إلى ح/الصندوق أو البنك
+                const entry = {
+                    id: Date.now(),
+                    date: payment.date,
+                    description: `دفعة إلى ${invoice.supplierName || 'مورد'} - فاتورة رقم PUR${invoice.number.toString().padStart(3, '0')}`,
+                    reference: `PAY-${payment.id}`,
+                    referenceType: 'purchasePayment',
+                    referenceId: payment.id,
+                    entries: [
+                        {
+                            accountCode: '2010',
+                            accountName: 'الدائنون (الموردين)',
+                            debit: payment.amount,
+                            credit: 0
+                        },
+                        {
+                            accountCode: accountCode,
+                            accountName: accountName,
+                            debit: 0,
+                            credit: payment.amount
+                        }
+                    ]
+                };
+                journalEntries.push(entry);
+            }
+            
+            saveToLocalStorage('journalEntries', journalEntries);
+            syncWithFirebase('journalEntries', journalEntries);
+        }
+        
         // حفظ دفعة جديدة
         async function savePayment(invoiceId, type) {
             const amount = parseFloat(document.getElementById('paymentAmount').value);
@@ -16821,6 +17146,9 @@ function loadCustomersToSelect() {
                 purchasePayments.push(payment);
                 saveToLocalStorage('purchasePayments', purchasePayments);
             }
+            
+            // إنشاء القيد المحاسبي للدفعة
+            createPaymentJournalEntry(payment, invoice, type);
             
             closePaymentModal();
             
@@ -16871,7 +17199,22 @@ function loadCustomersToSelect() {
             };
             
             let paymentsRows = '';
-            if (payments.length === 0) {
+            
+            // إضافة الدفعة الأولى إن وجدت
+            if (originalPaid > 0) {
+                paymentsRows += `
+                    <tr style="background-color: #e3f2fd;">
+                        <td>0</td>
+                        <td>${invoice.date}</td>
+                        <td>${originalPaid.toFixed(2)}</td>
+                        <td>${getPaymentMethodDisplay(invoice.paymentMethod || 'cash')}</td>
+                        <td>الدفعة الأولية</td>
+                        <td style="text-align: center;">-</td>
+                    </tr>
+                `;
+            }
+            
+            if (payments.length === 0 && originalPaid === 0) {
                 paymentsRows = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">لا توجد دفعات مسجلة</td></tr>';
             } else {
                 payments.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -20498,14 +20841,18 @@ if (data.length > 0) {
                 );
                 if (confirmed2) {
                     try {
-                        const dataKeys = ['items', 'customers', 'suppliers', 'purchases', 'sales', 'salesReturns', 'purchaseReturns', 'expenses', 'revenues', 'salaries', 'lastBackup'];
+                        const dataKeys = ['items', 'customers', 'suppliers', 'purchases', 'sales', 'salesReturns', 'purchaseReturns', 'expenses', 'revenues', 'salaries', 'advances', 'assets', 'branches', 'salePayments', 'purchasePayments', 'journalEntries', 'chartOfAccounts'];
                         
                         // حذف من Firebase
-                        if (auth.currentUser && currentActivityId) {
+                        if (USE_FIREBASE && window.firebaseAuth?.currentUser && currentActivityId) {
+                            const { ref, remove } = window.firebaseModules;
+                            const db = window.firebaseDatabase;
+                            
                             const deletePromises = dataKeys.map(async (key) => {
                                 const path = `activities/${currentActivityId}/${key}`;
                                 try {
-                                    await database.ref(path).remove();
+                                    const dataRef = ref(db, path);
+                                    await remove(dataRef);
                                     console.log(`✅ تم حذف ${key} من Firebase`);
                                     return true;
                                 } catch (error) {
