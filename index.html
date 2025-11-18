@@ -318,6 +318,9 @@
     <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi&display=swap" rel="stylesheet">
     
+    <!-- مكتبة PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <!-- CSS مخصص للنوافذ المنبثقة -->
     <style>
         /* التأكد من إخفاء النوافذ المنبثقة بشكل افتراضي */
@@ -5407,6 +5410,7 @@ textarea.editing-mode {
             <option value="carton">كرتون</option>
             <option value="kg">كيلوجرام</option>
             <option value="gram">جرام</option>
+            <option value="tola">تولة</option>
             <option value="liter">لتر</option>
             <option value="meter">متر</option>
             <option value="pack">حزمة</option>
@@ -5614,6 +5618,7 @@ textarea.editing-mode {
             <option value="carton">كرتون</option>
             <option value="kg">كجم</option>
             <option value="gram">جرام</option>
+            <option value="tola">تولة</option>
             <option value="liter">لتر</option>
             <option value="meter">متر</option>
             <option value="pack">حزمة</option>
@@ -5767,8 +5772,22 @@ textarea.editing-mode {
         </select>
         <input type="number" id="saleQuantity" placeholder="الكمية" min="1" value="1">
         <select id="saleUnit">
-            <option value="قطعة">قطعة</option>
-            <option value="درزن">درزن</option>
+            <option value="">-- اختر الوحدة --</option>
+            <option value="piece">قطعة</option>
+            <option value="box">علبة</option>
+            <option value="carton">كرتون</option>
+            <option value="kg">كجم</option>
+            <option value="gram">جرام</option>
+            <option value="tola">تولة</option>
+            <option value="liter">لتر</option>
+            <option value="meter">متر</option>
+            <option value="pack">حزمة</option>
+            <option value="bottle">زجاجة</option>
+            <option value="can">علبة معدنية</option>
+            <option value="bag">كيس</option>
+            <option value="dozen">دستة</option>
+            <option value="set">طقم</option>
+            <option value="roll">لفة</option>
         </select>
         <input type="number" id="salePrice" placeholder="سعر البيع">
     </div>
@@ -7052,6 +7071,9 @@ textarea.editing-mode {
         <div style="margin-bottom: 15px;">
             <button class="btn-primary" onclick="exportJournalToExcel()" style="background: linear-gradient(135deg, #28a745, #20c997);">
                 📊 تصدير دفتر اليومية إلى Excel
+            </button>
+            <button class="btn-primary" onclick="exportJournalToPDF()" style="background: linear-gradient(135deg, #007bff, #0056b3);">
+                📄 تصدير دفتر اليومية إلى PDF
             </button>
         </div>
         
@@ -8883,6 +8905,144 @@ async function deleteJournalEntryUI(entryId) {
         renderChartOfAccounts();
     } else {
         showNotification('❌ خطأ', 'فشل حذف القيد', 'error');
+    }
+}
+
+function exportJournalToPDF() {
+    try {
+        const filterFrom = document.getElementById('journalFilterFrom')?.value;
+        const filterTo = document.getElementById('journalFilterTo')?.value;
+        const searchText = document.getElementById('journalSearchText')?.value.toLowerCase();
+        
+        let filtered = [...journalEntries];
+        
+        if (filterFrom) filtered = filtered.filter(e => e.date >= filterFrom);
+        if (filterTo) filtered = filtered.filter(e => e.date <= filterTo);
+        if (searchText) {
+            filtered = filtered.filter(e => 
+                e.description.toLowerCase().includes(searchText) ||
+                (e.reference && e.reference.toLowerCase().includes(searchText))
+            );
+        }
+        
+        if (filtered.length === 0) {
+            showNotification('⚠️ تنبيه', 'لا توجد قيود للتصدير', 'warning');
+            return;
+        }
+        
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Create a temporary container for the PDF content
+        // We wrap it to ensure it's rendered in the DOM but not visible to the user
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '0';
+        wrapper.style.width = '1200px'; // Fixed width for landscape
+        document.body.appendChild(wrapper);
+
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.direction = 'rtl';
+        container.style.fontFamily = 'Tajawal, sans-serif';
+        container.style.backgroundColor = '#ffffff';
+        container.style.color = '#000000';
+        wrapper.appendChild(container);
+        
+        // Add Header
+        const activityName = activities.find(a => a.id == currentActivityId)?.name 
+            || document.getElementById('currentActivityNameDisplay')?.textContent 
+            || 'النشاط';
+        const header = document.createElement('div');
+        header.innerHTML = `
+            <h2 style="text-align: center; color: #333; margin-bottom: 10px;">دفتر اليومية - ${activityName}</h2>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; color: #666;">
+                <span>تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}</span>
+                <span>${filterFrom || filterTo ? `الفترة: ${filterFrom || 'البداية'} إلى ${filterTo || 'النهاية'}` : 'جميع الفترات'}</span>
+            </div>
+        `;
+        container.appendChild(header);
+        
+        // Add Table
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.fontSize = '12px';
+        
+        // Table Header
+        table.innerHTML = `
+            <thead>
+                <tr style="background-color: rgba(33, 150, 243, 0.15); color: #000; border-bottom: 2px solid #333;">
+                    <th style="padding: 8px; border: 1px solid #999; width: 10%;">التاريخ</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 25%;">البيان</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 10%;">رقم الحساب</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 20%;">اسم الحساب</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 12%;">مدين</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 12%;">دائن</th>
+                    <th style="padding: 8px; border: 1px solid #999; width: 11%;">المرجع</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        
+        const tbody = table.querySelector('tbody');
+        
+        filtered.forEach(entry => {
+            entry.entries.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.style.backgroundColor = index % 2 === 0 ? '#fff' : '#f9f9f9';
+                
+                tr.innerHTML = `
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${index === 0 ? entry.date : ''}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${index === 0 ? entry.description : ''}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${row.accountCode}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${row.accountName}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${formatCurrency(row.debit)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${formatCurrency(row.credit)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${entry.reference || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Add separator row
+            const separator = document.createElement('tr');
+            separator.innerHTML = '<td colspan="7" style="height: 10px; background-color: #eee; border: none;"></td>';
+            tbody.appendChild(separator);
+        });
+        
+        container.appendChild(table);
+        
+        // Generate PDF
+        const opt = {
+            margin: 10,
+            filename: 'journal-entries.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        
+        // Show loading
+        const btn = document.querySelector('button[onclick="exportJournalToPDF()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ جاري التصدير...';
+        btn.disabled = true;
+        
+        html2pdf().set(opt).from(container).save().then(() => {
+            document.body.removeChild(wrapper); // Cleanup
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            showNotification('✅ تم', 'تم تصدير دفتر اليومية بنجاح', 'success');
+        }).catch(err => {
+            if (document.body.contains(wrapper)) document.body.removeChild(wrapper); // Cleanup on error
+            console.error(err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            showNotification('❌ خطأ', 'حدث خطأ أثناء تصدير PDF', 'error');
+        });
+        
+    } catch (error) {
+        console.error('PDF Export Error:', error);
+        showNotification('❌ خطأ', 'حدث خطأ أثناء تصدير PDF', 'error');
     }
 }
 
