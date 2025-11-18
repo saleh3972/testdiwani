@@ -5611,6 +5611,13 @@ textarea.editing-mode {
             <input type="number" id="purchasePaidAmount" placeholder="0.00" oninput="updatePurchaseTotals()">
         </div>
         <div>
+            <span>طريقة الدفع:</span>
+            <select id="purchasePaymentMethod" style="padding: 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                <option value="cash">💵 نقدي</option>
+                <option value="bank">🏦 بنك</option>
+            </select>
+        </div>
+        <div>
             <span>المبلغ المتبقي:</span>
             <span id="purchaseRemainingAmount" class="remaining-unpaid">0.00</span>
         </div>
@@ -6099,7 +6106,7 @@ textarea.editing-mode {
             <option value="مسدد">مسدد</option>
             <option value="جزئي">مسدد جزئياً</option>
         </select>
-        <button class="btn-success btn-add" onclick="addAdvance()">إضافة عهدة/سلفة</button>
+        <button class="btn-success btn-add" onclick="addAdvance()" style="white-space: nowrap; padding: 12px 20px;">إضافة عهدة/سلفة</button>
     </div>
 
     <div class="search-container">
@@ -8198,7 +8205,8 @@ const DEFAULT_CHART_OF_ACCOUNTS = [
     { code: "5800", name: "مصروفات التسويق", nameEn: "Marketing Expenses", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" },
     { code: "5900", name: "مصروفات إدارية وعمومية", nameEn: "General & Administrative", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" },
     { code: "5910", name: "خصم ممنوح", nameEn: "Discount Given", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" },
-    { code: "5920", name: "مصروفات أخرى", nameEn: "Other Expenses", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" }
+    { code: "5920", name: "مصروفات أخرى", nameEn: "Other Expenses", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" },
+    { code: "5930", name: "الصدقات والتبرعات", nameEn: "Charity & Donations", type: "account", parent: "5000", balance: 0, debit: 0, credit: 0, category: "expense" }
 ];
 
 // ========================================
@@ -8857,14 +8865,14 @@ function renderChartOfAccounts() {
     let html = '<table style="width: 100%; border-collapse: collapse; background: white;">';
     html += `
         <thead>
-            <tr style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white;">
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">الكود</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">اسم الحساب</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">الاسم بالإنجليزية</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">التصنيف</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">المدين</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">الدائن</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">الرصيد</th>
+            <tr style="background: linear-gradient(135deg, #1976d2, #42a5f5);">
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; color: white;">الكود</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: right; color: white;">اسم الحساب</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: right; color: white;">الاسم بالإنجليزية</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; color: white;">التصنيف</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; color: white;">المدين</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; color: white;">الدائن</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center; color: white;">الرصيد</th>
             </tr>
         </thead>
         <tbody>
@@ -8910,9 +8918,7 @@ async function initializeApp() {
     
     // 📒 تهيئة النظام المحاسبي
     console.log('📊 تهيئة النظام المحاسبي...');
-    initializeChartOfAccounts();
-    journalEntries = (loadFromLocalStorage('journalEntries')) || [];
-    console.log(`✅ تم تحميل ${journalEntries.length} قيد محاسبي`);
+    // لا نستدعي initializeChartOfAccounts هنا - سيتم تحميله من Firebase أولاً
     
     if (!currentActivityId) { 
         console.log('⚠️ لا يوجد نشاط محدد - عرض نافذة الأنشطة');
@@ -8923,6 +8929,13 @@ async function initializeApp() {
     // تحميل البيانات من Firebase أو LocalStorage
     if (USE_FIREBASE) {
         debugLog('🔥 تحميل البيانات من Firebase...');
+        
+        // تحميل القيود المحاسبية ودليل الحسابات من Firebase أولاً
+        const firebaseJournalEntries = await firebaseGetActivityData(currentActivityId, 'journalEntries') || [];
+        console.log(`📒 تم تحميل ${firebaseJournalEntries.length} قيد محاسبي من Firebase`);
+        
+        const firebaseChartOfAccounts = await firebaseGetActivityData(currentActivityId, 'chartOfAccounts') || [];
+        console.log(`📊 تم تحميل ${firebaseChartOfAccounts.length} حساب من Firebase`);
         
         // تحميل البيانات من Firebase
         console.log(`🔍 بدء تحميل البيانات للنشاط: ${currentActivityId}`);
@@ -8972,24 +8985,47 @@ async function initializeApp() {
         const firebasePurchasePayments = await firebaseGetActivityData(currentActivityId, 'purchasePayments') || [];
         console.log(`💳 تم تحميل ${firebasePurchasePayments.length} دفعة مشتريات من Firebase`);
         
-        // تعيين البيانات مباشرة
-        items = firebaseItems;
-        customers = firebaseCustomers;
-        suppliers = firebaseSuppliers;
-        purchases = firebasePurchases;
-        sales = firebaseSales;
-        expenses = firebaseExpenses;
-        revenues = firebaseRevenues;
-        salaries = firebaseSalaries;
-        assets = firebaseAssets;
-        salesReturns = firebaseSalesReturns;
-        advances = firebaseAdvances;
-        branches = firebaseBranches;
-        purchaseReturns = firebasePurchaseReturns;
-        salePayments = firebaseSalePayments;
-        purchasePayments = firebasePurchasePayments;
+        // 🔄 Fallback: تحميل من LocalStorage إذا كانت Firebase فارغة
+        console.log('🔄 تطبيق نظام Fallback الذكي...');
         
-        debugLog('✅ تم تحميل البيانات من Firebase');
+        // تعيين البيانات من Firebase مباشرة
+        // Firebase هو مصدر الحقيقة - نحمّل منه مباشرة بدون شروط
+        items = firebaseItems || [];
+        customers = firebaseCustomers || [];
+        suppliers = firebaseSuppliers || [];
+        purchases = firebasePurchases || [];
+        sales = firebaseSales || [];
+        expenses = firebaseExpenses || [];
+        revenues = firebaseRevenues || [];
+        salaries = firebaseSalaries || [];
+        assets = firebaseAssets || [];
+        salesReturns = firebaseSalesReturns || [];
+        advances = firebaseAdvances || [];
+        branches = firebaseBranches || [];
+        purchaseReturns = firebasePurchaseReturns || [];
+        salePayments = firebaseSalePayments || [];
+        purchasePayments = firebasePurchasePayments || [];
+        
+        // 📒 تحميل القيود المحاسبية من Firebase
+        journalEntries = firebaseJournalEntries || [];
+        
+        // دليل الحسابات من Firebase أو الافتراضي
+        if (firebaseChartOfAccounts && firebaseChartOfAccounts.length > 0) {
+            chartOfAccounts = firebaseChartOfAccounts;
+        } else {
+            chartOfAccounts = JSON.parse(JSON.stringify(DEFAULT_CHART_OF_ACCOUNTS));
+        }
+        
+        console.log('🔥 تم تحميل البيانات من Firebase:');
+        console.log(`  - items: ${items.length}`);
+        console.log(`  - customers: ${customers.length}`);
+        console.log(`  - suppliers: ${suppliers.length}`);
+        console.log(`  - purchases: ${purchases.length}`);
+        console.log(`  - sales: ${sales.length}`);
+        console.log(`  - journalEntries: ${journalEntries.length}`);
+        console.log(`  - chartOfAccounts: ${chartOfAccounts.length}`);
+        
+        debugLog('✅ تم تحميل البيانات من Firebase مع Fallback إلى LocalStorage');
     } else {
         debugLog('📦 تحميل البيانات من LocalStorage...');
         
@@ -9005,9 +9041,25 @@ async function initializeApp() {
         salesReturns = (loadFromLocalStorage('salesReturns')) || [];
         advances = (loadFromLocalStorage('advances')) || [];
         purchaseReturns = (loadFromLocalStorage('purchaseReturns')) || [];
-        branches = (loadFromLocalStorage('branches')) || []; // 🏪 تحميل الفروع
-        salePayments = (loadFromLocalStorage('salePayments')) || []; // 💰 دفعات المبيعات
-        purchasePayments = (loadFromLocalStorage('purchasePayments')) || []; // 💳 دفعات المشتريات
+        branches = (loadFromLocalStorage('branches')) || [];
+        salePayments = (loadFromLocalStorage('salePayments')) || [];
+        purchasePayments = (loadFromLocalStorage('purchasePayments')) || [];
+        journalEntries = (loadFromLocalStorage('journalEntries')) || [];
+        
+        // دليل الحسابات: LocalStorage > الافتراضي
+        const localChartOfAccounts = loadFromLocalStorage('chartOfAccounts');
+        if (localChartOfAccounts && localChartOfAccounts.length > 0) {
+            console.log('✅ تحميل دليل الحسابات من LocalStorage');
+            chartOfAccounts = localChartOfAccounts;
+        } else {
+            console.log('⚠️ لا توجد بيانات في LocalStorage - استخدام دليل الحسابات الافتراضي');
+            chartOfAccounts = JSON.parse(JSON.stringify(DEFAULT_CHART_OF_ACCOUNTS));
+            saveToLocalStorage('chartOfAccounts', chartOfAccounts);
+        }
+        
+        console.log('📊 تم تحميل البيانات من LocalStorage:');
+        console.log(`  - journalEntries: ${journalEntries.length}`);
+        console.log(`  - chartOfAccounts: ${chartOfAccounts.length}`);
     }
 
     currentPurchaseNumber = purchases.length > 0 ? Math.max(0, ...purchases.map(p => p.number)) + 1 : 1;
@@ -9052,10 +9104,33 @@ async function initializeApp() {
     
     // 🔄 تحديث إضافي فوري للوحة التحكم بعد تحميل جميع البيانات
     console.log('🔄 تحديث فوري للوحة التحكم بعد تحميل البيانات...');
+    console.log('📊 البيانات المحملة حالياً:');
+    console.log(`  - items: ${items.length}`);
+    console.log(`  - customers: ${customers.length}`);
+    console.log(`  - suppliers: ${suppliers.length}`);
+    console.log(`  - purchases: ${purchases.length}`);
+    console.log(`  - sales: ${sales.length}`);
+    console.log(`  - expenses: ${expenses.length}`);
+    console.log(`  - revenues: ${revenues.length}`);
+    
+    if (purchases.length > 0) {
+        console.log('🛒 تفاصيل فواتير المشتريات:');
+        purchases.forEach((p, idx) => {
+            console.log(`  - فاتورة ${idx + 1}: رقم=${p.number}, تاريخ=${p.date}, إجمالي=${p.total}`);
+        });
+        console.log(`  - إجمالي قيمة المشتريات: ${purchases.reduce((s, i) => s + (Number(i.total) || 0), 0).toFixed(2)}`);
+    }
+    
     if (typeof updateDashboard === 'function') {
         try {
             updateDashboard();
             console.log('✅ تم تحديث لوحة التحكم بنجاح');
+            
+            // فحص القيمة المعروضة بعد التحديث
+            setTimeout(() => {
+                const displayedValue = document.getElementById('totalPurchases')?.textContent;
+                console.log(`🔍 القيمة المعروضة في #totalPurchases بعد التحديث: "${displayedValue}"`);
+            }, 200);
         } catch (e) {
             console.error('❌ خطأ في تحديث لوحة التحكم:', e);
         }
@@ -10803,7 +10878,22 @@ loadSavedEmailSettings();
                 localStorage.setItem(fullKey, JSON.stringify(data));
                 console.log(`✅ تم الحفظ بنجاح في LocalStorage: ${fullKey}`);
                 
-                // تحقق فوري من الحفظ (خاص بالمستخدمين)
+                // 🔍 تحقق فوري من الحفظ في localStorage
+                const immediateVerify = localStorage.getItem(fullKey);
+                if (immediateVerify) {
+                    const parsedVerify = JSON.parse(immediateVerify);
+                    if (Array.isArray(parsedVerify) && Array.isArray(data)) {
+                        if (parsedVerify.length === data.length) {
+                            console.log(`✅ تم التحقق الفوري: البيانات محفوظة بنجاح (${parsedVerify.length} عنصر)`);
+                        } else {
+                            console.error(`⚠️ تحذير: عدم تطابق في الحفظ! محفوظ=${parsedVerify.length}, مطلوب=${data.length}`);
+                        }
+                    }
+                } else {
+                    console.error(`❌ فشل التحقق الفوري: البيانات غير موجودة في localStorage!`);
+                }
+                
+                // تحقق فوري من الحفظ (خاص بالمستخدمين) - يمكن حذف هذا الجزء لأنه مكرر
                 if (key === 'diwan_users') {
                     const immediateCheck = JSON.parse(localStorage.getItem(fullKey) || '[]');
                     console.log('🔍 تحقق فوري من الحفظ في localStorage:');
@@ -10818,15 +10908,36 @@ loadSavedEmailSettings();
                 
                 // حفظ في Firebase إذا كان مفعّلاً
                 if (USE_FIREBASE && currentActivityId && !GLOBAL_STORAGE_KEYS.has(key)) {
+                    console.log(`🔥 Firebase: محاولة حفظ ${key}...`);
+                    console.log(`  - USE_FIREBASE: ${USE_FIREBASE}`);
+                    console.log(`  - currentActivityId: ${currentActivityId}`);
+                    console.log(`  - GLOBAL_STORAGE_KEYS.has('${key}'): ${GLOBAL_STORAGE_KEYS.has(key)}`);
+                    console.log(`  - Array.isArray(data): ${Array.isArray(data)}`);
+                    
                     // تحديد نوع البيانات من المفتاح
                     const dataType = key;
-                    await firebaseSaveActivityData(currentActivityId, dataType, data);
-                    debugLog(`🔥 تم الحفظ في Firebase: ${dataType}`);
+                    const firebaseResult = await firebaseSaveActivityData(currentActivityId, dataType, data);
+                    
+                    if (firebaseResult) {
+                        console.log(`✅ Firebase: تم حفظ ${dataType} بنجاح`);
+                        debugLog(`🔥 تم الحفظ في Firebase: ${dataType}`);
+                    } else {
+                        console.error(`❌ Firebase: فشل حفظ ${dataType}`);
+                    }
+                } else {
+                    if (!USE_FIREBASE) {
+                        console.log(`⚠️ تخطي Firebase: غير مفعل`);
+                    } else if (!currentActivityId) {
+                        console.log(`⚠️ تخطي Firebase: currentActivityId غير موجود`);
+                    } else if (GLOBAL_STORAGE_KEYS.has(key)) {
+                        console.log(`⚠️ تخطي Firebase: ${key} من المفاتيح العامة`);
+                    }
                 }
                 
                 return true;
             } catch (error) {
                 console.error('❌ خطأ في حفظ البيانات:', error);
+                console.error('❌ تفاصيل الخطأ:', error.message, error.stack);
                 return false;
             }
         }
@@ -10961,8 +11072,12 @@ loadSavedEmailSettings();
             }
             
             // حفظ القيد
+            console.log('📒 حفظ القيد المحاسبي:', entry.id, entry.description);
             journalEntries.unshift(entry);
-            await saveToLocalStorage('journalEntries', journalEntries);
+            console.log(`📊 عدد القيود الحالي: ${journalEntries.length}`);
+            
+            const saveResult = await saveToLocalStorage('journalEntries', journalEntries);
+            console.log(`💾 نتيجة حفظ القيود: ${saveResult ? '✅ نجح' : '❌ فشل'}`);
             
             console.log('✅ تم إنشاء القيد المحاسبي:', entry.id);
             return entry;
@@ -10996,39 +11111,44 @@ loadSavedEmailSettings();
          */
         async function createSaleJournalEntry(sale) {
             const total = sale.total || 0;
+            const paidAmount = sale.paidAmount || 0;
+            const remainingAmount = total - paidAmount;
             const customer = customers.find(c => c.id === sale.customerId);
             const customerName = customer ? customer.name : 'عميل';
             
             const entries = [];
             
-            // حسب طريقة الدفع
-            if (sale.paymentMethod === 'cash') {
-                // من حـ/ الصندوق
-                entries.push({
-                    accountCode: '1111',
-                    accountName: 'الصندوق',
-                    debit: total,
-                    credit: 0
-                });
-            } else if (sale.paymentMethod === 'bank') {
-                // من حـ/ البنك
-                entries.push({
-                    accountCode: '1112',
-                    accountName: 'البنك',
-                    debit: total,
-                    credit: 0
-                });
-            } else {
-                // مبيعات آجلة - من حـ/ المدينون (العملاء)
+            // من حـ/ الصندوق/البنك (المبلغ المستلم)
+            if (paidAmount > 0) {
+                if (sale.paymentMethod === 'bank') {
+                    entries.push({
+                        accountCode: '1112',
+                        accountName: 'البنك',
+                        debit: paidAmount,
+                        credit: 0
+                    });
+                } else {
+                    // cash أو أي طريقة دفع أخرى
+                    entries.push({
+                        accountCode: '1111',
+                        accountName: 'الصندوق',
+                        debit: paidAmount,
+                        credit: 0
+                    });
+                }
+            }
+            
+            // من حـ/ المدينون (العملاء) - المبلغ المتبقي
+            if (remainingAmount > 0) {
                 entries.push({
                     accountCode: '1120',
                     accountName: 'المدينون (العملاء)',
-                    debit: total,
+                    debit: remainingAmount,
                     credit: 0
                 });
             }
             
-            // إلى حـ/ المبيعات
+            // إلى حـ/ المبيعات (إجمالي الفاتورة بالكامل)
             entries.push({
                 accountCode: '4100',
                 accountName: 'إيرادات المبيعات',
@@ -11038,7 +11158,7 @@ loadSavedEmailSettings();
             
             return await createJournalEntry({
                 date: sale.date,
-                description: `فاتورة مبيعات رقم SAL${String(sale.number).padStart(3, '0')} - ${customerName}`,
+                description: `فاتورة مبيعات رقم SAL${String(sale.number).padStart(3, '0')} - ${customerName}${paidAmount > 0 && remainingAmount > 0 ? ' (مقسطة)' : ''}`,
                 reference: sale.id,
                 referenceType: 'sale',
                 entries: entries,
@@ -11052,12 +11172,14 @@ loadSavedEmailSettings();
          */
         async function createPurchaseJournalEntry(purchase) {
             const total = purchase.total || 0;
+            const paidAmount = purchase.paidAmount || 0;
+            const remainingAmount = total - paidAmount;
             const supplier = suppliers.find(s => s.id === purchase.supplierId);
             const supplierName = supplier ? supplier.name : 'مورد';
             
             const entries = [];
             
-            // من حـ/ المشتريات
+            // من حـ/ المشتريات (إجمالي الفاتورة بالكامل)
             entries.push({
                 accountCode: '5200',
                 accountName: 'المشتريات',
@@ -11065,37 +11187,38 @@ loadSavedEmailSettings();
                 credit: 0
             });
             
-            // إلى حـ/ الدائنون (الموردون) أو النقدية/البنك
-            if (purchase.paidAmount >= total) {
-                // مدفوعة بالكامل
+            // إلى حـ/ الصندوق/البنك (المبلغ المدفوع)
+            if (paidAmount > 0) {
                 if (purchase.paymentMethod === 'bank') {
                     entries.push({
                         accountCode: '1112',
                         accountName: 'البنك',
                         debit: 0,
-                        credit: total
+                        credit: paidAmount
                     });
                 } else {
                     entries.push({
                         accountCode: '1111',
                         accountName: 'الصندوق',
                         debit: 0,
-                        credit: total
+                        credit: paidAmount
                     });
                 }
-            } else {
-                // مشتريات آجلة
+            }
+            
+            // إلى حـ/ الدائنون (الموردون) - المبلغ المتبقي
+            if (remainingAmount > 0) {
                 entries.push({
                     accountCode: '2110',
                     accountName: 'الدائنون (الموردون)',
                     debit: 0,
-                    credit: total
+                    credit: remainingAmount
                 });
             }
             
             return await createJournalEntry({
                 date: purchase.date,
-                description: `فاتورة مشتريات رقم PUR${String(purchase.number).padStart(3, '0')} - ${supplierName}`,
+                description: `فاتورة مشتريات رقم PUR${String(purchase.number).padStart(3, '0')} - ${supplierName}${paidAmount > 0 && remainingAmount > 0 ? ' (مقسطة)' : ''}`,
                 reference: purchase.id,
                 referenceType: 'purchase',
                 entries: entries,
@@ -11162,6 +11285,50 @@ loadSavedEmailSettings();
                 entries: entries,
                 total: amount,
                 notes: expense.notes || ''
+            });
+        }
+        
+        /**
+         * إنشاء قيد تلقائي لصدقة
+         */
+        async function createCharityJournalEntry(charity) {
+            const amount = charity.amount || 0;
+            
+            const entries = [];
+            
+            // من حـ/ الصدقات والتبرعات
+            entries.push({
+                accountCode: '5930',
+                accountName: 'الصدقات والتبرعات',
+                debit: amount,
+                credit: 0
+            });
+            
+            // إلى حـ/ الصندوق أو البنك
+            if (charity.paymentMethod === 'bank') {
+                entries.push({
+                    accountCode: '1112',
+                    accountName: 'البنك',
+                    debit: 0,
+                    credit: amount
+                });
+            } else {
+                entries.push({
+                    accountCode: '1111',
+                    accountName: 'الصندوق',
+                    debit: 0,
+                    credit: amount
+                });
+            }
+            
+            return await createJournalEntry({
+                date: charity.date,
+                description: `صدقة: ${charity.desc || 'صدقة وتبرع'}`,
+                reference: charity.id,
+                referenceType: 'charity',
+                entries: entries,
+                total: amount,
+                notes: charity.desc || ''
             });
         }
         
@@ -12523,7 +12690,13 @@ loadSavedEmailSettings();
                             <input type="number" id="sadaqaAmount" placeholder="المبلغ (ريال) *" min="1" required>
                             <input type="date" id="sadaqaDate" required>
                             <input type="text" id="sadaqaDesc" placeholder="وصف أو اسم المستفيد">
-                            <button class="btn-primary btn-add" onclick="addSadaqa()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;"> إضافة صدقة</button>
+                            <select id="sadaqaPaymentMethod" style="padding: 10px; border: 2px solid #ddd; border-radius: 8px;">
+                                <option value="cash">💵 نقدي (صندوق)</option>
+                                <option value="bank">🏦 بنك</option>
+                            </select>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button class="btn-primary btn-add" onclick="addSadaqa()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">💚 إضافة صدقة</button>
                         </div>
                         <div id="sadaqaList" style="margin-top:2em;"></div>
                         <div id="sadaqaTotal" style="margin-top:1em; font-weight:bold;"></div>
@@ -12534,30 +12707,40 @@ loadSavedEmailSettings();
                 }
             }
             // دوال الصدقة
-            window.addSadaqa = function() {
+            window.addSadaqa = async function() {
                 const amount = parseFloat(document.getElementById('sadaqaAmount').value);
                 const date = document.getElementById('sadaqaDate').value;
                 const desc = document.getElementById('sadaqaDesc').value;
+                const paymentMethod = document.getElementById('sadaqaPaymentMethod').value;
                 if (!amount || !date) {
                     showNotification('⚠️ خطأ', 'يرجى إدخال المبلغ والتاريخ', 'error');
                     return;
                 }
                 const sadaqat = JSON.parse(localStorage.getItem('sadaqat') || '[]');
-                sadaqat.push({ amount, date, desc });
+                const newSadaqa = { id: Date.now(), amount, date, desc, paymentMethod };
+                sadaqat.push(newSadaqa);
                 localStorage.setItem('sadaqat', JSON.stringify(sadaqat));
+                
+                // إنشاء القيد المحاسبي
+                await createCharityJournalEntry(newSadaqa);
+                
                 document.getElementById('sadaqaAmount').value = '';
                 document.getElementById('sadaqaDate').value = '';
                 document.getElementById('sadaqaDesc').value = '';
+                document.getElementById('sadaqaPaymentMethod').value = 'cash';
                 renderSadaqaList();
+                showNotification('✅ تم الحفظ', 'تم إضافة الصدقة وتسجيل القيد المحاسبي', 'success');
             };
             window.renderSadaqaList = function() {
                 const sadaqat = JSON.parse(localStorage.getItem('sadaqat') || '[]');
-                let html = '<table border="1" style="width:100%;text-align:center"><tr><th>المبلغ</th><th>التاريخ</th><th>الوصف</th><th style="text-align:left">إجراءات</th></tr>';
+                let html = '<table border="1" style="width:100%;text-align:center"><tr><th>المبلغ</th><th>التاريخ</th><th>طريقة الدفع</th><th>الوصف</th><th style="text-align:left">إجراءات</th></tr>';
                 let total = 0;
                 sadaqat.forEach((s, i) => {
+                    const paymentIcon = s.paymentMethod === 'bank' ? '🏦 بنك' : '💵 نقدي';
                     html += `<tr>
                         <td>${s.amount}</td>
                         <td>${s.date}</td>
+                        <td>${paymentIcon}</td>
                         <td>${s.desc || ''}</td>
                         <td style='text-align:left'>
                             <div class='action-buttons' style='justify-content: flex-start;'>
@@ -12588,6 +12771,7 @@ loadSavedEmailSettings();
                 document.getElementById('sadaqaAmount').value = s.amount;
                 document.getElementById('sadaqaDate').value = s.date;
                 document.getElementById('sadaqaDesc').value = s.desc;
+                document.getElementById('sadaqaPaymentMethod').value = s.paymentMethod || 'cash';
                 // عند الحفظ، نستبدل السجل القديم
                 window._sadaqaEditIdx = idx;
                 const btn = document.querySelector('#sadaqa .btn-add');
@@ -12597,17 +12781,19 @@ loadSavedEmailSettings();
                         const amount = parseFloat(document.getElementById('sadaqaAmount').value);
                         const date = document.getElementById('sadaqaDate').value;
                         const desc = document.getElementById('sadaqaDesc').value;
+                        const paymentMethod = document.getElementById('sadaqaPaymentMethod').value;
                         if (!amount || !date) {
                             showNotification('⚠️ خطأ', 'يرجى إدخال المبلغ والتاريخ', 'error');
                             return;
                         }
-                        sadaqat[idx] = { amount, date, desc };
+                        sadaqat[idx] = { ...sadaqat[idx], amount, date, desc, paymentMethod };
                         localStorage.setItem('sadaqat', JSON.stringify(sadaqat));
                         renderSadaqaList();
                         document.getElementById('sadaqaAmount').value = '';
                         document.getElementById('sadaqaDate').value = '';
                         document.getElementById('sadaqaDesc').value = '';
-                        btn.textContent = '➕ إضافة صدقة';
+                        document.getElementById('sadaqaPaymentMethod').value = 'cash';
+                        btn.textContent = '💚 إضافة صدقة';
                         btn.onclick = addSadaqa;
                         window._sadaqaEditIdx = null;
                     };
@@ -14006,9 +14192,11 @@ async function savePurchaseReturn() {
     purchaseReturns.push(newReturn);
     currentPurchaseReturnNumber++;
     
-    const success1 = saveToLocalStorage('purchaseReturns', purchaseReturns);
-    const success2 = saveToLocalStorage('items', items);
-    const success3 = saveToLocalStorage('purchases', purchases); 
+    console.log('💾 حفظ مرتجع المشتريات...');
+    const success1 = await saveToLocalStorage('purchaseReturns', purchaseReturns);
+    const success2 = await saveToLocalStorage('items', items);
+    const success3 = await saveToLocalStorage('purchases', purchases); 
+    console.log(`💾 نتيجة الحفظ: purchaseReturns=${success1}, items=${success2}, purchases=${success3}`);
     
     if (success1 && success2 && success3) { 
         showNotification('✅ تم الحفظ', `تم حفظ مرتجع المشتريات رقم S-PR${newReturn.number.toString().padStart(3, '0')} بنجاح`, 'success');
@@ -14435,9 +14623,9 @@ function loadCustomersToSelect() {
                     });
                     debugLog(`✅ تم تحديث ${purchasesCount} صنف في فواتير المشتريات`);
                     
-                    const success = saveToLocalStorage('items', items);
-                    const salesSuccess = salesUpdated ? saveToLocalStorage('sales', sales) : true;
-                    const purchasesSuccess = saveToLocalStorage('purchases', purchases);
+                    const success = await saveToLocalStorage('items', items);
+                    const salesSuccess = salesUpdated ? await saveToLocalStorage('sales', sales) : true;
+                    const purchasesSuccess = await saveToLocalStorage('purchases', purchases);
                     
                     debugLog('💾 حفظ البيانات:', { success, salesSuccess, purchasesSuccess });
                     
@@ -15154,6 +15342,7 @@ function loadCustomersToSelect() {
     const branchId = document.getElementById('purchaseBranch').value ? parseInt(document.getElementById('purchaseBranch').value) : null;
     const notes = document.getElementById('purchaseNotes').value;
     const paidAmount = parseFloat(document.getElementById('purchasePaidAmount').value) || 0;
+    const paymentMethod = document.getElementById('purchasePaymentMethod').value;
 
     if (!date || !supplierId || currentPurchaseItems.length === 0) {
         showNotification('⚠️ بيانات ناقصة', 'يرجى ملء جميع البيانات المطلوبة وإضافة أصناف للفاتورة', 'warning');
@@ -15193,6 +15382,7 @@ function loadCustomersToSelect() {
                 branchId,
                 notes,
                 paidAmount,
+                paymentMethod,
                 items: [...currentPurchaseItems],
                 subtotal,
                 tax,
@@ -15213,7 +15403,8 @@ function loadCustomersToSelect() {
              supplierId, 
              branchId,
              notes, 
-             paidAmount, 
+             paidAmount,
+             paymentMethod, 
              items: [...currentPurchaseItems], 
              subtotal, 
              tax, 
@@ -15226,20 +15417,48 @@ function loadCustomersToSelect() {
         showNotification('✅ تم الحفظ', `تم حفظ الفاتورة رقم PUR${newPurchaseData.number.toString().padStart(3, '0')} بنجاح!`, 'success');
         
         // 📒 إنشاء القيد المحاسبي التلقائي
+        console.log('📒 إنشاء القيد المحاسبي للمشتريات...');
         await createPurchaseJournalEntry(newPurchaseData);
     }
     
-    const success1 = saveToLocalStorage('purchases', purchases);
+    console.log('💾 حفظ فاتورة المشتريات...');
+    console.log(`📊 عدد فواتير المشتريات قبل الحفظ: ${purchases.length}`);
+    const success1 = await saveToLocalStorage('purchases', purchases);
+    console.log(`💾 نتيجة حفظ المشتريات: ${success1 ? '✅ نجح' : '❌ فشل'}`);
+    
+    // 🔍 تحقق فوري من الحفظ في LocalStorage
+    const fullKey = currentActivityId ? `activity_${currentActivityId}_purchases` : 'purchases';
+    const immediateCheck = localStorage.getItem(fullKey);
+    if (immediateCheck) {
+        const parsedData = JSON.parse(immediateCheck);
+        console.log(`✅ التحقق الفوري: تم حفظ ${parsedData.length} فاتورة في localStorage`);
+        if (parsedData.length !== purchases.length) {
+            console.error(`⚠️ تحذير: عدم تطابق! محفوظ=${parsedData.length}, متوقع=${purchases.length}`);
+        }
+    } else {
+        console.error(`❌ خطأ خطير: البيانات غير موجودة في localStorage بعد الحفظ!`);
+    }
     
     currentPurchaseItems.forEach(pi => {
         const item = items.find(i => i.id === pi.id);
         if (item) item.stock += pi.quantity;
     });
-    const success2 = saveToLocalStorage('items', items);
+    
+    console.log('💾 حفظ الأصناف...');
+    const success2 = await saveToLocalStorage('items', items);
+    console.log(`💾 نتيجة حفظ الأصناف: ${success2 ? '✅ نجح' : '❌ فشل'}`);
     
     if (success1 && success2) {
-        newPurchase();
+        console.log('✅ جميع البيانات تم حفظها بنجاح - الآن سيتم تحديث لوحة التحكم');
+        console.log(`📊 عدد فواتير المشتريات النهائي: ${purchases.length}`);
+        console.log(`📊 إجمالي قيمة المشتريات: ${purchases.reduce((s, i) => s + (Number(i.total) || 0), 0).toFixed(2)}`);
+        
+        await newPurchase();
+        
+        console.log('🔄 استدعاء updateDashboard...');
         updateDashboard();
+        console.log('✅ تم استدعاء updateDashboard');
+        
         renderItems();
     } else {
         showNotification('❌ خطأ', 'حدث خطأ في حفظ البيانات', 'error');
@@ -15260,6 +15479,7 @@ function loadCustomersToSelect() {
             document.getElementById('purchaseSupplierAddress').value = '';
             document.getElementById('purchaseNotes').value = '';
             document.getElementById('purchasePaidAmount').value = '';
+            document.getElementById('purchasePaymentMethod').value = 'cash';
             generatePurchaseCode();
             document.getElementById('savePurchaseBtn').textContent = '💾 حفظ الفاتورة';
             renderPurchaseItems();
@@ -17775,6 +17995,197 @@ function renderPurchaseReturns() {
             });
         }
 
+        // ===== Advances Functions =====
+        
+        async function addAdvance() {
+            const date = document.getElementById('advanceDate').value;
+            const type = document.getElementById('advanceType').value;
+            const employee = document.getElementById('advanceEmployee').value;
+            const amount = parseFloat(document.getElementById('advanceAmount').value);
+            const description = document.getElementById('advanceDescription').value;
+            const status = document.getElementById('advanceStatus').value;
+
+            if (!date || !employee || !amount) {
+                showNotification('⚠️ بيانات ناقصة', 'يرجى ملء الحقول الإلزامية', 'error');
+                return;
+            }
+
+            const newAdvance = {
+                id: Date.now(),
+                date,
+                type,
+                employee,
+                amount,
+                description,
+                status,
+                createdAt: new Date().toISOString()
+            };
+
+            advances.push(newAdvance);
+            saveToLocalStorage('advances', advances);
+            
+            renderAdvances();
+            updateAdvanceStats();
+            clearAdvanceForm();
+            
+            showNotification('✅ تمت الإضافة', 'تم إضافة السلفة/العهدة بنجاح', 'success');
+        }
+
+        function renderAdvances() {
+            const advancesList = document.getElementById('advancesList');
+            if (!advancesList) return;
+
+            advancesList.innerHTML = advances.map(advance => `
+                <tr>
+                    <td>${advance.date}</td>
+                    <td>${advance.type}</td>
+                    <td>${advance.employee}</td>
+                    <td>${advance.amount.toFixed(2)}</td>
+                    <td>${getStatusBadge(advance.status)}</td>
+                    <td>${advance.description || '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning edit-btn" onclick="editAdvance(${advance.id})">✏️ تعديل</button>
+                        <button class="btn-danger edit-btn" onclick="deleteAdvance(${advance.id})">🗑️ حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const miniStat = document.getElementById('miniStatAdvances');
+            if (miniStat) {
+                miniStat.textContent = advances.length;
+            }
+        }
+
+        async function clearAdvanceForm() {
+            const confirmed = await confirmCancelEdit('#advances');
+            if (!confirmed) return;
+            
+            document.getElementById('advanceDate').value = '';
+            document.getElementById('advanceEmployee').value = '';
+            document.getElementById('advanceAmount').value = '';
+            document.getElementById('advanceDescription').value = '';
+            
+            const addButton = document.querySelector('#advances .btn-add');
+            if (addButton) {
+                addButton.textContent = ' إضافة سلفة/ عهدة';
+                addButton.onclick = addAdvance;
+            }
+            
+            removeEditMode('#advances', '#advances h2', '💵 العهد والسلف <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatAdvances" class="stat-mini-number">0</span></span>');
+        }
+
+        function updateAdvanceStats() {
+            const totalAdvancesEl = document.getElementById('totalAdvances');
+            const dueAdvancesEl = document.getElementById('dueAdvances');
+            const paidAdvancesEl = document.getElementById('paidAdvances');
+
+            if (totalAdvancesEl) {
+                const total = advances.reduce((sum, advance) => sum + advance.amount, 0);
+                totalAdvancesEl.textContent = total.toFixed(2);
+            }
+
+            if (dueAdvancesEl) {
+                const due = advances
+                    .filter(advance => advance.status === 'مستحق')
+                    .reduce((sum, advance) => sum + advance.amount, 0);
+                dueAdvancesEl.textContent = due.toFixed(2);
+            }
+
+            if (paidAdvancesEl) {
+                const paid = advances
+                    .filter(advance => advance.status === 'مسدد')
+                    .reduce((sum, advance) => sum + advance.amount, 0);
+                paidAdvancesEl.textContent = paid.toFixed(2);
+            }
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'مستحق': '<span style="color: #e74c3c; font-weight: bold;">مستحق</span>',
+                'مسدد': '<span style="color: #27ae60; font-weight: bold;">مسدد</span>',
+                'جزئي': '<span style="color: #f39c12; font-weight: bold;">مسدد جزئياً</span>'
+            };
+            return badges[status] || status;
+        }
+
+        function editAdvance(id) {
+            const advance = advances.find(a => a.id === id);
+            if (!advance) return;
+
+            document.getElementById('advanceDate').value = advance.date;
+            document.getElementById('advanceType').value = advance.type;
+            document.getElementById('advanceEmployee').value = advance.employee;
+            document.getElementById('advanceAmount').value = advance.amount;
+            document.getElementById('advanceDescription').value = advance.description || '';
+            document.getElementById('advanceStatus').value = advance.status;
+
+            const addButton = document.querySelector('#advances .btn-add');
+            addButton.textContent = '💾 حفظ التعديل';
+            addButton.onclick = function() { updateAdvance(id); };
+
+            applyEditMode('#advances', 'advanceEmployee', '#advances h2', `✏️ تعديل السلفة: ${advance.employee}`);
+        }
+
+        async function updateAdvance(id) {
+            const advanceIndex = advances.findIndex(a => a.id === id);
+            if (advanceIndex === -1) return;
+
+            const date = document.getElementById('advanceDate').value;
+            const type = document.getElementById('advanceType').value;
+            const employee = document.getElementById('advanceEmployee').value;
+            const amount = parseFloat(document.getElementById('advanceAmount').value);
+            const description = document.getElementById('advanceDescription').value;
+            const status = document.getElementById('advanceStatus').value;
+
+            advances[advanceIndex] = {
+                ...advances[advanceIndex],
+                date,
+                type,
+                employee,
+                amount,
+                description,
+                status
+            };
+
+            saveToLocalStorage('advances', advances);
+            renderAdvances();
+            updateAdvanceStats();
+            clearAdvanceForm();
+
+            const addButton = document.querySelector('#advances .btn-add');
+            addButton.textContent = ' إضافة عهدة/سلفة';
+            addButton.onclick = addAdvance;
+
+            showNotification('✅ تم التحديث', 'تم تحديث السلفة/العهدة بنجاح', 'success');
+        }
+        
+        async function deleteAdvance(id) {
+            const confirmed = await showConfirmDialog({
+                title: '⚠️ تأكيد الحذف',
+                message: 'هل أنت متأكد من حذف هذه السلفة/العهدة؟',
+                type: 'danger',
+                confirmText: 'نعم، احذف',
+                cancelText: 'إلغاء'
+            });
+
+            if (!confirmed) return;
+
+            const advanceIndex = advances.findIndex(a => a.id === id);
+            if (advanceIndex === -1) return;
+
+            moveToTrash('advances', advances[advanceIndex]);
+            
+            advances.splice(advanceIndex, 1);
+            saveToLocalStorage('advances', advances);
+            
+            renderAdvances();
+            updateAdvanceStats();
+            
+            showNotification('✅ تم الحذف', 'تم حذف السلفة/العهدة بنجاح', 'success');
+        }
+
+        // ===== End Advances Functions =====
+
         function updateSalarySummary() {
             const monthInput = document.getElementById('salaryMonth');
             const targetMonth = monthInput ? monthInput.value : '';
@@ -20192,7 +20603,20 @@ if (data.length > 0) {
     setText('totalSuppliers', suppliers.length);
     setText('stockValue', items.reduce((s, i) => s + ((Number(i.stock) || 0) * (Number(i.cost) || 0)), 0).toFixed(2));
     setText('totalSales', sales.reduce((s, i) => s + (Number(i.total) || 0), 0).toFixed(2));
-    setText('totalPurchases', purchases.reduce((s, i) => s + (Number(i.total) || 0), 0).toFixed(2));
+    
+    // 🔍 تشخيص خاص لبطاقة المشتريات
+    console.log('🛒 تحديث بطاقة المشتريات:');
+    console.log('  - عدد فواتير المشتريات:', purchases.length);
+    purchases.forEach((p, idx) => {
+        console.log(`  - فاتورة ${idx + 1}: رقم=${p.number}, تاريخ=${p.date}, إجمالي=${p.total}`);
+    });
+    const totalPurchasesValue = purchases.reduce((s, i) => s + (Number(i.total) || 0), 0);
+    console.log(`  - إجمالي قيمة المشتريات المحسوبة: ${totalPurchasesValue.toFixed(2)}`);
+    
+    setText('totalPurchases', totalPurchasesValue.toFixed(2));
+    
+    console.log(`  - القيمة المحفوظة في #totalPurchases: ${document.getElementById('totalPurchases')?.textContent}`);
+    
     setText('totalExpensesHome', expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0).toFixed(2));
     setText('totalRevenuesHome', revenues.reduce((s, r) => s + (Number(r.amount) || 0), 0).toFixed(2));
     
@@ -21069,11 +21493,15 @@ function updateAllCharts() {
                     return dataArray;
                 } else {
                     console.warn(`⚠️ Firebase: لا توجد بيانات ${dataType} للنشاط ${activityId}`);
+                    console.warn(`⚠️ Path المفحوص: activities/${activityId}/${dataType}`);
+                    console.warn(`⚠️ هذا يعني أن Firebase لا يحتوي على بيانات - سيتم التحميل من LocalStorage`);
                     debugLog(`⚠️ لا توجد بيانات ${dataType} في Firebase`);
                     return [];
                 }
             } catch (error) {
                 console.error(`❌ Firebase خطأ في جلب ${dataType} للنشاط ${activityId}:`, error);
+                console.error(`❌ تفاصيل الخطأ:`, error.message, error.code);
+                console.error(`❌ سيتم المحاولة من LocalStorage بدلاً من ذلك`);
                 return null;
             }
         }
@@ -21082,26 +21510,42 @@ function updateAllCharts() {
          * حفظ بيانات في Firebase
          */
         async function firebaseSaveActivityData(activityId, dataType, data) {
-            if (!USE_FIREBASE) return false;
+            if (!USE_FIREBASE) {
+                console.log('⚠️ Firebase غير مفعل');
+                return false;
+            }
 
             try {
                 const { ref, set } = window.firebaseModules;
                 const db = window.firebaseDatabase;
                 
+                // التحقق من أن البيانات مصفوفة
+                if (!Array.isArray(data)) {
+                    console.error(`❌ البيانات ليست مصفوفة: ${dataType}`, typeof data);
+                    return false;
+                }
+                
+                console.log(`🔥 Firebase: بدء حفظ ${dataType} (${data.length} عنصر) للنشاط ${activityId}`);
+                
                 // تحويل المصفوفة إلى كائن
                 const dataObject = {};
-                data.forEach(item => {
-                    const itemId = item.id || item.number || Date.now() + Math.random();
+                data.forEach((item, index) => {
+                    // استخدام id الفريد لكل عنصر، مع fallback آمن
+                    const itemId = item.id || item.number || `${Date.now()}_${index}`;
                     dataObject[itemId] = item;
                 });
+                
+                console.log(`🔥 Firebase: تم تحويل ${Object.keys(dataObject).length} عنصر إلى كائن`);
                 
                 const dataRef = ref(db, `activities/${activityId}/${dataType}`);
                 await set(dataRef, dataObject);
                 
+                console.log(`✅ Firebase: تم حفظ ${dataType} بنجاح`);
                 debugLog(`✅ تم حفظ ${dataType} في Firebase`);
                 return true;
             } catch (error) {
-                console.error(`❌ خطأ في حفظ ${dataType}:`, error);
+                console.error(`❌ Firebase: خطأ في حفظ ${dataType}:`, error);
+                console.error(`❌ Firebase: تفاصيل الخطأ:`, error.message, error.code);
                 return false;
             }
         }
@@ -25366,247 +25810,6 @@ function toggleAllCustomerCheckboxes(mainCheckbox) {
     checkboxes.forEach(checkbox => {
         checkbox.checked = mainCheckbox.checked;
     });
-}
-
-// دالة إضافة عهدة/سلفة جديدة
-async function addAdvance() {
-    const date = document.getElementById('advanceDate').value;
-    const type = document.getElementById('advanceType').value;
-    const employee = document.getElementById('advanceEmployee').value;
-    const amount = parseFloat(document.getElementById('advanceAmount').value);
-    const description = document.getElementById('advanceDescription').value;
-    const status = document.getElementById('advanceStatus').value;
-
-    if (!date || !employee || !amount) {
-        showNotification('⚠️ بيانات ناقصة', 'يرجى ملء الحقول الإلزامية', 'error');
-        return;
-    }
-
-    const newAdvance = {
-        id: Date.now(),
-        date,
-        type,
-        employee,
-        amount,
-        description,
-        status,
-        createdAt: new Date().toISOString()
-    };
-
-    advances.push(newAdvance);
-    saveToLocalStorage('advances', advances);
-    
-    // تحديث الواجهة
-    renderAdvances();
-    updateAdvanceStats();
-    clearAdvanceForm();
-    
-    showNotification('✅ تمت الإضافة', 'تم إضافة السلفة/العهدة بنجاح', 'success');
-}
-
-// دالة عرض العهد والسلف
-function renderAdvances() {
-    const advancesList = document.getElementById('advancesList');
-    if (!advancesList) return;
-
-    advancesList.innerHTML = advances.map(advance => `
-        <tr>
-            <td>${advance.date}</td>
-            <td>${advance.type}</td>
-            <td>${advance.employee}</td>
-            <td>${advance.amount.toFixed(2)}</td>
-            <td>${getStatusBadge(advance.status)}</td>
-            <td>${advance.description || '-'}</td>
-            <td class="action-buttons">
-                <button class="btn-warning edit-btn" onclick="editAdvance(${advance.id})">✏️ تعديل</button>
-                <button class="btn-danger edit-btn" onclick="deleteAdvance(${advance.id})">🗑️ حذف</button>
-            </td>
-        </tr>
-    `).join('');
-
-    // تحديث الإحصائيات المصغرة
-    const miniStat = document.getElementById('miniStatAdvances');
-    if (miniStat) {
-        miniStat.textContent = advances.length;
-    }
-}
-
-// دالة مسح النموذج
-async function clearAdvanceForm() {
-    // التحقق من وجود تعديل قيد التنفيذ
-    const confirmed = await confirmCancelEdit('#advances');
-    if (!confirmed) return;
-    
-    document.getElementById('advanceDate').value = '';
-    document.getElementById('advanceEmployee').value = '';
-    document.getElementById('advanceAmount').value = '';
-    document.getElementById('advanceDescription').value = '';
-    
-    // إعادة زر الإضافة
-    const addButton = document.querySelector('#advances .btn-add');
-    if (addButton) {
-        addButton.textContent = '➕ إضافة سلفة';
-        addButton.onclick = addAdvance;
-    }
-    
-    // إزالة المؤثر البصري
-    removeEditMode('#advances', '#advances h2', '💵 العهد والسلف <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatAdvances" class="stat-mini-number">0</span></span>');
-}
-
-// دالة تحديث إحصائيات العهد والسلف
-function updateAdvanceStats() {
-    const totalAdvancesEl = document.getElementById('totalAdvances');
-    const dueAdvancesEl = document.getElementById('dueAdvances');
-    const paidAdvancesEl = document.getElementById('paidAdvances');
-
-    if (totalAdvancesEl) {
-        const total = advances.reduce((sum, advance) => sum + advance.amount, 0);
-        totalAdvancesEl.textContent = total.toFixed(2);
-    }
-
-    if (dueAdvancesEl) {
-        const due = advances
-            .filter(advance => advance.status === 'مستحق')
-            .reduce((sum, advance) => sum + advance.amount, 0);
-        dueAdvancesEl.textContent = due.toFixed(2);
-    }
-
-    if (paidAdvancesEl) {
-        const paid = advances
-            .filter(advance => advance.status === 'مسدد')
-            .reduce((sum, advance) => sum + advance.amount, 0);
-        paidAdvancesEl.textContent = paid.toFixed(2);
-    }
-}
-
-// دالة لعرض شارة الحالة
-function getStatusBadge(status) {
-    const badges = {
-        'مستحق': '<span style="color: #e74c3c; font-weight: bold;">مستحق</span>',
-        'مسدد': '<span style="color: #27ae60; font-weight: bold;">مسدد</span>',
-        'جزئي': '<span style="color: #f39c12; font-weight: bold;">مسدد جزئياً</span>'
-    };
-    return badges[status] || status;
-}
-
-// دالة التعديل
-function editAdvance(id) {
-    const advance = advances.find(a => a.id === id);
-    if (!advance) return;
-
-    document.getElementById('advanceDate').value = advance.date;
-    document.getElementById('advanceType').value = advance.type;
-    document.getElementById('advanceEmployee').value = advance.employee;
-    document.getElementById('advanceAmount').value = advance.amount;
-    document.getElementById('advanceDescription').value = advance.description || '';
-    document.getElementById('advanceStatus').value = advance.status;
-
-    // تغيير زر الإضافة إلى تحديث
-    const addButton = document.querySelector('#advances .btn-add');
-    addButton.textContent = '💾 حفظ التعديل';
-    addButton.onclick = function() { updateAdvance(id); };
-
-    // تطبيق المؤثر البصري الأخضر
-    applyEditMode('#advances', 'advanceEmployee', '#advances h2', `✏️ تعديل السلفة: ${advance.employee}`);
-}
-
-// دالة التحديث
-async function updateAdvance(id) {
-    const advanceIndex = advances.findIndex(a => a.id === id);
-    if (advanceIndex === -1) return;
-
-    const date = document.getElementById('advanceDate').value;
-    const type = document.getElementById('advanceType').value;
-    const employee = document.getElementById('advanceEmployee').value;
-    const amount = parseFloat(document.getElementById('advanceAmount').value);
-    const description = document.getElementById('advanceDescription').value;
-    const status = document.getElementById('advanceStatus').value;
-
-    advances[advanceIndex] = {
-        ...advances[advanceIndex],
-        date,
-        type,
-        employee,
-        amount,
-        description,
-        status
-    };
-
-    saveToLocalStorage('advances', advances);
-    renderAdvances();
-    updateAdvanceStats();
-    clearAdvanceForm();
-
-    // إعادة زر الإضافة
-    const addButton = document.querySelector('#advances .btn-add');
-    addButton.textContent = '➕ إضافة عهدة/سلفة';
-    addButton.onclick = addAdvance;
-
-    showNotification('✅ تم التحديث', 'تم تحديث السلفة/العهدة بنجاح', 'success');
-}
-// دالة حذف عهدة/سلفة
-async function deleteAdvance(id) {
-    const confirmed = await showConfirmDialog({
-        title: '⚠️ تأكيد الحذف',
-        message: 'هل أنت متأكد من حذف هذه السلفة/العهدة؟',
-        type: 'danger',
-        confirmText: 'نعم، احذف',
-        cancelText: 'إلغاء'
-    });
-
-    if (!confirmed) return;
-
-    const advanceIndex = advances.findIndex(a => a.id === id);
-    if (advanceIndex === -1) return;
-
-    // نقل إلى سلة المحذوفات
-    moveToTrash('advances', advances[advanceIndex]);
-    
-    advances.splice(advanceIndex, 1);
-    saveToLocalStorage('advances', advances);
-    
-    renderAdvances();
-    updateAdvanceStats();
-    
-    showNotification('✅ تم الحذف', 'تم حذف السلفة/العهدة بنجاح', 'success');
-}
-
-// دالة البحث في العهد والسلف
-function setupAdvanceSearch() {
-    const searchInput = document.getElementById('searchAdvances');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const filteredAdvances = advances.filter(advance => 
-                advance.employee.toLowerCase().includes(searchTerm) ||
-                advance.type.toLowerCase().includes(searchTerm) ||
-                advance.description.toLowerCase().includes(searchTerm) ||
-                advance.status.toLowerCase().includes(searchTerm)
-            );
-            renderFilteredAdvances(filteredAdvances);
-        });
-    }
-}
-
-// دالة عرض نتائج البحث
-function renderFilteredAdvances(filteredAdvances) {
-    const advancesList = document.getElementById('advancesList');
-    if (!advancesList) return;
-
-    advancesList.innerHTML = filteredAdvances.map(advance => `
-        <tr>
-            <td>${advance.date}</td>
-            <td>${advance.type}</td>
-            <td>${advance.employee}</td>
-            <td>${advance.amount.toFixed(2)}</td>
-            <td>${getStatusBadge(advance.status)}</td>
-            <td>${advance.description || '-'}</td>
-            <td class="action-buttons">
-                <button class="btn-warning edit-btn" onclick="editAdvance(${advance.id})">✏️</button>
-                <button class="btn-danger" onclick="deleteAdvance(${advance.id})">🗑️</button>
-            </td>
-        </tr>
-    `).join('');
 }
 
 // === دوال حذف المرتجعات ===
