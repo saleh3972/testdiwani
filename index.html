@@ -5211,7 +5211,7 @@ textarea.editing-mode {
 <div id="items" class="section">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>📦 إدارة الأصناف <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatItems" class="stat-mini-number">0</span></span></h2>
-        <button type="button" class="btn-primary" onclick="showSection('addItem')" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">اضافة صنف جديد</button>
+        <button type="button" class="btn-primary" onclick="openAddItemForm()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">اضافة صنف جديد</button>
     </div>
     
     <div class="search-container">
@@ -5309,7 +5309,7 @@ textarea.editing-mode {
     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #667eea;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0; color: #667eea;">📏 وحدات القياس المتعددة</h3>
-            <button type="button" class="btn-primary" onclick="addUnitRow()" style="padding: 8px 16px;">➕ إضافة وحدة</button>
+            <button type="button" class="btn-primary" onclick="addUnitRow()" style="padding: 8px 16px; background: #667eea; border-color: #667eea;">➕ إضافة وحدة</button>
         </div>
         
         <div id="unitsContainer">
@@ -5332,7 +5332,7 @@ textarea.editing-mode {
                 </div>
             </div>
         </div>
-        
+
         <div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border-radius: 6px; border-right: 4px solid #2196f3;">
             <small style="color: #1976d2;">
                 <strong>💡 ملاحظة:</strong> الوحدة الأساسية هي وحدة التخزين (مثل: جرام للعود). معامل التحويل = كم وحدة أساسية في هذه الوحدة؟ (مثال: تولة = 12 جرام)
@@ -16405,7 +16405,7 @@ function searchCustomers() {
             
             clearUnitsContainer(); // 📏 Clear units
             
-            const addButton = document.querySelector('#addItem .btn-primary');
+            const addButton = document.querySelector('#addItem .btn-add');
             if (addButton) {
                 addButton.textContent = '💾 حفظ الصنف';
                 addButton.onclick = addItemNew;
@@ -16556,13 +16556,6 @@ function searchCustomers() {
             // التحقق من تكرار الكود (استثناء الصنف الحالي)
             if (code && items.some(item => item.code === code && item.id !== id)) {
                 showNotification('⚠️ خطأ', 'كود الصنف موجود مسبقاً لصنف آخر، يرجى استخدام كود آخر', 'warning');
-                return;
-            }
-            
-            // التأكد من أن سعر البيع ليس فارغاً أو سالباً
-            const priceValue = parseFloat(price);
-            if (isNaN(priceValue) || priceValue < 0) {
-                showNotification('⚠️ خطأ', 'سعر البيع مطلوب ويجب أن يكون صفر أو أكثر', 'warning');
                 return;
             }
 
@@ -16803,6 +16796,50 @@ function loadCustomersToSelect() {
             renderItems();
         }
 
+        function openAddItemForm() {
+            resetAddItemForm();
+            showSection('addItem');
+        }
+
+        function resetAddItemForm() {
+            // Clear inputs
+            const codeField = document.getElementById('itemCodeNew');
+            codeField.value = '';
+            delete codeField.dataset.originalCode;
+            
+            document.getElementById('itemNameNew').value = '';
+            document.getElementById('itemCategoryNew').value = '';
+            document.getElementById('itemCostNew').value = '';
+            document.getElementById('itemStockNew').value = '';
+            document.getElementById('itemMinStockNew').value = '';
+            
+            // Reset units
+            clearUnitsContainer();
+            // Ensure base unit row is empty
+            const baseRow = document.querySelector('.unit-row[data-unit-index="0"]');
+            if (baseRow) {
+                baseRow.querySelector('.unit-name').value = 'حبة'; 
+                baseRow.querySelector('.unit-price').value = '';
+                // Ensure factor is 1 and disabled for base unit
+                const factorInput = baseRow.querySelector('.unit-factor');
+                if (factorInput) {
+                    factorInput.value = '1';
+                    factorInput.disabled = true;
+                }
+            }
+
+            // Reset button
+            const addButton = document.querySelector('#addItem .btn-add');
+            if (addButton) {
+                addButton.textContent = '💾 حفظ الصنف';
+                addButton.onclick = addItemNew;
+            }
+            
+            // Reset title
+            const title = document.querySelector('#addItem h2');
+            if (title) title.innerHTML = '➕ إضافة صنف جديد';
+        }
+
         function editItem(id) {
             const item = items.find(item => item.id === id);
             if (!item) return;
@@ -16818,8 +16855,14 @@ function loadCustomersToSelect() {
             
             document.getElementById('itemNameNew').value = item.name;
             document.getElementById('itemCategoryNew').value = item.category || '';
-            document.getElementById('itemCostNew').value = item.cost;
-            document.getElementById('itemStockNew').value = item.stock;
+            
+            // تنظيف الحقول من النقطة أو الصفر لإظهار النص الإرشادي
+            const costVal = item.cost;
+            document.getElementById('itemCostNew').value = (costVal === '.' || costVal == 0) ? '' : costVal;
+            
+            const stockVal = item.stock;
+            document.getElementById('itemStockNew').value = (stockVal === '.' || stockVal == 0) ? '' : stockVal;
+
             document.getElementById('itemMinStockNew').value = item.minStock || '';
             
             // 📏 Populate units container with existing units
@@ -16853,7 +16896,7 @@ function loadCustomersToSelect() {
                 }
             }
             
-            const addButton = document.querySelector('#addItem .btn-primary');
+            const addButton = document.querySelector('#addItem .btn-add');
             if (addButton) {
                 addButton.textContent = '💾 تحديث الصنف';
                 addButton.onclick = function() { updateItemNew(id); };
