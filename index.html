@@ -917,6 +917,32 @@
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
+/* ===== أنماط الجداول الموحدة للتقارير ===== */
+.report-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.report-summary-table td {
+    padding: 12px;
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.report-summary-table td.label {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #2c3e50;
+    width: 20%;
+}
+
+.report-summary-table td.value {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
 /* ===== نهاية أنماط الإشعارات ===== */
 
 /* ===== أنماط نظام الحوار الاحترافي (Confirm Dialog) ===== */
@@ -4752,7 +4778,7 @@ textarea.editing-mode {
                 </button>
                 <button class="btn-secondary" onclick="closeEditActivityModal()" 
                         style="flex: 1; padding: 15px; font-size: 1.1em; font-weight: 600; border-radius: 12px; transition: all 0.3s ease; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); color: white; box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);">
-                    ❌ إلغاء
+                     إلغاء
                 </button>
             </div>
         </div>
@@ -5202,7 +5228,7 @@ textarea.editing-mode {
                 
                 <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">
                     <button class="btn-primary" onclick="saveWarehouse()" style="padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💾 حفظ المستودع</button>
-                    <button class="btn-secondary" onclick="closeWarehouseModal()" style="padding: 12px 30px;">❌ إلغاء</button>
+                    <button class="btn-secondary" onclick="closeWarehouseModal()" style="padding: 12px 30px;"> إلغاء</button>
                 </div>
             </div>
         </div>
@@ -5211,7 +5237,10 @@ textarea.editing-mode {
 <div id="items" class="section">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>📦 إدارة الأصناف <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatItems" class="stat-mini-number">0</span></span></h2>
-        <button type="button" class="btn-primary" onclick="openAddItemForm()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">اضافة صنف جديد</button>
+        <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-primary" onclick="openStockTransferModal()" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">🔄 تحويل بين المستودعات</button>
+            <button type="button" class="btn-primary" onclick="openAddItemForm()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">اضافة صنف جديد</button>
+        </div>
     </div>
     
     <div class="search-container">
@@ -5277,7 +5306,7 @@ textarea.editing-mode {
 <div id="addItem" class="section">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>➕ إضافة صنف جديد</h2>
-        <button type="button" class="btn-secondary" onclick="showSection('items')">❌ إلغاء</button>
+        <button type="button" class="btn-secondary" onclick="showSection('items')"> إلغاء</button>
     </div>
     
     <div class="form-grid grid-3">
@@ -5309,7 +5338,7 @@ textarea.editing-mode {
     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #667eea;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0; color: #667eea;">📏 وحدات القياس المتعددة</h3>
-            <button type="button" class="btn-primary" onclick="addUnitRow()" style="padding: 8px 16px; background: #667eea; border-color: #667eea;">➕ إضافة وحدة</button>
+            <button type="button" class="btn-primary" onclick="addUnitRow()" style="padding: 8px 16px; background: #667eea; border-color: #667eea;"> إضافة وحدة</button>
         </div>
         
         <div id="unitsContainer">
@@ -5524,7 +5553,7 @@ textarea.editing-mode {
             
             <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">
                 <button class="btn-primary" onclick="saveManualPermission()" style="padding: 12px 30px;">💾 حفظ الإذن</button>
-                <button class="btn-secondary" onclick="closeManualPermissionModal()" style="padding: 12px 30px;">❌ إلغاء</button>
+                <button class="btn-secondary" onclick="closeManualPermissionModal()" style="padding: 12px 30px;"> إلغاء</button>
             </div>
         </div>
     </div>
@@ -5603,6 +5632,67 @@ textarea.editing-mode {
 </div>
 
 <!-- Modal for Inventory Counting -->
+<div id="stockTransferModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; overflow-y: auto;">
+    <div class="modal-content" style="max-width: 95%; width: 900px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #17a2b8; padding-bottom: 15px;">
+            <h2 style="margin: 0; color: #17a2b8;">🔄 تحويل مخزني بين المستودعات</h2>
+            <button onclick="closeStockTransferModal()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 16px;">✖</button>
+        </div>
+        
+        <div class="form-grid grid-3" style="margin-bottom: 20px;">
+            <div>
+                <label>تاريخ التحويل *</label>
+                <input type="date" id="transferDate" required>
+            </div>
+            <div>
+                <label>من المستودع (المصدر) *</label>
+                <select id="sourceWarehouse" required onchange="updateTransferItemsStock()">
+                    <option value="">اختر المستودع</option>
+                </select>
+            </div>
+            <div>
+                <label>إلى المستودع (الوجهة) *</label>
+                <select id="destWarehouse" required>
+                    <option value="">اختر المستودع</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>ملاحظات</label>
+            <textarea id="transferNotes" rows="2" placeholder="ملاحظات حول عملية التحويل..."></textarea>
+        </div>
+        
+        <div style="margin-bottom: 15px; background: #e0f7fa; padding: 15px; border-radius: 8px; border-right: 4px solid #00bcd4;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #006064;">📦 الأصناف المراد تحويلها</h3>
+                <button type="button" class="btn-primary" onclick="addTransferItemRow()" style="padding: 8px 15px; font-size: 14px;">➕ إضافة صنف</button>
+            </div>
+        </div>
+        
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 20px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #f8f9fa; position: sticky; top: 0;">
+                    <tr>
+                        <th style="padding: 12px; text-align: right; border-bottom: 2px solid #dee2e6;">الصنف</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6; width: 120px;">الرصيد الحالي</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6; width: 120px;">الكمية المحولة</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6; width: 60px;">حذف</th>
+                    </tr>
+                </thead>
+                <tbody id="transferItemsList">
+                    <!-- Items will be added here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 20px;">
+            <button type="button" class="btn-secondary" onclick="closeStockTransferModal()">إلغاء</button>
+            <button type="button" class="btn-primary" onclick="saveStockTransfer()" style="background: #17a2b8;">💾 حفظ التحويل</button>
+        </div>
+    </div>
+</div>
+
 <div id="inventoryModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; overflow-y: auto;">
     <div class="modal-content" style="max-width: 95%; width: 1400px; max-height: 90vh; overflow-y: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #667eea; padding-bottom: 15px;">
@@ -5666,7 +5756,7 @@ textarea.editing-mode {
         
         <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">
             <button class="btn-primary" onclick="saveInventoryAdjustment()" style="padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💾 حفظ وتطبيق التسويات</button>
-            <button class="btn-secondary" onclick="closeInventoryModal()" style="padding: 12px 40px;">❌ إلغاء</button>
+            <button class="btn-secondary" onclick="closeInventoryModal()" style="padding: 12px 40px;"> إلغاء</button>
         </div>
     </div>
 </div>
@@ -5771,7 +5861,7 @@ textarea.editing-mode {
                 <th class="sortable" data-column="address">العنوان</th>
                 <th>الإجراءات</th>
             </tr>
-        </thead>
+        </thead>حل
         <tbody id="suppliersList"></tbody>
     </table>
 </div>
@@ -5779,7 +5869,7 @@ textarea.editing-mode {
 <div id="purchasesManagement" class="section">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>📋 إدارة فواتير المشتريات</h2>
-        <button type="button" class="btn-primary" onclick="showSection('purchases'); newPurchase();" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">➕ إنشاء فاتورة شراء جديدة</button>
+        <button type="button" class="btn-primary" onclick="showSection('purchases'); newPurchase();" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);"> إنشاء فاتورة شراء جديدة</button>
     </div>
 
     <div class="search-container">
@@ -5922,7 +6012,7 @@ textarea.editing-mode {
     
    <div style="display: flex; gap: 10px; margin-top: 20px; align-items: center; flex-wrap: wrap;">
     <button class="btn-primary" id="savePurchaseBtn" onclick="savePurchase()" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 12px 40px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s ease;">💾 حفظ الفاتورة</button>
-    <button class="btn-secondary" onclick="showSection('purchasesManagement')" style="padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">❌ إلغاء</button>
+    <button class="btn-secondary" onclick="showSection('purchasesManagement')" style="padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;"> إلغاء</button>
 
     <input type="file" id="purchaseAttachment" accept="image/*,application/pdf" style="flex: 1; min-width: 250px; padding: 10px; border: 2px dashed var(--primary-color); background: #f8f9fa;">
 </div>
@@ -5931,7 +6021,7 @@ textarea.editing-mode {
 <div id="salesManagement" class="section">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>📋 إدارة الفواتير</h2>
-        <button type="button" class="btn-primary" onclick="showSection('sales')" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">➕ إنشاء فاتورة جديدة</button>
+        <button type="button" class="btn-primary" onclick="showSection('sales')" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);"> إنشاء فاتورة جديدة</button>
     </div>
     
     <div class="search-container">
@@ -5998,7 +6088,7 @@ textarea.editing-mode {
             <h2>💰 فواتير المبيعات <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatSales" class="stat-mini-number">0</span></span></h2>
             <p style="margin-bottom: 0;">📈 هنا يمكنك إدارة فواتير المبيعات وتحديث المخزون تلقائياً</p>
         </div>
-        <button class="btn-secondary" onclick="showSection('salesManagement')">❌ إلغاء والعودة</button>
+        <button class="btn-secondary" onclick="showSection('salesManagement')"> إلغاء والعودة</button>
     </div>
     
     <div class="form-grid grid-4">
@@ -6574,6 +6664,110 @@ textarea.editing-mode {
     </div>
 </div>
 
+<div id="treasury" class="section">
+    <h2>🏦 خزائن وحسابات بنكية</h2>
+    <p>إدارة الصناديق النقدية والحسابات البنكية والتحويلات الداخلية</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTreasuryTab('accounts')">📋 قائمة الحسابات</button>
+        <button class="tab-btn" onclick="showTreasuryTab('transfer')">💸 تحويل داخلي</button>
+    </div>
+
+    <!-- تبويب قائمة الحسابات -->
+    <div id="treasury-accounts-tab" class="tab-content active" style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>أرصدة الخزائن والبنوك</h3>
+            <button class="btn-primary" onclick="openAddTreasuryAccountModal()">➕ إضافة حساب جديد</button>
+        </div>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>اسم الحساب</th>
+                        <th>النوع</th>
+                        <th>الرصيد الحالي</th>
+                    </tr>
+                </thead>
+                <tbody id="treasuryAccountsTableBody">
+                    <!-- سيتم تعبئة البيانات هنا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- تبويب التحويل الداخلي -->
+    <div id="treasury-transfer-tab" class="tab-content" style="display: none; margin-top: 20px;">
+        <div class="form-container" style="max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h3 style="text-align: center; margin-bottom: 20px; color: var(--primary-color);">💸 تحويل نقدية بين الحسابات</h3>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>من حساب (المصدر) *</label>
+                <select id="transferFromAccount" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    <option value="">اختر الحساب...</option>
+                </select>
+                <small id="transferFromBalance" style="color: #666; display: block; margin-top: 5px;"></small>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>إلى حساب (المستلم) *</label>
+                <select id="transferToAccount" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    <option value="">اختر الحساب...</option>
+                </select>
+            </div>
+
+            <div class="form-grid grid-2" style="gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label>المبلغ *</label>
+                    <input type="number" id="transferAmount" class="form-control" min="0.01" step="0.01" placeholder="0.00" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                </div>
+                <div>
+                    <label>التاريخ *</label>
+                    <input type="date" id="transferDate" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>ملاحظات</label>
+                <textarea id="transferNotes" class="form-control" rows="3" placeholder="سبب التحويل..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="processInternalTransfer()" style="width: 100%; padding: 12px; font-size: 1.1em;">✅ تنفيذ التحويل</button>
+        </div>
+    </div>
+</div>
+
+<!-- مودال إضافة حساب جديد -->
+<div id="addTreasuryAccountModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div class="modal-content" style="background-color: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+        <h3 style="margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">➕ إضافة حساب مالي جديد</h3>
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>نوع الحساب *</label>
+            <select id="newAccountType" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <option value="cash">💰 صندوق نقدي (Cash)</option>
+                <option value="bank">🏦 حساب بنكي (Bank)</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>اسم الحساب *</label>
+            <input type="text" id="newAccountName" class="form-control" placeholder="مثال: صندوق الفرع 2 / بنك الراجحي" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>الرصيد الافتتاحي</label>
+            <input type="number" id="newAccountBalance" class="form-control" placeholder="0.00" min="0" step="0.01" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            <small style="color: #666;">سيتم إنشاء قيد افتتاحي تلقائياً لهذا الرصيد</small>
+        </div>
+
+        <div class="form-grid grid-2" style="margin-top: 25px; gap: 10px;">
+            <button class="btn-success" onclick="saveNewTreasuryAccount()" style="padding: 12px;">💾 حفظ</button>
+            <button class="btn-secondary" onclick="document.getElementById('addTreasuryAccountModal').style.display='none'" style="padding: 12px;"> إلغاء</button>
+        </div>
+    </div>
+</div>
+
 <div id="revenues" class="section">
     <h2>💰 إدارة الإيرادات <span class="title-stat-card"><span class="stat-mini-label">الإجمالي:</span><span id="miniStatRevenues" class="stat-mini-number">0</span></span></h2>
     <p>💵 هنا يمكنك إدارة وتصنيف الإيرادات المختلفة</p>
@@ -6778,7 +6972,7 @@ textarea.editing-mode {
                     💾 حفظ
                 </button>
                 <button onclick="closeAddEmployee()" class="btn-secondary">
-                    ❌ إلغاء
+                     إلغاء
                 </button>
             </div>
         </div>
@@ -9652,7 +9846,7 @@ if (typeof window !== 'undefined') {
 // ========================================
 let activities = [];
 // currentActivityId already defined early in script
-let items = [], customers = [], suppliers = [], purchases = [], sales = [], expenses = [], revenues = [], salaries = [], assets = [];
+let items = [], customers = [], suppliers = [], purchases = [], sales = [], expenses = [], revenues = [], salaries = [], assets = [], bonds = [];
 let branches = []; // 🏢 الفروع/المستودعات - جديد
 var warehouses = []; // 🏭 المستودعات - متزامن مع branches
 let advances = [];
@@ -10552,6 +10746,9 @@ async function initializeApp() {
         const firebaseInventoryAdjustments = await firebaseGetActivityData(currentActivityId, 'inventoryAdjustments') || [];
         console.log(`📦 تم تحميل ${firebaseInventoryAdjustments.length} عملية جرد من Firebase`);
         
+        const firebaseBonds = await firebaseGetActivityData(currentActivityId, 'bonds') || [];
+        console.log(`📋 تم تحميل ${firebaseBonds.length} سند من Firebase`);
+        
         // تعيين البيانات من Firebase مباشرة
         items = firebaseItems || [];
         customers = firebaseCustomers || [];
@@ -10572,6 +10769,7 @@ async function initializeApp() {
         purchasePayments = firebasePurchasePayments || [];
         permissions = firebasePermissions || [];
         inventoryAdjustments = firebaseInventoryAdjustments || [];
+        bonds = firebaseBonds || [];
         
         // 📒 تحميل القيود المحاسبية من Firebase
         journalEntries = firebaseJournalEntries || [];
@@ -10614,6 +10812,7 @@ async function initializeApp() {
         purchasePayments = (loadFromLocalStorage('purchasePayments')) || [];
         permissions = (loadFromLocalStorage('permissions')) || [];
         inventoryAdjustments = (loadFromLocalStorage('inventoryAdjustments')) || [];
+        bonds = (loadFromLocalStorage('bonds')) || [];
         console.log('🔍 After loading inventoryAdjustments from localStorage:', inventoryAdjustments);
         console.log('🔍 inventoryAdjustments length:', inventoryAdjustments.length);
         window.inventoryAdjustments = inventoryAdjustments; // 🌐 Make globally accessible
@@ -13423,7 +13622,8 @@ loadSavedEmailSettings();
                 { name: 'الأصول', key: 'assets', data: assets },
                 { name: 'مرتجعات المبيعات', key: 'salesReturns', data: salesReturns },
                 { name: 'مرتجعات المشتريات', key: 'purchaseReturns', data: purchaseReturns },
-                { name: 'العهد والسلف', key: 'advances', data: advances }
+                { name: 'العهد والسلف', key: 'advances', data: advances },
+                { name: 'السندات', key: 'bonds', data: bonds }
             ];
 
             const totalItems = dataTypes.reduce((sum, type) => sum + (type.data ? type.data.length : 0), 0);
@@ -14246,6 +14446,7 @@ loadSavedEmailSettings();
                     id: 'finance', 
                     label: '💼 المالية',
                     subsections: [
+                        { id: 'treasury', label: '🏦 خزائن وحسابات بنكية' },
                         { id: 'revenues', label: '💰 إيرادات أخرى' },
                         { id: 'expenses', label: '💸 المصروفات' },
                         { id: 'bonds', label: '📄 السندات' },
@@ -14847,6 +15048,7 @@ function getLast7Days() {
         if (revenueDateEl) revenueDateEl.value = new Date().toISOString().split('T')[0];
     } else if (sectionId === 'bonds') {
         renderBonds();
+        updateBondPartySelect();
         const bondDateEl = document.getElementById('bondDate');
         if (bondDateEl) bondDateEl.value = new Date().toISOString().split('T')[0];
     } else if (sectionId === 'salaries') {
@@ -16379,7 +16581,7 @@ function searchCustomers() {
                     <input type="number" class="unit-price" placeholder="0.00" min="0" step="0.01" required style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; width: 100%;">
                 </div>
                 <div style="display: flex; align-items: flex-end;">
-                    <button type="button" class="btn-danger" onclick="removeUnitRow(${unitRowCounter})" style="padding: 10px; width: 100%;">🗑️</button>
+                    <button type="button" onclick="removeUnitRow(${unitRowCounter})" style="padding: 8px; width: 100%; background: transparent; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; color: #999; font-size: 18px; transition: all 0.2s;" onmouseover="this.style.background='#ffebee'; this.style.color='#d32f2f'; this.style.borderColor='#d32f2f';" onmouseout="this.style.background='transparent'; this.style.color='#999'; this.style.borderColor='#ddd';">✕</button>
                 </div>
             `;
             
@@ -19637,7 +19839,7 @@ function loadCustomersToSelect() {
                         </div>
                         <div class="modal-footer">
                             <button class="btn-primary" onclick="savePayment(${invoiceId}, '${type}')">💾 حفظ الدفعة</button>
-                            <button class="btn-secondary" onclick="closePaymentModal()">❌ إلغاء</button>
+                            <button class="btn-secondary" onclick="closePaymentModal()"> إلغاء</button>
                         </div>
                     </div>
                 </div>
@@ -19779,10 +19981,18 @@ function loadCustomersToSelect() {
             
             // تحديث الواجهة
             if (type === 'sale') {
+                console.log('Updating Sales UI...');
+                if (typeof renderSalesManagement === 'function') renderSalesManagement();
                 renderSalesList();
+                if (typeof renderCustomerPayments === 'function') renderCustomerPayments();
             } else {
+                console.log('Updating Purchases UI...');
                 renderPurchasesList();
+                if (typeof renderSupplierPayments === 'function') renderSupplierPayments();
             }
+            
+            // تحديث لوحة المعلومات
+            if (typeof updateDashboard === 'function') updateDashboard();
             updateDashboard();
         }
         window.savePayment = savePayment;
@@ -20002,6 +20212,30 @@ function loadCustomersToSelect() {
                 });
             });
             
+            // إضافة سندات القبض من قسم السندات
+            if (typeof bonds !== 'undefined' && bonds.length > 0) {
+                const receiptBonds = bonds.filter(bond => bond.type === 'receipt' && bond.partyType === 'customer');
+                receiptBonds.forEach(bond => {
+                    // Find customer directly using partyId
+                    const customer = customers.find(c => c.id === bond.partyId);
+                    const customerName = customer ? customer.name : (bond.partyName || 'غير معروف');
+                    
+                    allPayments.push({
+                        id: `BOND-${bond.id}`,
+                        invoiceId: bond.partyId, // Customer ID
+                        invoiceNumber: `سند قبض #${bond.number || bond.id}`,
+                        amount: bond.amount,
+                        method: bond.method || 'cash',
+                        date: bond.date,
+                        type: 'bond',
+                        reference: bond.reference || '',
+                        notes: bond.description || 'سند قبض',
+                        createdAt: bond.createdAt || bond.date,
+                        customerName: customerName // Store customer name directly in payment object
+                    });
+                });
+            }
+            
             return allPayments;
         }
         
@@ -20049,11 +20283,18 @@ function loadCustomersToSelect() {
             const sortedPayments = [...displayPayments].sort((a, b) => new Date(b.date) - new Date(a.date));
             
             sortedPayments.forEach(payment => {
-                const sale = sales.find(s => s.id === payment.invoiceId);
-                const customer = sale ? customers.find(c => c.id === sale.customerId) : null;
+                // For bonds, use the stored customer name directly
+                let customerName, invoiceNumber;
                 
-                const customerName = customer ? customer.name : 'غير معروف';
-                const invoiceNumber = sale ? `SAL${sale.number.toString().padStart(3, '0')}` : '-';
+                if (payment.type === 'bond') {
+                    customerName = payment.customerName || 'غير معروف';
+                    invoiceNumber = payment.invoiceNumber; // Already formatted as "سند قبض #X"
+                } else {
+                    const sale = sales.find(s => s.id === payment.invoiceId);
+                    const customer = sale ? customers.find(c => c.id === sale.customerId) : null;
+                    customerName = customer ? customer.name : 'غير معروف';
+                    invoiceNumber = sale ? `SAL${sale.number.toString().padStart(3, '0')}` : '-';
+                }
                 
                 const getPaymentMethodDisplay = (method) => {
                     switch(method) {
@@ -20066,6 +20307,8 @@ function loadCustomersToSelect() {
                 
                 const paymentTypeDisplay = payment.type === 'initial' ? 
                     '<span style="background: #e3f2fd; color: #1976d2; padding: 3px 8px; border-radius: 4px; font-size: 0.85em;">🔵 أولية</span>' :
+                    payment.type === 'bond' ?
+                    '<span style="background: #e8f5e9; color: #2e7d32; padding: 3px 8px; border-radius: 4px; font-size: 0.85em;">📝 سند قبض</span>' :
                     '<span style="background: #fff3e0; color: #f57c00; padding: 3px 8px; border-radius: 4px; font-size: 0.85em;">🟠 إضافية</span>';
                 
                 // Format Transaction ID: show only last 6 characters with full ID in tooltip
@@ -20488,26 +20731,18 @@ function loadCustomersToSelect() {
     
     <script>
         window.onload = function() {
-            window.print();
+            // Short delay to ensure styles are loaded
+            setTimeout(function() {
+                window.focus();
+                window.print();
+            }, 500);
         };
-        
-        // إغلاق النافذة تلقائياً بعد الطباعة أو الإلغاء
+
+        // This event fires after the print dialog is closed (Print or Cancel)
         window.onafterprint = function() {
             window.close();
         };
-        
-        // للمتصفحات القديمة - إغلاق بعد فترة قصيرة
-        setTimeout(function() {
-            if (window.matchMedia) {
-                const mediaQueryList = window.matchMedia('print');
-                mediaQueryList.addListener(function(mql) {
-                    if (!mql.matches) {
-                        window.close();
-                    }
-                });
-            }
-        }, 100);
-    <\/script>
+    </script>
 </body>
 </html>`;
             
@@ -21636,7 +21871,7 @@ function loadCustomersToSelect() {
         }
 
         // ===== Bonds Functions =====
-        let bonds = loadFromLocalStorage('bonds') || [];
+        // bonds is now declared globally at the top
 
         function renderBonds() {
             const tbody = document.getElementById('bondsList');
@@ -21711,9 +21946,13 @@ function loadCustomersToSelect() {
                 }
             }
             
+            // Calculate new number based on max existing number to avoid duplicates
+            const maxNumber = bonds.length > 0 ? Math.max(...bonds.map(b => b.number)) : 0;
+            const newBondNumber = maxNumber + 1;
+
             const newBond = {
                 id: Date.now(),
-                number: bonds.length + 1,
+                number: newBondNumber,
                 date,
                 type,
                 amount,
@@ -21783,50 +22022,297 @@ function loadCustomersToSelect() {
 
         function printBond(id) {
             const bond = bonds.find(b => b.id === id);
-            if (!bond) return;
+            if (!bond) {
+                showNotification('❌ خطأ', 'لم يتم العثور على السند', 'error');
+                return;
+            }
+            
+            // Fetch activity name dynamically
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'المنشأة';
+            
+            const title = bond.type === 'receipt' ? 'سند قبض' : 'سند صرف';
+            const subtitle = bond.type === 'receipt' ? 'RECEIPT VOUCHER' : 'PAYMENT VOUCHER';
+            const partyLabel = bond.type === 'receipt' ? 'استلمنا من السيد/ة:' : 'صرفنا للسيد/ة:';
+            
+            const getPaymentMethodDisplay = (method) => {
+                switch(method) {
+                    case 'cash': return 'كاش';
+                    case 'bank': return 'بنك';
+                    case 'check': return 'شيك';
+                    default: return method || 'كاش';
+                }
+            };
             
             const printWindow = window.open('', '_blank', 'width=800,height=600');
-            const title = bond.type === 'receipt' ? 'سند قبض' : 'سند صرف';
             
             printWindow.document.write(`
-                <html dir="rtl">
-                <head>
-                    <title>${title} #${bond.number}</title>
-                    <style>
-                        body { font-family: Tahoma, sans-serif; padding: 20px; }
-                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-                        .content { margin: 20px 0; }
-                        .row { margin: 15px 0; font-size: 18px; }
-                        .label { font-weight: bold; width: 120px; display: inline-block; }
-                        .footer { margin-top: 50px; display: flex; justify-content: space-between; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>${title}</h1>
-                        <h3>رقم: ${bond.number}</h3>
-                    </div>
-                    <div class="content">
-                        <div class="row"><span class="label">التاريخ:</span> ${bond.date}</div>
-                        <div class="row"><span class="label">المبلغ:</span> ${bond.amount.toFixed(2)} ريال</div>
-                        <div class="row"><span class="label">الطرف:</span> ${bond.partyName || '-'}</div>
-                        <div class="row"><span class="label">البيان:</span> ${bond.description || '-'}</div>
-                    </div>
-                    <div class="footer">
-                        <div>المستلم</div>
-                        <div>المحاسب</div>
-                        <div>المدير</div>
-                    </div>
-                    <script>window.print(); window.onafterprint = function(){ window.close(); };<\/script>
-                </body>
-                </html>
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} #${bond.number}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .receipt-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border: 2px solid #1976d2;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 3px solid #1976d2;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .receipt-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+        .receipt-body {
+            margin: 30px 0;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .receipt-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 150px;
+        }
+        .receipt-value {
+            text-align: left;
+            color: #333;
+            flex: 1;
+        }
+        .amount-row {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #1976d2;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .amount-row .receipt-value {
+            color: #1976d2;
+        }
+        .receipt-footer {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .signature-section {
+            flex: 1;
+        }
+        .signature-box {
+            margin-top: 10px;
+        }
+        .signature-line {
+            border-top: 2px solid #333;
+            margin-top: 50px;
+            padding-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+            .receipt-container {
+                border: none;
+                padding: 20px;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <div class="company-name">${activityName}</div>
+            <div class="receipt-title">${title}</div>
+            <div style="margin-top: 10px; color: #666;">${subtitle}</div>
+        </div>
+        
+        <div class="receipt-body">
+            <div class="receipt-row">
+                <span class="receipt-label">رقم السند:</span>
+                <span class="receipt-value">${bond.number || bond.id}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">التاريخ:</span>
+                <span class="receipt-value">${bond.date}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">${partyLabel}</span>
+                <span class="receipt-value">${bond.partyName || '-'}</span>
+            </div>
+            <div class="receipt-row amount-row">
+                <span class="receipt-label">مبلغ وقدره:</span>
+                <span class="receipt-value">${bond.amount.toFixed(2)} ريال سعودي</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">طريقة الدفع:</span>
+                <span class="receipt-value">${getPaymentMethodDisplay(bond.method)}</span>
+            </div>
+            ${bond.reference ? `
+            <div class="receipt-row">
+                <span class="receipt-label">رقم المرجع:</span>
+                <span class="receipt-value">${bond.reference}</span>
+            </div>
+            ` : ''}
+            ${bond.description ? `
+            <div class="receipt-row">
+                <span class="receipt-label">البيان:</span>
+                <span class="receipt-value">${bond.description}</span>
+            </div>
+            ` : ''}
+        </div>
+        
+        <div class="receipt-footer">
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="signature-line">${bond.type === 'receipt' ? 'توقيع المستلم' : 'توقيع المستلم'}</div>
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="signature-line">توقيع المحاسب</div>
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="signature-line">توقيع المدير</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            // Short delay to ensure styles are loaded
+            setTimeout(function() {
+                window.focus();
+                window.print();
+            }, 500);
+        };
+
+        // This event fires after the print dialog is closed (Print or Cancel)
+        window.onafterprint = function() {
+            window.close();
+        };
+    </script>
+</body>
+</html>
             `);
             printWindow.document.close();
         }
 
         async function createBondJournalEntry(bond) {
-            // Placeholder for journal entry creation
-            console.log('Creating journal entry for bond:', bond);
+            // 1. Identify Accounts
+            // Cash/Bank Account: Default to '1111' (Main Cash Box)
+            const cashAccountCode = '1111'; 
+            let partyAccountCode = '';
+            
+            // Map party type to account code
+            if (bond.partyType === 'customer') {
+                partyAccountCode = '1131'; // General Customers
+            } else if (bond.partyType === 'supplier') {
+                partyAccountCode = '2111'; // General Suppliers
+            } else if (bond.partyType === 'employee') {
+                partyAccountCode = '1151'; // Employee Advances
+            } else {
+                console.warn('⚠️ نوع الطرف غير معروف للسند:', bond.partyType);
+                // Fallback or return? For now, let's return to avoid bad entries
+                return;
+            }
+
+            // Helper to get account name safely from global chartOfAccounts
+            const getAccountName = (code) => {
+                const acc = chartOfAccounts.find(a => a.code === code);
+                return acc ? acc.name : (code === '1111' ? 'الصندوق الرئيسي' : 'حساب عام');
+            };
+
+            const cashAccountName = getAccountName(cashAccountCode);
+            const partyAccountName = getAccountName(partyAccountCode);
+
+            // 2. Determine Debit/Credit based on Bond Type
+            let entries = [];
+            
+            if (bond.type === 'receipt') {
+                // Receipt (قبض): Debit Cash (1111), Credit Party
+                entries = [
+                    {
+                        accountCode: cashAccountCode,
+                        accountName: cashAccountName,
+                        debit: bond.amount,
+                        credit: 0
+                    },
+                    {
+                        accountCode: partyAccountCode,
+                        accountName: partyAccountName,
+                        debit: 0,
+                        credit: bond.amount
+                    }
+                ];
+            } else if (bond.type === 'payment') {
+                // Payment (صرف): Debit Party, Credit Cash (1111)
+                entries = [
+                    {
+                        accountCode: partyAccountCode,
+                        accountName: partyAccountName,
+                        debit: bond.amount,
+                        credit: 0
+                    },
+                    {
+                        accountCode: cashAccountCode,
+                        accountName: cashAccountName,
+                        debit: 0,
+                        credit: bond.amount
+                    }
+                ];
+            } else {
+                console.warn('⚠️ نوع السند غير معروف:', bond.type);
+                return;
+            }
+
+            // 3. Execution
+            const description = `سند ${bond.type === 'receipt' ? 'قبض' : 'صرف'} رقم ${bond.number} - ${bond.partyName}`;
+            
+            const journalEntryData = {
+                date: bond.date,
+                description: description,
+                reference: `BOND-${bond.number}`,
+                referenceType: 'bond',
+                entries: entries,
+                total: bond.amount,
+                createdBy: window.currentUser?.name || 'النظام',
+                notes: bond.description || ''
+            };
+
+            console.log('Creating journal entry for bond:', journalEntryData);
+            await createJournalEntry(journalEntryData);
         }
 
         // ===== Employees Functions =====
@@ -23459,6 +23945,7 @@ function clearSalaryForm() {
         
         // دالة كشف حساب الموردين
         function generateSuppliersStatement(fromDate, toDate) {
+            let summaryHTML = '';
             const specificSupplierId = document.getElementById('specificSupplierFilter').value;
             
             let filteredPurchases = purchases.filter(p => 
@@ -23476,8 +23963,18 @@ function clearSalaryForm() {
             let totalPaid = 0;
             let totalRemaining = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            
+            // Determine Report Title
+            let reportTitle = '<h3>📦 كشف حساب الموردين</h3>';
+            if (specificSupplierId !== 'all') {
+                const supplier = suppliers.find(s => s.id == specificSupplierId);
+                if (supplier) {
+                    reportTitle = `<h3>📦 كشف حساب المورد / ${supplier.name}</h3>`;
+                }
+            }
+
             let tableHTML = `
-                <h3>📦 كشف حساب الموردين</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -23518,41 +24015,26 @@ function clearSalaryForm() {
                 </table>
             `;
             
-            const summaryHTML = `
-                <div class="dashboard-cards">
-                    <div class="dashboard-card customers">
-                        <div class="card-value">${totalPurchases.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المشتريات</div>
-                        <div class="card-growth">
-                            <span>+8%</span>
-                            <span class="growth-icon">📦</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card profit">
-                        <div class="card-value">${totalPaid.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المدفوع</div>
-                        <div class="card-growth">
-                            <span>+12%</span>
-                            <span class="growth-icon">✅</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card revenue">
-                        <div class="card-value">${totalRemaining.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المتبقي</div>
-                        <div class="card-growth">
-                            <span>${totalRemaining > 0 ? '-5%' : '+15%'}</span>
-                            <span class="growth-icon">${totalRemaining > 0 ? '⏳' : '🎉'}</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card sales-today">
-                        <div class="card-value">${filteredPurchases.length}</div>
-                        <div class="card-title">عدد المشتريات</div>
-                        <div class="card-growth">
-                            <span>+5%</span>
-                            <span class="growth-icon">📋</span>
-                        </div>
-                    </div>
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    ${reportTitle}
                 </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">عدد المشتريات</td>
+                            <td class="value">${filteredPurchases.length}</td>
+                            <td class="label">إجمالي المشتريات</td>
+                            <td class="value">${totalPurchases.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">إجمالي المدفوع</td>
+                            <td class="value" style="color: var(--success-color);">${totalPaid.toFixed(2)}</td>
+                            <td class="label">إجمالي المتبقي</td>
+                            <td class="value" style="color: ${totalRemaining > 0 ? 'var(--accent-color)' : 'var(--success-color)'};">${totalRemaining.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
             
             document.getElementById('statementSummary').innerHTML = summaryHTML;
@@ -23561,6 +24043,7 @@ function clearSalaryForm() {
         
         // دالة كشف حساب العملاء - محدّثة لنظام الدفعات
         function generateCustomersStatement(fromDate, toDate) {
+            let summaryHTML = '';
             const specificCustomerId = document.getElementById('specificCustomerFilter').value;
             
             let filteredSales = sales.filter(s => 
@@ -23578,8 +24061,18 @@ function clearSalaryForm() {
             let totalPaid = 0;
             let totalRemaining = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            
+            // Determine Report Title
+            let reportTitle = '<h3>👥 كشف حساب العملاء</h3>';
+            if (specificCustomerId !== 'all') {
+                const customer = customers.find(c => c.id == specificCustomerId);
+                if (customer) {
+                    reportTitle = `<h3>👥 كشف حساب العميل / ${customer.name}</h3>`;
+                }
+            }
+
             let tableHTML = `
-                <h3>👥 كشف حساب العملاء (مع نظام الدفعات المحسّن)</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -23623,41 +24116,26 @@ function clearSalaryForm() {
                 </table>
             `;
             
-            const summaryHTML = `
-                <div class="dashboard-cards">
-                    <div class="dashboard-card customers">
-                        <div class="card-value">${totalSales.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المبيعات</div>
-                        <div class="card-growth">
-                            <span>💰</span>
-                            <span class="growth-icon">📈</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card profit">
-                        <div class="card-value">${totalPaid.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المدفوع</div>
-                        <div class="card-growth">
-                            <span>✅</span>
-                            <span class="growth-icon">💵</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card revenue">
-                        <div class="card-value">${totalRemaining.toFixed(2)}</div>
-                        <div class="card-title">إجمالي المتبقي</div>
-                        <div class="card-growth">
-                            <span>${totalRemaining > 0 ? '⏳' : '🎉'}</span>
-                            <span class="growth-icon">${totalRemaining > 0 ? '⚠️' : '✅'}</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card sales-today">
-                        <div class="card-value">${filteredSales.length}</div>
-                        <div class="card-title">عدد المبيعات</div>
-                        <div class="card-growth">
-                            <span>📋</span>
-                            <span class="growth-icon">🔢</span>
-                        </div>
-                    </div>
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    ${reportTitle}
                 </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">عدد المبيعات</td>
+                            <td class="value">${filteredSales.length}</td>
+                            <td class="label">إجمالي المبيعات</td>
+                            <td class="value">${totalSales.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">إجمالي المدفوع</td>
+                            <td class="value" style="color: var(--success-color);">${totalPaid.toFixed(2)}</td>
+                            <td class="label">إجمالي المتبقي</td>
+                            <td class="value" style="color: ${totalRemaining > 0 ? 'var(--accent-color)' : 'var(--success-color)'};">${totalRemaining.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
             
             document.getElementById('statementSummary').innerHTML = summaryHTML;
@@ -23666,6 +24144,7 @@ function clearSalaryForm() {
         
         // دالة كشف حساب الموظفين
         function generateEmployeesStatement(fromDate, toDate) {
+            let summaryHTML = '';
             const specificEmployee = document.getElementById('specificEmployeeFilter').value;
             
             let filteredSalaries = salaries.filter(s => 
@@ -23684,8 +24163,15 @@ function clearSalaryForm() {
             let totalDeductions = 0;
             let totalNet = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            
+            // Determine Report Title
+            let reportTitle = '<h3>👷 كشف حساب الموظفين</h3>';
+            if (specificEmployee !== 'all') {
+                reportTitle = `<h3>👷 كشف حساب الموظف / ${specificEmployee}</h3>`;
+            }
+
             let tableHTML = `
-                <h3>👷 كشف حساب الموظفين</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -23727,41 +24213,26 @@ function clearSalaryForm() {
                 </table>
             `;
             
-            const summaryHTML = `
-                <div class="dashboard-cards">
-                    <div class="dashboard-card customers">
-                        <div class="card-value">${totalBasic.toFixed(2)}</div>
-                        <div class="card-title">إجمالي الرواتب الأساسية</div>
-                        <div class="card-growth">
-                            <span>+5%</span>
-                            <span class="growth-icon">💼</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card profit">
-                        <div class="card-value">${totalAllowances.toFixed(2)}</div>
-                        <div class="card-title">إجمالي البدلات</div>
-                        <div class="card-growth">
-                            <span>+10%</span>
-                            <span class="growth-icon">🎁</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card revenue">
-                        <div class="card-value">${totalDeductions.toFixed(2)}</div>
-                        <div class="card-title">إجمالي الاستقطاعات</div>
-                        <div class="card-growth">
-                            <span>-3%</span>
-                            <span class="growth-icon">📉</span>
-                        </div>
-                    </div>
-                    <div class="dashboard-card sales-today">
-                        <div class="card-value">${totalNet.toFixed(2)}</div>
-                        <div class="card-title">إجمالي صافي الرواتب</div>
-                        <div class="card-growth">
-                            <span>+8%</span>
-                            <span class="growth-icon">💰</span>
-                        </div>
-                    </div>
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    ${reportTitle}
                 </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">إجمالي الرواتب الأساسية</td>
+                            <td class="value">${totalBasic.toFixed(2)}</td>
+                            <td class="label">إجمالي البدلات</td>
+                            <td class="value">${totalAllowances.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">إجمالي الاستقطاعات</td>
+                            <td class="value" style="color: var(--accent-color);">${totalDeductions.toFixed(2)}</td>
+                            <td class="label">إجمالي صافي الرواتب</td>
+                            <td class="value" style="color: var(--success-color);">${totalNet.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
             `;
             
             document.getElementById('statementSummary').innerHTML = summaryHTML;
@@ -23770,6 +24241,7 @@ function clearSalaryForm() {
         
         // دالة كشف حساب البنك
         function generateBankStatement(fromDate, toDate) {
+            let summaryHTML = '';
             let bankTransactions = [];
             
             // إضافة المبيعات البنكية
@@ -23807,8 +24279,9 @@ function clearSalaryForm() {
             let totalDebits = 0;
             let totalCredits = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            
             let tableHTML = `
-                <h3>🏦 كشف حساب البنك</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -23845,7 +24318,30 @@ function clearSalaryForm() {
                 </table>
             `;
             
-            const summaryHTML = `
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    <h2>${activityName}</h2>
+                    <h3>🏦 كشف حساب البنك</h3>
+                </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">عدد المعاملات</td>
+                            <td class="value">${bankTransactions.length}</td>
+                            <td class="label">الرصيد النهائي</td>
+                            <td class="value" style="color: ${balance >= 0 ? 'var(--success-color)' : 'var(--accent-color)'};">${balance.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">إجمالي المدين</td>
+                            <td class="value" style="color: var(--accent-color);">${totalDebits.toFixed(2)}</td>
+                            <td class="label">إجمالي الدائن</td>
+                            <td class="value" style="color: var(--success-color);">${totalCredits.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            /*
+            const old_summaryHTML = `
                 <div class="dashboard-cards">
                     <div class="dashboard-card revenue">
                         <div class="card-value">${totalDebits.toFixed(2)}</div>
@@ -23882,12 +24378,14 @@ function clearSalaryForm() {
                 </div>
             `;
             
+            */
             document.getElementById('statementSummary').innerHTML = summaryHTML;
             document.getElementById('statementResults').innerHTML = tableHTML;
         }
         
         // دالة كشف حساب النقدية
         function generateCashStatement(fromDate, toDate) {
+            let summaryHTML = '';
             let cashTransactions = [];
             
             // إضافة المبيعات النقدية
@@ -23951,7 +24449,9 @@ function clearSalaryForm() {
             let totalDebits = 0;
             let totalCredits = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
             let tableHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;"><h2>${activityName}</h2></div>
                 <h3>💰 كشف حساب النقدية</h3>
                 <table class="account-statement-table">
                     <thead>
@@ -23989,7 +24489,30 @@ function clearSalaryForm() {
                 </table>
             `;
             
-            const summaryHTML = `
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    <h2>${activityName}</h2>
+                    <h3>💰 كشف حساب النقدية</h3>
+                </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">عدد المعاملات</td>
+                            <td class="value">${cashTransactions.length}</td>
+                            <td class="label">الرصيد النهائي</td>
+                            <td class="value" style="color: ${balance >= 0 ? 'var(--success-color)' : 'var(--accent-color)'};">${balance.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">إجمالي المدين</td>
+                            <td class="value" style="color: var(--accent-color);">${totalDebits.toFixed(2)}</td>
+                            <td class="label">إجمالي الدائن</td>
+                            <td class="value" style="color: var(--success-color);">${totalCredits.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            /*
+            const old_summaryHTML = `
                 <div class="dashboard-cards">
                     <div class="dashboard-card revenue">
                         <div class="card-value">${totalDebits.toFixed(2)}</div>
@@ -24026,12 +24549,14 @@ function clearSalaryForm() {
                 </div>
             `;
             
+            */
             document.getElementById('statementSummary').innerHTML = summaryHTML;
             document.getElementById('statementResults').innerHTML = tableHTML;
         }
         
         // دالة كشف حساب الضريبة
         function generateTaxStatement(fromDate, toDate) {
+            let summaryHTML = '';
             const taxFilter = document.getElementById('taxFilterType').value;
             const TAX_RATE = 0.15; // نسبة الضريبة 15%
             
@@ -24093,8 +24618,32 @@ function clearSalaryForm() {
             let totalPurchasesTax = 0;
             let cumulativeTaxBalance = 0;
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            
+            summaryHTML = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    <h2>${activityName}</h2>
+                    <h3>📊 كشف حساب الضريبة (15%)</h3>
+                </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">إجمالي ضريبة المبيعات</td>
+                            <td class="value" style="color: var(--success-color);">${totalSalesTax.toFixed(2)}</td>
+                            <td class="label">إجمالي ضريبة المشتريات</td>
+                            <td class="value" style="color: var(--accent-color);">${totalPurchasesTax.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">صافي الضريبة المستحقة</td>
+                            <td class="value" style="color: ${cumulativeTaxBalance >= 0 ? 'var(--success-color)' : 'var(--accent-color)'}; font-size: 1.3em;">${cumulativeTaxBalance.toFixed(2)}</td>
+                            <td class="label">الحالة</td>
+                            <td class="value">${cumulativeTaxBalance >= 0 ? 'مستحق للدفع' : 'رصيد دائن'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
             let tableHTML = `
-                <h3>📊 كشف حساب الضريبة (15%)</h3>
                 <table class="account-statement-table">
                     <thead>
                         <tr>
@@ -24152,6 +24701,7 @@ function clearSalaryForm() {
                 </table>
             `;
             
+            /*
             const summaryHTML = `
                 <div class="dashboard-cards">
                     <div class="dashboard-card sales-today">
@@ -24188,6 +24738,7 @@ function clearSalaryForm() {
                     </div>
                 </div>
             `;
+            */
             
             document.getElementById('statementSummary').innerHTML = summaryHTML;
             document.getElementById('statementResults').innerHTML = tableHTML;
@@ -24268,6 +24819,7 @@ function clearSalaryForm() {
                 return;
             }
             
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
             const printContent = `
                 <html>
                     <head>
@@ -24282,16 +24834,30 @@ function clearSalaryForm() {
                         </style>
                     </head>
                     <body>
+                        <div style="text-align:center; border-bottom:2px solid #eee; margin-bottom:20px; padding-bottom:10px;"><h1>${activityName}</h1></div>
                         ${statementSummary}
                         ${statementResults}
                     </body>
+                    <script>
+                        window.onload = function() {
+                            // Short delay to ensure styles are loaded
+                            setTimeout(function() {
+                                window.focus();
+                                window.print();
+                            }, 500);
+                        };
+
+                        // This event fires after the print dialog is closed (Print or Cancel)
+                        window.onafterprint = function() {
+                            window.close();
+                        };
+                    </script>
                 </html>
             `;
             
             const printWindow = window.open('', '_blank');
             printWindow.document.write(printContent);
             printWindow.document.close();
-            printWindow.print();
         }
 
 console.log('🔍 Reached line ~15100 in main script...');
@@ -24427,6 +24993,21 @@ function generateReport() {
 
     let data = [];
     let reportTitle = '';
+    
+    // تحديد عنوان التقرير بدقة
+    switch (reportType) {
+        case 'sales': reportTitle = 'تقرير المبيعات'; break;
+        case 'purchases': reportTitle = 'تقرير المشتريات'; break;
+        case 'sales_returns': reportTitle = 'تقرير مرتجعات المبيعات'; break;
+        case 'purchase_returns': reportTitle = 'تقرير مرتجعات المشتريات'; break;
+        case 'expenses': reportTitle = 'تقرير المصروفات'; break;
+        case 'revenues': reportTitle = 'تقرير الإيرادات'; break;
+        case 'salaries': reportTitle = 'تقرير مسيرات الرواتب'; break;
+        case 'profit_loss': reportTitle = 'تقرير الربح والخسارة'; break;
+        case 'balance_sheet': reportTitle = 'الميزانية العمومية'; break;
+        default: reportTitle = 'تقرير عام';
+    }
+
     let tableHeaders = '';
     let tableBody = '';
     let summary = {
@@ -24560,7 +25141,7 @@ function generateReport() {
         }
 
         case 'sales': {
-            reportTitle = 'تقرير المبيعات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>رقم الفاتورة</th><th>التاريخ</th><th>العميل</th><th>المجموع</th><th>الخصم</th><th>الإجمالي</th><th>المدفوع</th><th>طريقة الدفع</th><th>المتبقي</th>`;
             let src = Array.isArray(sales) ? sales : [];
             data = src.filter(s => (!fromDate || s.date >= fromDate) && (!toDate || s.date <= toDate));
@@ -24580,7 +25161,7 @@ function generateReport() {
             break;
         }
         case 'purchases': {
-            reportTitle = 'تقرير المشتريات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>رقم الفاتورة</th><th>التاريخ</th><th>المورد</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th>`;
             let src = Array.isArray(purchases) ? purchases : [];
             data = src.filter(p => (!fromDate || p.date >= fromDate) && (!toDate || p.date <= toDate));
@@ -24602,7 +25183,7 @@ function generateReport() {
             break;
         }
         case 'sales_returns': {
-            reportTitle = 'تقرير مرتجعات المبيعات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>رقم المرتجع</th><th>التاريخ</th><th>العميل</th><th>الفاتورة الأصلية</th><th>إجمالي المرتجع</th>`;
             let src = Array.isArray(salesReturns) ? salesReturns : [];
             data = src.filter(r => (!fromDate || r.date >= fromDate) && (!toDate || r.date <= toDate));
@@ -24622,7 +25203,7 @@ function generateReport() {
             break;
         }
         case 'purchase_returns': {
-            reportTitle = 'تقرير مرتجعات المشتريات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>رقم المرتجع</th><th>التاريخ</th><th>المورد</th><th>الفاتورة الأصلية</th><th>إجمالي المرتجع</th>`;
             let src = Array.isArray(purchaseReturns) ? purchaseReturns : [];
             data = src.filter(r => (!fromDate || r.date >= fromDate) && (!toDate || r.date <= toDate));
@@ -24642,7 +25223,7 @@ function generateReport() {
             break;
         }
         case 'expenses': {
-            reportTitle = 'تقرير المصروفات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>التاريخ</th><th>التصنيف</th><th>الوصف</th><th>المبلغ</th>`;
             const src = Array.isArray(expenses) ? expenses : [];
             data = src.filter(e => (!fromDate || e.date >= fromDate) && (!toDate || e.date <= toDate));
@@ -24660,7 +25241,7 @@ function generateReport() {
             break;
         }
         case 'revenues': {
-            reportTitle = 'تقرير الإيرادات';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>التاريخ</th><th>التصنيف</th><th>المصدر</th><th>المبلغ</th>`;
             const src = Array.isArray(revenues) ? revenues : [];
             data = src.filter(r => (!fromDate || r.date >= fromDate) && (!toDate || r.date <= toDate));
@@ -24676,7 +25257,7 @@ function generateReport() {
             break;
         }
         case 'salaries': {
-            reportTitle = 'تقرير الرواتب';
+            // reportTitle تم تعيينه مسبقاً
             tableHeaders = `<th>الموظف</th><th>الشهر</th><th>المسمى الوظيفي</th><th>الراتب الأساسي</th><th>البدلات</th><th>الإجمالي</th><th>استقطاع GOSI</th><th>مساهمة جهة العمل</th><th>استقطاعات أخرى</th><th>صافي الراتب</th>`;
             const src = Array.isArray(salaries) ? salaries : [];
             data = src.filter(salary => {
@@ -24700,7 +25281,7 @@ function generateReport() {
             break;
         }
         case 'profit_loss': {
-            reportTitle = 'تقرير الربح والخسارة';
+            // reportTitle تم تعيينه مسبقاً
 
             const filteredSales = (Array.isArray(sales) ? sales : [])
                 .filter(s => (!fromDate || s.date >= fromDate) && (!toDate || s.date <= toDate));
@@ -24718,11 +25299,30 @@ function generateReport() {
             // 🔥 التصحيح المحاسبي: صافي الربح من العمليات فقط (بدون رأس المال)
             const netProfitFromOperations = grossProfit + totalOtherRevenues - totalExpenses;
 
-            let summaryHtml = `<h3>ملخص ${reportTitle}</h3>
-                <p><strong>الفترة من:</strong> ${fromDate || 'البداية'} <strong>إلى:</strong> ${toDate || 'النهاية'}</p>
-                <p><strong>عدد فواتير المبيعات:</strong> ${filteredSales.length}</p>
-                <p><strong>عدد المصروفات:</strong> ${filteredExpenses.length}</p>
-                <p><strong>عدد الإيرادات الأخرى:</strong> ${filteredRevenues.length}</p>`;
+            const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+            let summaryHtml = `
+                <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+                    <h2>${activityName}</h2>
+                    <h3>${reportTitle}</h3>
+                </div>
+                <table class="report-summary-table">
+                    <tbody>
+                        <tr>
+                            <td class="label">الفترة</td>
+                            <td class="value" colspan="3">${fromDate || 'البداية'} إلى ${toDate || 'النهاية'}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">عدد فواتير المبيعات</td>
+                            <td class="value">${filteredSales.length}</td>
+                            <td class="label">عدد المصروفات</td>
+                            <td class="value">${filteredExpenses.length}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">عدد الإيرادات الأخرى</td>
+                            <td class="value" colspan="3">${filteredRevenues.length}</td>
+                        </tr>
+                    </tbody>
+                </table>`;
             document.getElementById('reportSummary').innerHTML = summaryHtml;
 
             let resultsHtml = `
@@ -24842,7 +25442,9 @@ function generateReport() {
         if (paymentStatus === 'paid' || paymentStatus === 'unpaid') {
             data = data.filter(inv => {
                 const total = Number(inv.total) || 0;
-                const paid = Number(inv.paidAmount) || 0;
+                // 🔥 استخدام دالة getTotalPaid لحساب المدفوع الفعلي
+                const type = reportType === 'sales' ? 'sale' : 'purchase';
+                const paid = getTotalPaid(inv.id, type);
                 const remaining = total - paid;
                 
                 if (paymentStatus === 'paid') {
@@ -24868,7 +25470,8 @@ if (data.length > 0) {
             const subtotal = Number(item.subtotal) || 0;
             const discount = Number(item.discount) || 0;
             const total = Number(item.total) || 0;
-            const paid  = Number(item.paidAmount) || 0;
+            // 🔥 استخدام دالة getTotalPaid لحساب المدفوع الفعلي
+            const paid = getTotalPaid(item.id, 'sale');
             const remaining = total - paid;
             
             // دالة لعرض طريقة الدفع في التقرير
@@ -24900,7 +25503,8 @@ if (data.length > 0) {
         } else if (reportType === 'purchases') {
             const supplier = (Array.isArray(suppliers) ? suppliers : []).find(s => s.id === item.supplierId);
             const total = Number(item.total) || 0;
-            const paid  = Number(item.paidAmount) || 0;
+            // 🔥 استخدام دالة getTotalPaid لحساب المدفوع الفعلي
+            const paid = getTotalPaid(item.id, 'purchase');
             const remaining = total - paid;
 
             tableBody += `<tr>
@@ -25007,32 +25611,75 @@ if (data.length > 0) {
     }
 
     const summaryDiv = document.getElementById('reportSummary');
-    let summaryHtml = `<h3>ملخص ${reportTitle}</h3>`;
+    const activityName = activities.find(a => a.id == currentActivityId)?.name || 'النشاط التجاري';
+    
+    let summaryHtml = `
+        <div style="text-align:center; margin-bottom:20px; color:#2c5aa0;">
+            <h2>${activityName}</h2>
+            <h3>${reportTitle}</h3>
+        </div>
+        <table class="report-summary-table">
+            <tbody>`;
+
     if (reportType === 'sales' || reportType === 'purchases') {
         summaryHtml += `
-            <p><strong>عدد الفواتير:</strong> ${summary.count}</p>
-            <p><strong>إجمالي المبالغ:</strong> ${summary.totalAmount.toFixed(2)}</p>
-            <p><strong>إجمالي المدفوع:</strong> ${summary.totalPaid.toFixed(2)}</p>
-            <p><strong>إجمالي المتبقي:</strong> ${summary.totalRemaining.toFixed(2)}</p>`;
+            <tr>
+                <td class="label">عدد الفواتير</td>
+                <td class="value">${summary.count}</td>
+                <td class="label">إجمالي المبالغ</td>
+                <td class="value">${summary.totalAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="label">إجمالي المدفوع</td>
+                <td class="value" style="color: var(--success-color);">${summary.totalPaid.toFixed(2)}</td>
+                <td class="label">إجمالي المتبقي</td>
+                <td class="value" style="color: ${summary.totalRemaining > 0 ? 'var(--accent-color)' : 'var(--success-color)'};">${summary.totalRemaining.toFixed(2)}</td>
+            </tr>`;
     } else if (reportType === 'sales_returns' || reportType === 'purchase_returns') {
         summaryHtml += `
-            <p><strong>عدد المرتجعات:</strong> ${summary.count}</p>
-            <p><strong>إجمالي قيمة المرتجعات:</strong> ${summary.totalAmount.toFixed(2)}</p>`;
+            <tr>
+                <td class="label">عدد المرتجعات</td>
+                <td class="value">${summary.count}</td>
+                <td class="label">إجمالي قيمة المرتجعات</td>
+                <td class="value">${summary.totalAmount.toFixed(2)}</td>
+            </tr>`;
     } else if (reportType === 'salaries') {
         summaryHtml += `
-            <p><strong>عدد المسيرات:</strong> ${summary.count}</p>
-            <p><strong>إجمالي الرواتب الأساسية:</strong> ${summary.totalBasic.toFixed(2)}</p>
-            <p><strong>إجمالي البدلات:</strong> ${summary.totalAllowances.toFixed(2)}</p>
-            <p><strong>إجمالي الرواتب:</strong> ${summary.totalGross.toFixed(2)}</p>
-            <p><strong>إجمالي استقطاعات GOSI للموظفين:</strong> ${summary.totalGosiEmployee.toFixed(2)}</p>
-            <p><strong>إجمالي مساهمات جهة العمل في GOSI:</strong> ${summary.totalGosiEmployer.toFixed(2)}</p>
-            <p><strong>إجمالي الاستقطاعات الأخرى:</strong> ${summary.totalOtherDeductions.toFixed(2)}</p>
-            <p><strong>إجمالي صافي الرواتب:</strong> ${summary.totalNet.toFixed(2)}</p>`;
+            <tr>
+                <td class="label">عدد المسيرات</td>
+                <td class="value">${summary.count}</td>
+                <td class="label">إجمالي الرواتب</td>
+                <td class="value">${summary.totalGross.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="label">الرواتب الأساسية</td>
+                <td class="value">${summary.totalBasic.toFixed(2)}</td>
+                <td class="label">البدلات</td>
+                <td class="value">${summary.totalAllowances.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="label">استقطاعات GOSI</td>
+                <td class="value">${summary.totalGosiEmployee.toFixed(2)}</td>
+                <td class="label">مساهمة الشركة</td>
+                <td class="value">${summary.totalGosiEmployer.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="label">استقطاعات أخرى</td>
+                <td class="value">${summary.totalOtherDeductions.toFixed(2)}</td>
+                <td class="label">صافي الرواتب</td>
+                <td class="value" style="color: var(--primary-color);">${summary.totalNet.toFixed(2)}</td>
+            </tr>`;
     } else {
         summaryHtml += `
-            <p><strong>عدد السجلات:</strong> ${summary.count}</p>
-            <p><strong>إجمالي المبالغ:</strong> ${summary.totalAmount.toFixed(2)}</p>`;
+            <tr>
+                <td class="label">عدد السجلات</td>
+                <td class="value">${summary.count}</td>
+                <td class="label">إجمالي المبالغ</td>
+                <td class="value">${summary.totalAmount.toFixed(2)}</td>
+            </tr>`;
     }
+    
+    summaryHtml += `</tbody></table>`;
     summaryDiv.innerHTML = summaryHtml;
 
     const resultsDiv = document.getElementById('reportResults');
@@ -25130,7 +25777,20 @@ if (data.length > 0) {
             }
             
             const reportType = document.getElementById('reportType').value;
-            const reportTitle = `تقرير ${document.querySelector(`#reportType option[value='${reportType}']`).textContent}`;
+            
+            let reportTitle = '';
+            switch (reportType) {
+                case 'sales': reportTitle = 'تقرير المبيعات'; break;
+                case 'purchases': reportTitle = 'تقرير المشتريات'; break;
+                case 'sales_returns': reportTitle = 'تقرير مرتجعات المبيعات'; break;
+                case 'purchase_returns': reportTitle = 'تقرير مرتجعات المشتريات'; break;
+                case 'expenses': reportTitle = 'تقرير المصروفات'; break;
+                case 'revenues': reportTitle = 'تقرير الإيرادات'; break;
+                case 'salaries': reportTitle = 'تقرير مسيرات الرواتب'; break;
+                case 'profit_loss': reportTitle = 'تقرير الربح والخسارة'; break;
+                case 'balance_sheet': reportTitle = 'الميزانية العمومية'; break;
+                default: reportTitle = 'تقرير عام';
+            }
 
             const newWindow = window.open('', '_blank');
             newWindow.document.write(`
@@ -25693,7 +26353,7 @@ async function clearActivityData() {
                     'salesReturns', 'purchaseReturns', 'expenses', 'revenues', 
                     'salaries', 'advances', 'assets', 'branches', 
                     'salePayments', 'purchasePayments', 'journalEntries', 'chartOfAccounts',
-                    'employees' // <--- تمت الإضافة
+                    'employees', 'bonds'
                 ];
                 
                 // 2. حذف من Firebase
@@ -31485,16 +32145,16 @@ function printPermission(permissionId) {
             
             <script` + `>
                 window.onload = function() {
-                    window.print();
-                    window.onafterprint = function() {
-                        window.close();
-                    };
-                    // محاولة إغلاق النافذة بعد الطباعة للمتصفحات التي لا تدعم onafterprint بشكل جيد
+                    // Short delay to ensure styles are loaded
                     setTimeout(function() {
-                        // التحقق مما إذا كانت النافذة لا تزال مفتوحة والطباعة قد انتهت (تقريبياً)
-                        // ملاحظة: window.print() تحجب التنفيذ في معظم المتصفحات، لذا هذا السطر يعمل بعد إغلاق حوار الطباعة
-                        window.close();
+                        window.focus();
+                        window.print();
                     }, 500);
+                };
+
+                // This event fires after the print dialog is closed (Print or Cancel)
+                window.onafterprint = function() {
+                    window.close();
                 };
             </script` + `>
         </body>
@@ -32728,10 +33388,19 @@ function printInventoryReport(adjustmentId) {
     </div>
     
     <script>
-        window.onload = function() { window.print(); };
-        window.onafterprint = function() { window.close(); };
-        setTimeout(function() { window.close(); }, 100);
-    <\/script>
+        window.onload = function() {
+            // Short delay to ensure styles are loaded
+            setTimeout(function() {
+                window.focus();
+                window.print();
+            }, 500);
+        };
+
+        // This event fires after the print dialog is closed (Print or Cancel)
+        window.onafterprint = function() {
+            window.close();
+        };
+    </script>
 </body>
 </html>`;
     
@@ -32811,20 +33480,39 @@ function applySalesFiltersManagement() {
                                    sale.paymentMethod === 'bank' ? '🏦 بنك' : 
                                    sale.paymentMethod === 'mixed' ? '🔀 مختلط' : '💵 نقدي';
         
+        // 💰 حساب المدفوع من نظام الدفعات
+        const totalPaidFromPayments = getTotalPaid(sale.id, 'sale');
+        const totalPaidDisplay = totalPaidFromPayments > 0 ? totalPaidFromPayments : (sale.paidAmount || 0);
+        const remaining = sale.total - totalPaidDisplay;
+        
+        // تحديد الكلاس بناءً على قيمة المتبقي
+        const remainingClass = remaining > 0.01 ? 'remaining-unpaid' : (remaining < -0.01 ? 'remaining-credit' : 'remaining-paid');
+        
+        // عدد الدفعات
+        const paymentsCount = salePayments.filter(p => p.invoiceId === sale.id).length;
+        const paymentsInfo = paymentsCount > 0 ? ` (${paymentsCount} دفعة)` : '';
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>SAL${sale.number.toString().padStart(3, '0')}</td>
             <td>${sale.date}</td>
             <td>${customer ? customer.name : 'غير معروف'}</td>
             <td>${sale.total.toFixed(2)}</td>
-            <td>${(sale.paidAmount || 0).toFixed(2)}</td>
-            <td class="${sale.remainingAmount > 0 ? 'remaining-unpaid' : 'remaining-paid'}">${(sale.remainingAmount || 0).toFixed(2)}</td>
+            <td>${totalPaidDisplay.toFixed(2)}${paymentsInfo}</td>
+            <td class="${remainingClass}">${remaining.toFixed(2)}</td>
             <td>${paymentMethodText}</td>
             <td>
-                <div class="action-buttons">
-                    <button class="btn-warning edit-btn" onclick="editSale(${sale.id})">✏️ تعديل</button>
-                    <button class="btn-info" onclick="printSale(${sale.id})">🖨️ طباعة</button>
-                    <button class="btn-danger" onclick="deleteSale(${sale.id})">حذف</button>
+                <div class="action-menu-container">
+                    <button class="action-menu-btn" onclick="event.stopPropagation(); toggleActionMenu(event, ${sale.id})">⋮</button>
+                    <div class="action-menu-content" id="menu-${sale.id}">
+                        ${remaining > 0.5 ? `<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showAddPaymentModal(${sale.id}, 'sale');">💰 إضافة دفعة</a>` : ''}
+                        ${paymentsCount > 0 ? `<a href="#" onclick="event.preventDefault(); event.stopPropagation(); showPaymentsHistory(${sale.id}, 'sale');">📜 سجل الدفعات</a>` : ''}
+                        <a href="#" onclick="event.preventDefault(); event.stopPropagation(); printSaleInvoice(${sale.id});">🖨️ طباعة</a>
+                        <a href="#" onclick="event.preventDefault(); event.stopPropagation(); sendWhatsAppInvoice(${sale.id});">💬 واتساب</a>
+                        <a href="#" onclick="event.preventDefault(); event.stopPropagation(); emailSaleInvoice(${sale.id});">📧 بريد إلكتروني</a>
+                        <a href="#" onclick="event.preventDefault(); event.stopPropagation(); editSale(${sale.id});">✏️ تعديل</a>
+                        <a href="#" onclick="event.preventDefault(); event.stopPropagation(); deleteSale(${sale.id});" style="color: #dc3545;">🗑️ حذف</a>
+                    </div>
                 </div>
             </td>
         `;
@@ -33066,24 +33754,8 @@ function checkBackupReminder() {
                 // التأكد من أن المستخدم مسجل دخول
                 const isLoggedIn = sessionStorage.getItem('isLoggedIn');
                 if (isLoggedIn === 'true') {
-                    showConfirmDialog(
-                        '💾 تذكير: النسخ الاحتياطي',
-                        'مرت 24 ساعة على آخر تذكير. هل تريد عمل نسخة احتياطية الآن؟\n\n• يمكنك الضغط على "نعم" للذهاب إلى صفحة النسخ الاحتياطي\n• أو "لاحقاً" للتذكير غداً',
-                        'info',
-                        'نعم، انتقل للنسخ الاحتياطي',
-                        'لاحقاً'
-                    ).then(confirmed => {
-                        // تحديث وقت آخر تذكير
-                        localStorage.setItem('lastBackupReminder', now.toString());
-                        
-                        if (confirmed) {
-                            // الانتقال لصفحة الإعدادات وفتح تبويبة النسخ الاحتياطي
-                            showSection('settings');
-                            setTimeout(() => {
-                                switchSettingsTab('backup');
-                            }, 500);
-                        }
-                    });
+                    // تم تعطيل التذكير التلقائي بالنسخ الاحتياطي
+                    console.log('ℹ️ تم تخطي التذكير بالنسخ الاحتياطي');
                 }
             }, 5000); // 5 ثوانٍ بعد تسجيل الدخول
         } else {
@@ -33370,7 +34042,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 <div class="form-grid grid-2" style="margin-top: 20px; gap: 10px;">
                     <button class="btn-success" onclick="saveFooterSettingsFromModal()">💾 حفظ التغييرات</button>
-                    <button class="btn-secondary" onclick="closeFooterSettingsModal()">❌ إلغاء</button>
+                    <button class="btn-secondary" onclick="closeFooterSettingsModal()"> إلغاء</button>
                 </div>
             </div>
         </div>
@@ -33752,7 +34424,7 @@ function saveAttendanceData() {
             
             <div class="form-grid grid-2" style="margin-top: 25px; gap: 10px;">
                 <button class="btn-success" onclick="saveOpeningBalance()" style="padding: 12px;">💾 حفظ آمن</button>
-                <button class="btn-secondary" onclick="document.getElementById('openingBalanceModal').style.display='none'" style="padding: 12px;">❌ إلغاء</button>
+                <button class="btn-secondary" onclick="document.getElementById('openingBalanceModal').style.display='none'" style="padding: 12px;"> إلغاء</button>
             </div>
         </div>
     </div>
@@ -33841,6 +34513,463 @@ function saveAttendanceData() {
             } catch (e) {
                 console.error('Error saving opening balances:', e);
                 alert('❌ حدث خطأ أثناء الحفظ');
+            }
+        }
+
+        // ==========================================
+        // 🏦 إدارة الخزائن والحسابات البنكية
+        // ==========================================
+
+        function showTreasuryTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('#treasury .tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#treasury .tab-btn').forEach(el => el.classList.remove('active'));
+
+            // إظهار التبويب المطلوب
+            if (tabName === 'accounts') {
+                document.getElementById('treasury-accounts-tab').style.display = 'block';
+                document.querySelector('button[onclick="showTreasuryTab(\'accounts\')"]').classList.add('active');
+                renderTreasuryAccounts();
+            } else if (tabName === 'transfer') {
+                document.getElementById('treasury-transfer-tab').style.display = 'block';
+                document.querySelector('button[onclick="showTreasuryTab(\'transfer\')"]').classList.add('active');
+                populateTreasuryDropdowns();
+            }
+        }
+
+        function renderTreasuryAccounts() {
+            const tbody = document.getElementById('treasuryAccountsTableBody');
+            tbody.innerHTML = '';
+
+            // جلب الأرصدة الافتتاحية من التخزين المعزول
+            const opening = JSON.parse(localStorage.getItem('activity_' + currentActivityId + '_opening_balances')) || { cash: 0, bank: 0 };
+
+            // تصفية الحسابات (111 للصناديق، 112 للبنوك)
+            const accounts = chartOfAccounts.filter(acc => 
+                acc.type === 'account' && (acc.code.startsWith('111') || acc.code.startsWith('112'))
+            );
+
+            accounts.forEach(acc => {
+                const typeLabel = acc.code.startsWith('111') ? '💰 صندوق نقدي' : '🏦 حساب بنكي';
+                let balance = acc.balance || 0;
+
+                // إضافة الرصيد الافتتاحي للحسابات الرئيسية
+                if (acc.code === '1111') {
+                    balance += (parseFloat(opening.cash) || 0);
+                } else if (acc.code === '1121') {
+                    balance += (parseFloat(opening.bank) || 0);
+                }
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${acc.code}</td>
+                    <td>${acc.name}</td>
+                    <td>${typeLabel}</td>
+                    <td style="font-weight: bold; color: ${balance >= 0 ? 'green' : 'red'}">${balance.toFixed(2)} ر.س</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openAddTreasuryAccountModal() {
+            document.getElementById('newAccountName').value = '';
+            document.getElementById('newAccountBalance').value = '';
+            document.getElementById('addTreasuryAccountModal').style.display = 'flex';
+        }
+
+        async function saveNewTreasuryAccount() {
+            const type = document.getElementById('newAccountType').value;
+            const name = document.getElementById('newAccountName').value;
+            const initialBalance = parseFloat(document.getElementById('newAccountBalance').value) || 0;
+
+            if (!name) {
+                showNotification('⚠️ تنبيه', 'يرجى إدخال اسم الحساب', 'warning');
+                return;
+            }
+
+            // تحديد الكود الجديد
+            const prefix = type === 'cash' ? '111' : '112';
+            const existingCodes = chartOfAccounts
+                .filter(acc => acc.code.startsWith(prefix) && acc.type === 'account')
+                .map(acc => parseInt(acc.code));
+            
+            let newCode;
+            if (existingCodes.length > 0) {
+                newCode = (Math.max(...existingCodes) + 1).toString();
+            } else {
+                newCode = prefix + '1';
+            }
+
+            // إنشاء الحساب الجديد
+            const newAccount = {
+                code: newCode,
+                name: name,
+                nameEn: name, // يمكن إضافة حقل للاسم الإنجليزي لاحقاً
+                type: 'account',
+                parent: prefix,
+                balance: 0, // الرصيد سيتم تحديثه عبر القيد الافتتاحي
+                debit: 0,
+                credit: 0,
+                category: 'asset'
+            };
+
+            chartOfAccounts.push(newAccount);
+            await saveToLocalStorage('chartOfAccounts', chartOfAccounts);
+
+            // إنشاء قيد افتتاحي إذا وجد رصيد
+            if (initialBalance > 0) {
+                const entryData = {
+                    date: new Date().toISOString().split('T')[0],
+                    description: `رصيد افتتاحي - ${name}`,
+                    entries: [
+                        { accountCode: newCode, accountName: name, debit: initialBalance, credit: 0 },
+                        { accountCode: '3111', accountName: 'رأس المال', debit: 0, credit: initialBalance } // افتراض حساب رأس المال
+                    ],
+                    total: initialBalance,
+                    notes: 'تم إنشاؤه تلقائياً عند إضافة الحساب'
+                };
+                await createJournalEntry(entryData);
+            }
+
+            showNotification('✅ تم الحفظ', 'تم إضافة الحساب بنجاح', 'success');
+            document.getElementById('addTreasuryAccountModal').style.display = 'none';
+            renderTreasuryAccounts();
+        }
+
+        function populateTreasuryDropdowns() {
+            // جلب الأرصدة الافتتاحية من التخزين المعزول
+            const opening = JSON.parse(localStorage.getItem('activity_' + currentActivityId + '_opening_balances')) || { cash: 0, bank: 0 };
+
+            const accounts = chartOfAccounts.filter(acc => 
+                acc.type === 'account' && (acc.code.startsWith('111') || acc.code.startsWith('112'))
+            );
+
+            const fromSelect = document.getElementById('transferFromAccount');
+            const toSelect = document.getElementById('transferToAccount');
+            
+            // حفظ القيمة المختارة حالياً
+            const currentFrom = fromSelect.value;
+            const currentTo = toSelect.value;
+
+            fromSelect.innerHTML = '<option value="">اختر الحساب...</option>';
+            toSelect.innerHTML = '<option value="">اختر الحساب...</option>';
+
+            accounts.forEach(acc => {
+                let balance = acc.balance || 0;
+                // إضافة الرصيد الافتتاحي للحسابات الرئيسية
+                if (acc.code === '1111') {
+                    balance += (parseFloat(opening.cash) || 0);
+                } else if (acc.code === '1121') {
+                    balance += (parseFloat(opening.bank) || 0);
+                }
+
+                const option = `<option value="${acc.code}" data-balance="${balance}">${acc.name} (رصيد: ${balance.toFixed(2)})</option>`;
+                fromSelect.innerHTML += option;
+                toSelect.innerHTML += option;
+            });
+
+            // استعادة القيمة المختارة
+            fromSelect.value = currentFrom;
+            toSelect.value = currentTo;
+
+            // تحديث عرض الرصيد عند التغيير
+            fromSelect.onchange = function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const balance = selectedOption.getAttribute('data-balance');
+                const balanceDisplay = document.getElementById('transferFromBalance');
+                if (balance) {
+                    balanceDisplay.textContent = `الرصيد الحالي: ${parseFloat(balance).toFixed(2)} ر.س`;
+                } else {
+                    balanceDisplay.textContent = '';
+                }
+            };
+        }
+
+        async function processInternalTransfer() {
+            const fromCode = document.getElementById('transferFromAccount').value;
+            const toCode = document.getElementById('transferToAccount').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const date = document.getElementById('transferDate').value;
+            const notes = document.getElementById('transferNotes').value;
+
+            if (!fromCode || !toCode || !amount || !date) {
+                showNotification('⚠️ خطأ', 'يرجى تعبئة جميع الحقول المطلوبة', 'error');
+                return;
+            }
+
+            if (fromCode === toCode) {
+                showNotification('⚠️ خطأ', 'لا يمكن التحويل لنفس الحساب', 'error');
+                return;
+            }
+
+            // التحقق من الرصيد
+            const fromAccount = chartOfAccounts.find(a => a.code === fromCode);
+            const toAccount = chartOfAccounts.find(a => a.code === toCode);
+
+            if (!fromAccount || !toAccount) {
+                showNotification('⚠️ خطأ', 'بيانات الحسابات غير صحيحة', 'error');
+                return;
+            }
+
+            // حساب الرصيد الفعلي (شاملاً الرصيد الافتتاحي)
+            let effectiveBalance = fromAccount.balance || 0;
+            const opening = JSON.parse(localStorage.getItem('activity_' + currentActivityId + '_opening_balances')) || { cash: 0, bank: 0 };
+            
+            if (fromAccount.code === '1111') {
+                effectiveBalance += (parseFloat(opening.cash) || 0);
+            } else if (fromAccount.code === '1121') {
+                effectiveBalance += (parseFloat(opening.bank) || 0);
+            }
+
+            if (effectiveBalance < amount) {
+                showNotification('⚠️ خطأ', 'رصيد الحساب المحول منه غير كافٍ', 'error');
+                return;
+            }
+
+            // إنشاء القيد المحاسبي
+            const entryData = {
+                date: date,
+                description: `تحويل داخلي من ${fromAccount.name} إلى ${toAccount.name}`,
+                entries: [
+                    { accountCode: toCode, accountName: toAccount.name, debit: amount, credit: 0 }, // المستلم مدين (زاد)
+                    { accountCode: fromCode, accountName: fromAccount.name, debit: 0, credit: amount }  // المرسل دائن (نقص)
+                ],
+                total: amount,
+                notes: notes
+            };
+
+            const result = await createJournalEntry(entryData);
+            
+            if (result !== null) { // createJournalEntry returns null on error
+                showNotification('✅ تم التحويل', 'تم تنفيذ التحويل الداخلي بنجاح', 'success');
+                
+                // تصفية النموذج
+                document.getElementById('transferAmount').value = '';
+                document.getElementById('transferNotes').value = '';
+                
+                // تحديث القوائم
+                populateTreasuryDropdowns();
+            }
+        }
+
+        // ==========================================
+        // 🔄 Stock Transfer Functions
+        // ==========================================
+
+        function openStockTransferModal() {
+            const modal = document.getElementById('stockTransferModal');
+            if (!modal) return;
+            
+            // Reset form
+            document.getElementById('transferDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transferNotes').value = '';
+            document.getElementById('transferItemsList').innerHTML = '';
+            
+            // Populate Warehouses
+            const sourceSelect = document.getElementById('sourceWarehouse');
+            const destSelect = document.getElementById('destWarehouse');
+            
+            sourceSelect.innerHTML = '<option value="">اختر المستودع</option>';
+            destSelect.innerHTML = '<option value="">اختر المستودع</option>';
+            
+            const warehouseList = (typeof warehouses !== 'undefined' && warehouses.length > 0) ? warehouses : (typeof branches !== 'undefined' ? branches : []);
+            
+            warehouseList.forEach(w => {
+                const option = `<option value="${w.id}">${w.name}</option>`;
+                sourceSelect.innerHTML += option;
+                destSelect.innerHTML += option;
+            });
+            
+            // Add one empty row
+            addTransferItemRow();
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeStockTransferModal() {
+            const modal = document.getElementById('stockTransferModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function addTransferItemRow() {
+            const tbody = document.getElementById('transferItemsList');
+            const rowId = Date.now();
+            const tr = document.createElement('tr');
+            tr.id = `transfer-row-${rowId}`;
+            
+            let itemsOptions = '<option value="">اختر الصنف</option>';
+            items.forEach(item => {
+                itemsOptions += `<option value="${item.id}">${item.name} (${item.code})</option>`;
+            });
+            
+            tr.innerHTML = `
+                <td style="padding: 8px; border-bottom: 1px solid #eee;">
+                    <select class="transfer-item-select" onchange="updateRowStock(this)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        ${itemsOptions}
+                    </select>
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">
+                    <input type="text" class="transfer-item-stock" readonly value="-" style="width: 80px; text-align: center; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">
+                    <input type="number" class="transfer-item-qty" min="1" placeholder="0" style="width: 80px; text-align: center; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">
+                    <button type="button" onclick="removeTransferItemRow('${rowId}')" style="background: #ff4d4d; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">🗑️</button>
+                </td>
+            `;
+            
+            tbody.appendChild(tr);
+        }
+
+        function removeTransferItemRow(rowId) {
+            const row = document.getElementById(`transfer-row-${rowId}`);
+            if (row) row.remove();
+        }
+
+        function updateRowStock(selectElement) {
+            const row = selectElement.closest('tr');
+            const stockInput = row.querySelector('.transfer-item-stock');
+            const itemId = selectElement.value;
+            const sourceWarehouseId = document.getElementById('sourceWarehouse').value;
+            
+            if (!itemId || !sourceWarehouseId) {
+                stockInput.value = '-';
+                return;
+            }
+            
+            const stock = calculateWarehouseStock(itemId, sourceWarehouseId);
+            stockInput.value = stock;
+        }
+
+        function updateTransferItemsStock() {
+            const selects = document.querySelectorAll('.transfer-item-select');
+            selects.forEach(select => updateRowStock(select));
+        }
+
+        function calculateWarehouseStock(itemId, warehouseId) {
+            // Calculate stock based on permissions
+            let stock = 0;
+            
+            // Filter permissions for this warehouse and item
+            permissions.forEach(perm => {
+                if (perm.warehouseId == warehouseId) {
+                    const itemEntry = perm.items.find(i => i.id == itemId);
+                    if (itemEntry) {
+                        if (perm.type === 'in') {
+                            stock += parseFloat(itemEntry.quantity) || 0;
+                        } else if (perm.type === 'out') {
+                            stock -= parseFloat(itemEntry.quantity) || 0;
+                        }
+                    }
+                }
+            });
+            
+            return stock;
+        }
+
+        async function saveStockTransfer() {
+            const date = document.getElementById('transferDate').value;
+            const sourceId = document.getElementById('sourceWarehouse').value;
+            const destId = document.getElementById('destWarehouse').value;
+            const notes = document.getElementById('transferNotes').value;
+            
+            // Validation
+            if (!date || !sourceId || !destId) {
+                showNotification('⚠️ خطأ', 'يرجى تعبئة جميع الحقول المطلوبة', 'warning');
+                return;
+            }
+            
+            if (sourceId === destId) {
+                showNotification('⚠️ خطأ', 'لا يمكن التحويل لنفس المستودع', 'warning');
+                return;
+            }
+            
+            const transferItems = [];
+            const rows = document.querySelectorAll('#transferItemsList tr');
+            let hasErrors = false;
+            
+            rows.forEach(row => {
+                const itemId = row.querySelector('.transfer-item-select').value;
+                const qty = parseFloat(row.querySelector('.transfer-item-qty').value);
+                const currentStock = parseFloat(row.querySelector('.transfer-item-stock').value);
+                
+                if (itemId && qty > 0) {
+                    if (qty > currentStock) {
+                        showNotification('⚠️ خطأ', 'الكمية المراد تحويلها أكبر من الرصيد المتاح للصنف', 'error');
+                        row.querySelector('.transfer-item-qty').style.borderColor = 'red';
+                        hasErrors = true;
+                    } else {
+                        const itemObj = items.find(i => i.id == itemId);
+                        transferItems.push({
+                            id: itemId,
+                            code: itemObj ? itemObj.code : '',
+                            name: itemObj ? itemObj.name : '',
+                            quantity: qty
+                        });
+                    }
+                }
+            });
+            
+            if (hasErrors) return;
+            
+            if (transferItems.length === 0) {
+                showNotification('⚠️ خطأ', 'يرجى إضافة صنف واحد على الأقل للتحويل', 'warning');
+                return;
+            }
+            
+            showLoading('جاري حفظ التحويل...');
+            
+            try {
+                const transferId = Date.now();
+                const transferNumber = permissions.length + 1; // Simple numbering
+                
+                // 1. Create OUT Permission (Source)
+                const outPermission = {
+                    id: transferId,
+                    number: transferNumber,
+                    date: date,
+                    type: 'out',
+                    source: 'transfer_out',
+                    sourceRef: `TRF-${transferId}`,
+                    warehouseId: sourceId,
+                    partyId: null,
+                    partyName: `تحويل إلى: ${document.getElementById('destWarehouse').options[document.getElementById('destWarehouse').selectedIndex].text}`,
+                    items: transferItems,
+                    notes: notes
+                };
+                
+                // 2. Create IN Permission (Destination)
+                const inPermission = {
+                    id: transferId + 1,
+                    number: transferNumber + 1,
+                    date: date,
+                    type: 'in',
+                    source: 'transfer_in',
+                    sourceRef: `TRF-${transferId}`,
+                    warehouseId: destId,
+                    partyId: null,
+                    partyName: `تحويل من: ${document.getElementById('sourceWarehouse').options[document.getElementById('sourceWarehouse').selectedIndex].text}`,
+                    items: transferItems,
+                    notes: notes
+                };
+                
+                permissions.push(outPermission);
+                permissions.push(inPermission);
+                
+                await saveToLocalStorage('permissions', permissions);
+                
+                hideLoading();
+                showNotification('✅ نجاح', 'تم حفظ التحويل المخزني بنجاح', 'success');
+                closeStockTransferModal();
+                
+                // Refresh UI if needed (e.g. if we are viewing permissions)
+                if (typeof renderPermissions === 'function') renderPermissions();
+                
+            } catch (error) {
+                hideLoading();
+                console.error(error);
+                showNotification('❌ خطأ', 'حدث خطأ أثناء حفظ التحويل', 'error');
             }
         }
     </script>
