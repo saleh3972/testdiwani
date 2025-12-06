@@ -2144,10 +2144,10 @@
             }
         }
     .sidebar-toggle { display: none; position: fixed; top: 20px; right: 20px; background: var(--primary-color); color: white; border: none; border-radius: 5px; padding: 10px 15px; cursor: pointer; z-index: 102; }
-        @media (max-width: 768px) { .sidebar-toggle { display: block; } 
-
-
-    }
+        @media (max-width: 768px) { 
+            .sidebar-toggle { display: block; } 
+            .header { padding-right: 130px !important; }
+        }
 @media (max-width: 640px) {
     .section {
         overflow-x: visible;
@@ -4276,6 +4276,73 @@ textarea.editing-mode {
         body.dark-mode .btn-warehouse-edit:hover {
             background: rgba(159, 168, 218, 0.1);
         }
+
+        /* Journal Summary Bar */
+        .journal-summary-bar {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        body.dark-mode .journal-summary-bar {
+            background: var(--dark-bg-secondary);
+            border-color: var(--dark-border);
+        }
+        
+        body.dark-mode .journal-summary-bar strong {
+            color: var(--dark-text);
+        }
+
+        body.dark-mode #totalDebit {
+            color: #ef5350 !important;
+        }
+
+        body.dark-mode #totalCredit {
+            color: #66bb6a !important;
+        }
+
+        body.dark-mode #balanceDiff {
+            color: var(--dark-text) !important;
+        }
+
+        /* Tree View Dark Mode Fixes */
+        body.dark-mode .tree-view-container,
+        body.dark-mode #chartOfAccountsTreeContainer {
+            background: var(--dark-bg-secondary) !important;
+            border-color: var(--dark-border) !important;
+            color: var(--dark-text);
+        }
+
+        body.dark-mode .tree-view-container h4,
+        body.dark-mode #chartOfAccountsTreeContainer h3 {
+            color: var(--dark-text) !important;
+            border-bottom-color: var(--dark-border) !important;
+        }
+
+        /* Action Buttons Dark Mode Fixes */
+        body.dark-mode .btn-icon {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--dark-border);
+            color: var(--dark-text);
+        }
+
+        body.dark-mode .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Table Empty State Dark Mode */
+        body.dark-mode #chartOfAccountsTableContainer > div,
+        body.dark-mode .table-view-container .no-data {
+            background: var(--dark-bg-secondary) !important;
+            color: var(--dark-text-secondary) !important;
+        }
+
+        body.dark-mode #chartOfAccountsTreeWrapper h3 {
+            color: var(--dark-text) !important;
+            border-bottom-color: var(--dark-border) !important;
+        }
         
         body.dark-mode .trash-content,
         body.dark-mode .modal-content {
@@ -4817,39 +4884,39 @@ textarea.editing-mode {
         }
 
         .activity-display-area {
-            text-align: center;
-            padding: 30px 0;
+            text-align: right;
+            padding: 10px 0;
+            margin-bottom: 15px;
         }
 
         .activity-icon-large {
-            font-size: 4em;
-            margin-bottom: 15px;
-            opacity: 0.8;
+            display: none;
         }
 
         select.activity-name-display {
-            font-size: 1.8em;
-            font-weight: bold;
+            font-size: 1.1em;
+            font-weight: 600;
             color: #2c3e50;
-            border: none;
-            background: transparent;
-            text-align: center;
+            border: 1px solid #dce0e4;
+            background: #ffffff;
+            text-align: right;
             width: 100%;
             outline: none;
             cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding: 5px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
         body.dark-mode select.activity-name-display {
             color: var(--dark-text);
+            background: var(--dark-input-bg);
+            border-color: var(--dark-border);
         }
         
-        select.activity-name-display:hover {
-            background: #f8f9fa;
-            border-radius: 8px;
+        select.activity-name-display:hover, select.activity-name-display:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
         }
         
         body.dark-mode select.activity-name-display:hover {
@@ -8965,7 +9032,8 @@ textarea.editing-mode {
                     <div class="activity-display-area">
                         <div class="activity-icon-large">🏢</div>
                         <!-- Combined Dropdown and Title Display -->
-                        <select id="activitiesDropdown" onchange="handleActivitySelection()" class="activity-name-display" style="text-align-last: center; -moz-text-align-last: center;">
+                        <label for="activitiesDropdown" style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">اختر النشاط:</label>
+                        <select id="activitiesDropdown" onchange="handleActivitySelection()" class="activity-name-display">
                             <option value="">اختر نشاطًا...</option>
                         </select>
                         <!-- Hidden input to prevent JS errors if referenced -->
@@ -9191,7 +9259,7 @@ textarea.editing-mode {
             <button type="button" class="btn-secondary" onclick="addJournalRow()" style="margin-top: 10px;"> إضافة حركة</button>
         </div>
         
-        <div style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px;">
+        <div class="journal-summary-bar">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
                 <div>
                     <strong>إجمالي المدين:</strong>
@@ -9271,7 +9339,7 @@ textarea.editing-mode {
     <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; margin-top: 20px;">
         
         <!-- Right Side (Tree) -->
-        <div class="settings-card" style="min-height: 500px; max-height: 800px; overflow-y: auto; padding: 15px;">
+        <div class="settings-card" id="chartOfAccountsTreeWrapper" style="min-height: 500px; max-height: 800px; overflow-y: auto; padding: 15px;">
             <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1em; color: #333;">🌳 الهيكل الشجري</h3>
             <div id="chartOfAccountsTreeContainer">
                 <!-- Tree goes here -->
@@ -9363,7 +9431,7 @@ textarea.editing-mode {
             <div class="search-box" style="flex: 1; margin-left: 20px;">
                 <input type="text" id="searchCostCenters" placeholder="🔍 بحث في مراكز التكلفة..." onkeyup="renderCostCentersTable()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
             </div>
-            <button class="btn-primary" onclick="openCostCenterModal()">➕ إضافة مركز تكلفة</button>
+            <button class="btn-primary" onclick="openCostCenterModal()"> إضافة مركز تكلفة</button>
         </div>
 
         <div class="cost-centers-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
@@ -14971,9 +15039,13 @@ loadSavedEmailSettings();
          * إنشاء قيد تلقائي لفاتورة مبيعات
          */
         async function createSaleJournalEntry(sale) {
-            const total = sale.total || 0;
-            const paidAmount = sale.paidAmount || 0;
-            const remainingAmount = total - paidAmount;
+            const total = Number(sale.total) || 0;
+            const tax = Number(sale.tax) || 0;
+            const netTotal = Number((total - tax).toFixed(2));
+            const paidAmount = Number(sale.paidAmount) || 0;
+            // استخدام toFixed(2) لتجنب مشاكل الفواصل العائمة
+            const remainingAmount = Number((total - paidAmount).toFixed(2));
+            
             const customer = customers.find(c => c.id === sale.customerId);
             const customerName = customer ? customer.name : 'عميل';
             
@@ -15007,15 +15079,33 @@ loadSavedEmailSettings();
                     debit: remainingAmount,
                     credit: 0
                 });
+            } else if (remainingAmount < 0) {
+                 // حالة الدفع الزائد (يتم تسجيله كدائن للعميل - دفعة مقدمة)
+                 entries.push({
+                    accountCode: '1131',
+                    accountName: 'العملاء (عام)',
+                    debit: 0,
+                    credit: Math.abs(remainingAmount)
+                });
             }
             
-            // إلى حـ/ المبيعات (إجمالي الفاتورة بالكامل)
+            // إلى حـ/ المبيعات (صافي الفاتورة بدون ضريبة)
             entries.push({
                 accountCode: '4111',
                 accountName: 'المبيعات',
                 debit: 0,
-                credit: total
+                credit: netTotal
             });
+
+            // إلى حـ/ ضرائب مستحقة (قيمة الضريبة)
+            if (tax > 0) {
+                entries.push({
+                    accountCode: '2122',
+                    accountName: 'ضرائب مستحقة',
+                    debit: 0,
+                    credit: tax
+                });
+            }
             
             return await createJournalEntry({
                 date: sale.date,
@@ -15032,21 +15122,35 @@ loadSavedEmailSettings();
          * إنشاء قيد تلقائي لفاتورة مشتريات
          */
         async function createPurchaseJournalEntry(purchase) {
-            const total = purchase.total || 0;
-            const paidAmount = purchase.paidAmount || 0;
-            const remainingAmount = total - paidAmount;
+            const total = Number(purchase.total) || 0;
+            const tax = Number(purchase.tax) || 0;
+            const netTotal = Number((total - tax).toFixed(2));
+            const paidAmount = Number(purchase.paidAmount) || 0;
+            // استخدام toFixed(2) لتجنب مشاكل الفواصل العائمة ثم تحويلها لرقم
+            const remainingAmount = Number((total - paidAmount).toFixed(2));
+            
             const supplier = suppliers.find(s => s.id === purchase.supplierId);
             const supplierName = supplier ? supplier.name : 'مورد';
             
             const entries = [];
             
-            // من حـ/ المشتريات (إجمالي الفاتورة بالكامل)
+            // من حـ/ المشتريات (صافي الفاتورة بدون ضريبة)
             entries.push({
                 accountCode: '5211',
                 accountName: 'المشتريات',
-                debit: total,
+                debit: netTotal,
                 credit: 0
             });
+
+            // من حـ/ ضرائب مستحقة (قيمة الضريبة)
+            if (tax > 0) {
+                entries.push({
+                    accountCode: '2122',
+                    accountName: 'ضرائب مستحقة',
+                    debit: tax,
+                    credit: 0
+                });
+            }
             
             // إلى حـ/ الصندوق/البنك (المبلغ المدفوع)
             if (paidAmount > 0) {
@@ -15074,6 +15178,14 @@ loadSavedEmailSettings();
                     accountName: 'الموردين (عام)',
                     debit: 0,
                     credit: remainingAmount
+                });
+            } else if (remainingAmount < 0) {
+                // حالة الدفع الزائد (يتم تسجيله كمدين للمورد)
+                entries.push({
+                    accountCode: '2111',
+                    accountName: 'الموردين (عام)',
+                    debit: Math.abs(remainingAmount),
+                    credit: 0
                 });
             }
             
@@ -17937,6 +18049,7 @@ console.log('🔍 Reached line ~10000 in main script...');
                 deleteBtn.style.display = isManager ? 'none' : 'flex';
             }
 
+            // تحديث الواجهة فوراً
             handleActivitySelection();
         }
 
@@ -17951,10 +18064,19 @@ console.log('🔍 Reached line ~10000 in main script...');
             if (!dropdown) return;
 
             const selectedId = dropdown.value;
-            const activity = activities.find(a => String(a.id) === selectedId);
+            let activity = activities.find(a => String(a.id) === selectedId);
+
+            // Fallback: If activity not found in array but selected in dropdown
+            if (!activity && selectedId) {
+                const option = dropdown.options[dropdown.selectedIndex];
+                if (option) {
+                    activity = { id: selectedId, name: option.text };
+                }
+            }
 
             if (!activity) {
-                if (infoBox) infoBox.style.display = 'none';
+                // لا نخفي مربع المعلومات لأنه يحتوي على القائمة المنسدلة
+                // if (infoBox) infoBox.style.display = 'none';
                 if (actionsBox) actionsBox.style.display = 'none';
                 if (nameInput) nameInput.value = '';
                 if (editBtn) editBtn.disabled = true;
@@ -20406,6 +20528,23 @@ function loadCustomersToSelect() {
 
             purchases[purchaseIndex] = updatedPurchase;
             
+            // 🔄 تحديث القيد المحاسبي عند تعديل فاتورة المشتريات
+            try {
+                // 1. البحث عن القيد القديم وحذفه
+                const existingEntry = journalEntries.find(e => e.reference == editingPurchaseId && e.referenceType === 'purchase');
+                if (existingEntry) {
+                    console.log('🗑️ حذف القيد القديم لفاتورة المشتريات المعدلة:', existingEntry.id);
+                    await deleteJournalEntry(existingEntry.id);
+                }
+
+                // 2. إنشاء قيد جديد بالبيانات المحدثة
+                console.log('📝 إنشاء قيد جديد لفاتورة المشتريات المعدلة...');
+                await createPurchaseJournalEntry(updatedPurchase);
+            } catch (error) {
+                console.error('❌ خطأ في تحديث القيد المحاسبي للمشتريات:', error);
+                showNotification('⚠️ تنبيه', 'تم تحديث الفاتورة ولكن حدث خطأ في تحديث القيد المحاسبي', 'warning');
+            }
+
             showNotification('✅ تم التحديث', `تم تحديث الفاتورة رقم PUR${originalPurchase.number.toString().padStart(3, '0')} بنجاح!`, 'success');
         }
     } else {
@@ -20575,7 +20714,11 @@ function loadCustomersToSelect() {
 
         // حساب المدفوع الكلي (من الفاتورة + الدفعات الجديدة)
         const totalPaid = getTotalPaid(purchase.id, 'purchase');
-        const remaining = purchase.total - totalPaid;
+        let remaining = purchase.total - totalPaid;
+
+        // تصحيح مشكلة الصفر السالب والفروقات البسيطة
+        if (Math.abs(remaining) < 0.005) remaining = 0;
+
         const remainingClass = remaining > 0.01 ? 'remaining-unpaid' : (remaining < -0.01 ? 'remaining-credit' : 'remaining-paid');
         const remainingText = remaining.toFixed(2);
         
@@ -21439,6 +21582,24 @@ function loadCustomersToSelect() {
                     };
                     
                     sales[saleIndex] = updatedSale;
+
+                    // 🔄 تحديث القيد المحاسبي عند تعديل الفاتورة
+                    try {
+                        // 1. البحث عن القيد القديم وحذفه
+                        // ملاحظة: نستخدم == للمقارنة لأن reference قد يكون نصاً أو رقماً
+                        const existingEntry = journalEntries.find(e => e.reference == editingSaleId && e.referenceType === 'sale');
+                        if (existingEntry) {
+                            console.log('🗑️ حذف القيد القديم للفاتورة المعدلة:', existingEntry.id);
+                            await deleteJournalEntry(existingEntry.id);
+                        }
+
+                        // 2. إنشاء قيد جديد بالبيانات المحدثة
+                        console.log('📝 إنشاء قيد جديد للفاتورة المعدلة...');
+                        await createSaleJournalEntry(updatedSale);
+                    } catch (error) {
+                        console.error('❌ خطأ في تحديث القيد المحاسبي:', error);
+                        showNotification('⚠️ تنبيه', 'تم تحديث الفاتورة ولكن حدث خطأ في تحديث القيد المحاسبي', 'warning');
+                    }
                     
                     showNotification('✅ تم التحديث', `تم تحديث الفاتورة رقم SAL${originalSale.number.toString().padStart(3, '0')} بنجاح!`, 'success');
                 }
@@ -23974,6 +24135,18 @@ function populateTransactionCostCenters(selectId) {
                 expenses[index] = { ...expenses[index], date, category, amount, description: document.getElementById('expenseDescription').value, paymentMethod: document.getElementById('expensePaymentMethod').value, reference: document.getElementById('expenseReference').value };
                 const success = saveToLocalStorage('expenses', expenses);
                 if (success) {
+                    
+                    // 🔄 تحديث القيد المحاسبي للمصروف
+                    try {
+                        const existingEntry = journalEntries.find(e => e.reference == id && e.referenceType === 'expense');
+                        if (existingEntry) {
+                            await deleteJournalEntry(existingEntry.id);
+                        }
+                        await createExpenseJournalEntry(expenses[index]);
+                    } catch (error) {
+                        console.error('❌ خطأ في تحديث قيد المصروف:', error);
+                    }
+
                     clearExpenseForm();
                     renderExpenses();
                     updateExpenseStats();
@@ -25744,6 +25917,18 @@ async function approvePayroll() {
 
             const success = saveToLocalStorage('salaries', salaries);
             if (success) {
+                
+                // 🔄 تحديث القيد المحاسبي للراتب
+                try {
+                    const existingEntry = journalEntries.find(e => e.reference == id && e.referenceType === 'salary');
+                    if (existingEntry) {
+                        await deleteJournalEntry(existingEntry.id);
+                    }
+                    await createSalaryJournalEntry(salaries[index]);
+                } catch (error) {
+                    console.error('❌ خطأ في تحديث قيد الراتب:', error);
+                }
+
                 showNotification('✅ تم التحديث', 'تم تحديث مسير الرواتب بنجاح', 'success');
                 clearSalaryForm(true, true); // تفريغ الحقول تلقائياً بعد التحديث
                 renderSalaries();
@@ -29869,7 +30054,16 @@ function updateAllCharts() {
                 console.error(`❌ Firebase خطأ في جلب ${dataType} للنشاط ${activityId}:`, error);
                 console.error(`❌ تفاصيل الخطأ:`, error.message, error.code);
                 console.error(`❌ سيتم المحاولة من LocalStorage بدلاً من ذلك`);
-                return null;
+                
+                // Fallback to LocalStorage
+                if (typeof loadFromLocalStorage === 'function') {
+                    const localData = loadFromLocalStorage(dataType);
+                    if (localData) {
+                        console.log(`✅ تم استرجاع ${localData.length} عنصر من LocalStorage لـ ${dataType}`);
+                        return localData;
+                    }
+                }
+                return [];
             }
         }
 
@@ -29913,6 +30107,14 @@ function updateAllCharts() {
             } catch (error) {
                 console.error(`❌ Firebase: خطأ في حفظ ${dataType}:`, error);
                 console.error(`❌ Firebase: تفاصيل الخطأ:`, error.message, error.code);
+                
+                // Fallback to LocalStorage
+                if (typeof saveToLocalStorage === 'function') {
+                    console.log(`⚠️ حفظ في LocalStorage بدلاً من Firebase لـ ${dataType}`);
+                    saveToLocalStorage(dataType, data);
+                    return true; // نعتبر العملية ناجحة لأنها حفظت محلياً
+                }
+                
                 return false;
             }
         }
@@ -34249,24 +34451,40 @@ function updateSaleReturnTotalNew() {
 }
 
 async function createSaleReturnJournalEntry(returnDoc) {
-    // Debit: 4112 (Sales Returns), Credit: 1131 (Customers)
+    const total = Number(returnDoc.total) || 0;
+    const tax = Number(returnDoc.tax) || 0;
+    const netTotal = Number(returnDoc.subtotal) || (total - tax);
+
     const customer = customers.find(c => c.id === returnDoc.customerId);
     const customerName = customer ? customer.name : 'عميل غير معروف';
     
-    const entries = [
-        {
-            accountCode: '4112', // Sales Returns
-            accountName: 'مردودات المبيعات',
-            debit: returnDoc.total,
+    const entries = [];
+
+    // من حـ/ مردودات المبيعات (صافي)
+    entries.push({
+        accountCode: '4112',
+        accountName: 'مردودات المبيعات',
+        debit: netTotal,
+        credit: 0
+    });
+
+    // من حـ/ ضرائب مستحقة (عكس الضريبة - مدين)
+    if (tax > 0) {
+        entries.push({
+            accountCode: '2122',
+            accountName: 'ضرائب مستحقة',
+            debit: tax,
             credit: 0
-        },
-        {
-            accountCode: '1131', // Customers
-            accountName: 'العملاء',
-            debit: 0,
-            credit: returnDoc.total
-        }
-    ];
+        });
+    }
+
+    // إلى حـ/ العملاء (الإجمالي)
+    entries.push({
+        accountCode: '1131',
+        accountName: 'العملاء',
+        debit: 0,
+        credit: total
+    });
 
     const journalEntryData = {
         date: returnDoc.date,
@@ -34274,7 +34492,7 @@ async function createSaleReturnJournalEntry(returnDoc) {
         reference: `SR-${returnDoc.number}`,
         referenceType: 'sales_return',
         entries: entries,
-        total: returnDoc.total,
+        total: total,
         createdBy: window.currentUser?.name || 'النظام',
         notes: `عن فاتورة رقم SAL-${returnDoc.originalInvoiceNumber}`
     };
@@ -34284,24 +34502,40 @@ async function createSaleReturnJournalEntry(returnDoc) {
 }
 
 async function createPurchaseReturnJournalEntry(returnDoc) {
-    // Debit: 2111 (Suppliers), Credit: 5212 (Purchase Returns)
+    const total = Number(returnDoc.total) || 0;
+    const tax = Number(returnDoc.tax) || 0;
+    const netTotal = Number(returnDoc.subtotal) || (total - tax);
+
     const supplier = suppliers.find(s => s.id === returnDoc.supplierId);
     const supplierName = supplier ? supplier.name : 'مورد غير معروف';
     
-    const entries = [
-        {
-            accountCode: '2111', // Suppliers
-            accountName: 'الموردين',
-            debit: returnDoc.total,
-            credit: 0
-        },
-        {
-            accountCode: '5212', // Purchase Returns
-            accountName: 'مردودات المشتريات',
+    const entries = [];
+
+    // من حـ/ الموردين (الإجمالي)
+    entries.push({
+        accountCode: '2111',
+        accountName: 'الموردين',
+        debit: total,
+        credit: 0
+    });
+
+    // إلى حـ/ مردودات المشتريات (صافي)
+    entries.push({
+        accountCode: '5212',
+        accountName: 'مردودات المشتريات',
+        debit: 0,
+        credit: netTotal
+    });
+
+    // إلى حـ/ ضرائب مستحقة (عكس الضريبة - دائن)
+    if (tax > 0) {
+        entries.push({
+            accountCode: '2122',
+            accountName: 'ضرائب مستحقة',
             debit: 0,
-            credit: returnDoc.total
-        }
-    ];
+            credit: tax
+        });
+    }
 
     const journalEntryData = {
         date: returnDoc.date,
@@ -34309,7 +34543,7 @@ async function createPurchaseReturnJournalEntry(returnDoc) {
         reference: `PR-${returnDoc.number}`,
         referenceType: 'purchase_return',
         entries: entries,
-        total: returnDoc.total,
+        total: total,
         createdBy: window.currentUser?.name || 'النظام',
         notes: `عن فاتورة رقم PUR-${returnDoc.originalInvoiceNumber}`
     };
@@ -34358,6 +34592,11 @@ async function saveSaleReturnNew() {
         }
     });
 
+    // حساب الضريبة للمرتجع إذا كانت الفاتورة الأصلية خاضعة للضريبة
+    const taxRate = activeSaleReturn.taxApplied ? 0.15 : 0;
+    const returnTax = totalReturnValue * taxRate;
+    const returnTotal = totalReturnValue + returnTax;
+
     const newReturn = {
         id: Date.now(),
         number: currentSaleReturnNumber,
@@ -34367,15 +34606,17 @@ async function saveSaleReturnNew() {
         customerId: activeSaleReturn.customerId,
         branchId: activeSaleReturn.branchId || null,
         items: returnedItems,
-        total: totalReturnValue
+        subtotal: totalReturnValue,
+        tax: returnTax,
+        total: returnTotal
     };
 
     const originalSaleIndex = sales.findIndex(s => s.id === activeSaleReturn.id);
     if (originalSaleIndex > -1) {
         const originalSale = sales[originalSaleIndex];
-        originalSale.total = roundCurrency((originalSale.total || 0) - totalReturnValue);
-        originalSale.remainingAmount = roundCurrency((originalSale.remainingAmount || 0) - totalReturnValue);
-        originalSale.notes = (originalSale.notes || '') + ` [مرتجع بقيمة: ${totalReturnValue.toFixed(2)}]`;
+        originalSale.total = roundCurrency((originalSale.total || 0) - returnTotal);
+        originalSale.remainingAmount = roundCurrency((originalSale.remainingAmount || 0) - returnTotal);
+        originalSale.notes = (originalSale.notes || '') + ` [مرتجع بقيمة: ${returnTotal.toFixed(2)}]`;
     }
 
     salesReturns.push(newReturn);
@@ -36465,6 +36706,10 @@ async function savePurchaseReturnNew() {
         }
     });
 
+    // حساب الضريبة للمرتجع (المشتريات دائماً عليها ضريبة في هذا النظام)
+    const returnTax = totalReturnValue * 0.15;
+    const returnTotal = totalReturnValue + returnTax;
+
     const newReturn = {
         id: Date.now(),
         number: currentPurchaseReturnNumber,
@@ -36474,15 +36719,17 @@ async function savePurchaseReturnNew() {
         supplierId: activePurchaseReturn.supplierId,
         branchId: activePurchaseReturn.branchId || null,
         items: returnedItems,
-        total: totalReturnValue
+        subtotal: totalReturnValue,
+        tax: returnTax,
+        total: returnTotal
     };
 
     const originalPurchaseIndex = purchases.findIndex(p => p.id === activePurchaseReturn.id);
     if (originalPurchaseIndex > -1) {
         const originalPurchase = purchases[originalPurchaseIndex];
-        originalPurchase.total = roundCurrency((originalPurchase.total || 0) - totalReturnValue);
-        originalPurchase.remainingAmount = roundCurrency((originalPurchase.remainingAmount || 0) - totalReturnValue);
-        originalPurchase.notes = (originalPurchase.notes || '') + ` [مرتجع بقيمة: ${totalReturnValue.toFixed(2)}]`;
+        originalPurchase.total = roundCurrency((originalPurchase.total || 0) - returnTotal);
+        originalPurchase.remainingAmount = roundCurrency((originalPurchase.remainingAmount || 0) - returnTotal);
+        originalPurchase.notes = (originalPurchase.notes || '') + ` [مرتجع بقيمة: ${returnTotal.toFixed(2)}]`;
     }
 
     purchaseReturns.push(newReturn);
